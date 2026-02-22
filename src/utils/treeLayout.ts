@@ -266,6 +266,7 @@ export function layoutTree(tree: TreePerson): { nodes: LNode[]; conns: Conn[] } 
         const trunkLen = d === 0 ? 120 : 60;
         const mid = (px + ptx) / 2;
         const ty2 = y + NODE_R + trunkLen;
+        // Trunk from couple midpoint (both are parents)
         conns.push({ x1: mid, y1: y + NODE_R + 4, x2: mid, y2: ty2, type: 'trunk', seed: hsh(p.id + 't'), depth: d });
 
         const tw = kids.reduce((s, c, i) => s + subW(c) + (i > 0 ? 40 : 0), 0);
@@ -273,8 +274,11 @@ export function layoutTree(tree: TreePerson): { nodes: LNode[]; conns: Conn[] } 
         kids.forEach(ch => {
           const cw = subW(ch);
           const cc = cl + cw / 2;
+          // If child has a partner, branch targets the child node (cc - 40), not the couple center
+          const hasPartner = ch.partners && ch.partners.length > 0 && ch.partners[0].person;
+          const branchTarget = hasPartner ? cc - 40 : cc;
           const genH = d === 0 ? GEN_H + 60 : GEN_H;
-          conns.push({ x1: mid, y1: ty2, x2: cc, y2: y + genH - NODE_R - 4, type: 'branch', seed: hsh(ch.id), depth: d + 1 });
+          conns.push({ x1: mid, y1: ty2, x2: branchTarget, y2: y + genH - NODE_R - 4, type: 'branch', seed: hsh(ch.id), depth: d + 1 });
           place(ch, cc, y + genH, d + 1);
           cl += cw + 40;
         });
@@ -294,8 +298,10 @@ export function layoutTree(tree: TreePerson): { nodes: LNode[]; conns: Conn[] } 
         kids.forEach(ch => {
           const cw = subW(ch);
           const cc = cl + cw / 2;
+          const hasPartner = ch.partners && ch.partners.length > 0 && ch.partners[0].person;
+          const branchTarget = hasPartner ? cc - 40 : cc;
           const genH = d === 0 ? GEN_H + 60 : GEN_H;
-          conns.push({ x1: cx, y1: ty2, x2: cc, y2: y + genH - NODE_R - 4, type: 'branch', seed: hsh(ch.id), depth: d + 1 });
+          conns.push({ x1: cx, y1: ty2, x2: branchTarget, y2: y + genH - NODE_R - 4, type: 'branch', seed: hsh(ch.id), depth: d + 1 });
           place(ch, cc, y + genH, d + 1);
           cl += cw + 40;
         });

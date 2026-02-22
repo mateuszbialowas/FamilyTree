@@ -85,87 +85,134 @@ export function genTrunk(x: number, y1: number, y2: number, bw: number, seed: nu
     return { cx: ctr[idx].x + side * ctr[idx].w * 0.35, cy: ctr[idx].y, rx: 2.5 + r() * 4.5, ry: 1.5 + r() * 3, col: pick(P.moss, r), op: 0.15 + r() * 0.2 };
   });
 
-  const roots: { path: string; barkLines: { d: string; w: number; op: number }[] }[] = [];
-  if (rootDir) {
-    const yDir = rootDir === 'up' ? -1 : 1;
-    const baseY = rootDir === 'up' ? y1 : y2;
-    for (let i = 0; i < 8; i++) {
-      const side = i < 4 ? -1 : 1;
-      const spread = 0.15 + (i % 4) * 0.2;
-      const sx = x + side * (bw * spread + r() * bw * 0.1);
-      const sy = baseY + yDir * (-3 + r() * 6);
-      const ex = sx + side * (30 + r() * 35);
-      const ey = sy + yDir * (15 + r() * 22);
-      const thick = 7 + r() * 7;
-      const rootSeed = seed + 3000 + i * 17;
-      roots.push(genRoot(sx, sy, ex, ey, thick, side, rootSeed));
-      // sub-roots
-      if (r() > 0.3) {
-        const subAng = (r() - 0.3) * 0.5;
-        const subLen = 10 + r() * 18;
-        const mainAng = Math.atan2(ey - sy, ex - sx);
-        const sex = ex + Math.cos(mainAng + subAng * side) * subLen * side;
-        const sey = ey + yDir * Math.abs(Math.sin(mainAng + subAng)) * subLen * 0.7;
-        roots.push(genRoot(ex, ey, sex, sey, thick * 0.35, side, rootSeed + 99));
-      }
-    }
-  }
-
   const midW = ctr[Math.floor(sg / 2)].w;
-  return { path, furrows, cracks, highlights, knots, moss, roots, midW };
+  return { path, furrows, cracks, highlights, knots, moss, rootDir, midW };
 }
 
 // ======================== ROOT GENERATION ========================
-function genRoot(sx: number, sy: number, ex: number, ey: number, thick: number, side: number, seed: number) {
-  const r = sr(seed), sg = 12;
-  const dx = ex - sx, dy = ey - sy;
-  const len = Math.sqrt(dx * dx + dy * dy);
-  const ang = Math.atan2(dy, dx), pA = ang + Math.PI / 2;
+// Generate organic root paths that grow directly from the trunk base.
+// Each root is a filled shape that starts wide at the trunk and tapers to a thin tip,
+// with natural curvature and sub-roots branching off.
+export function genRoots(
+  x: number, baseY: number, bw: number, seed: number, dir: 'up' | 'down',
+) {
+  const r = sr(seed + 777);
+  const flip = dir === 'up' ? -1 : 1;
+  const roots: string[] = [];
 
-  const pts: { x: number; y: number; w: number }[] = [];
-  for (let i = 0; i <= sg; i++) {
-    const t = i / sg;
-    const cx = lerp(sx, ex, t), cy = lerp(sy, ey, t);
-    const droop = Math.sin(t * Math.PI) * len * 0.06;
-    const wobble = Math.sin(t * Math.PI * 2.7 + r() * 4) * 2 * (r() - 0.3);
-    const baseBulge = t < 0.15 ? 1 + (1 - t / 0.15) * 0.6 : 1;
-    const taper = Math.pow(1 - t, 0.6);
-    const w = thick * taper * baseBulge + (r() - 0.5) * 1.5;
-    pts.push({ x: cx + wobble + (r() - 0.5) * 1, y: cy + droop, w: Math.max(1, w) });
-  }
+  // Main roots: 6-8 thick roots fanning out
+  const mainCount = 6 + Math.floor(r() * 3);
+  for (let i = 0; i < mainCount; i++) {
+    const t = i / (mainCount - 1); // 0..1
+    const angle = (t - 0.5) * Math.PI * 0.8; // fan: -72° to +72°
 
-  const lPts = pts.map(p => ({ x: p.x - Math.cos(pA) * p.w / 2, y: p.y - Math.sin(pA) * p.w / 2 }));
-  const rPts = pts.map(p => ({ x: p.x + Math.cos(pA) * p.w / 2, y: p.y + Math.sin(pA) * p.w / 2 }));
+    // Start inside the trunk base (overlapping)
+    const startX = x + (t - 0.5) * bw * 0.8;
+    const startY = baseY - flip * 5; // start slightly inside trunk
 
-  let path = `M ${lPts[0].x} ${lPts[0].y}`;
-  for (let i = 1; i < lPts.length; i++) {
-    const mx = (lPts[i - 1].x + lPts[i].x) / 2, my = (lPts[i - 1].y + lPts[i].y) / 2;
-    path += ` Q ${lPts[i - 1].x} ${lPts[i - 1].y} ${mx} ${my}`;
-  }
-  path += ` L ${lPts[sg].x} ${lPts[sg].y}`;
-  for (let i = rPts.length - 1; i >= 0; i--) {
-    if (i === rPts.length - 1) path += ` L ${rPts[i].x} ${rPts[i].y}`;
-    else {
-      const mx = (rPts[i + 1].x + rPts[i].x) / 2, my = (rPts[i + 1].y + rPts[i].y) / 2;
-      path += ` Q ${rPts[i + 1].x} ${rPts[i + 1].y} ${mx} ${my}`;
+    // Main root extends 50-120px
+    const reach = 50 + r() * 70;
+    const endX = startX + Math.sin(angle) * reach;
+    const endY = baseY + flip * Math.abs(Math.cos(angle)) * reach * 0.6 + flip * reach * 0.4;
+
+    // Thickness: thick at trunk, thin at tip
+    const startW = 6 + r() * 6 + (1 - Math.abs(t - 0.5) * 2) * 4; // center roots thicker
+    const endW = 0.5 + r() * 1;
+
+    // Two control points for S-curve
+    const cp1X = lerp(startX, endX, 0.3) + (r() - 0.5) * 15;
+    const cp1Y = lerp(startY, endY, 0.25) + flip * r() * 8;
+    const cp2X = lerp(startX, endX, 0.65) + (r() - 0.5) * 12;
+    const cp2Y = lerp(startY, endY, 0.7) + flip * r() * 6;
+
+    // Build filled shape using cubic beziers for both edges
+    const segments = 12;
+    const leftPts: { x: number; y: number }[] = [];
+    const rightPts: { x: number; y: number }[] = [];
+
+    for (let j = 0; j <= segments; j++) {
+      const s = j / segments;
+      // Cubic bezier interpolation
+      const s1 = (1 - s), s2 = s1 * s1, s3 = s2 * s1;
+      const t1 = s, t2 = t1 * t1, t3 = t2 * t1;
+      const bx = s3 * startX + 3 * s2 * t1 * cp1X + 3 * s1 * t2 * cp2X + t3 * endX;
+      const by = s3 * startY + 3 * s2 * t1 * cp1Y + 3 * s1 * t2 * cp2Y + t3 * endY;
+      const w = lerp(startW, endW, s * s); // quadratic taper
+
+      // Perpendicular direction at this point
+      const ds = 0.01;
+      const s_n = Math.min(s + ds, 1), s1n = 1 - s_n, s2n = s1n * s1n, s3n = s2n * s1n;
+      const t1n = s_n, t2n = t1n * t1n, t3n = t2n * t1n;
+      const nx = s3n * startX + 3 * s2n * t1n * cp1X + 3 * s1n * t2n * cp2X + t3n * endX;
+      const ny = s3n * startY + 3 * s2n * t1n * cp1Y + 3 * s1n * t2n * cp2Y + t3n * endY;
+      const dx = nx - bx, dy = ny - by;
+      const len = Math.sqrt(dx * dx + dy * dy) || 1;
+      const px = -dy / len, py = dx / len;
+
+      // Add wobble for organic feel
+      const wobble = Math.sin(s * Math.PI * 3 + r() * 4) * 0.8;
+
+      leftPts.push({ x: bx - px * (w / 2 + wobble), y: by - py * (w / 2 + wobble) });
+      rightPts.push({ x: bx + px * (w / 2 + wobble), y: by + py * (w / 2 + wobble) });
+    }
+
+    // Build path: left edge forward, right edge backward
+    let d = `M ${leftPts[0].x} ${leftPts[0].y}`;
+    for (let j = 1; j < leftPts.length; j++) {
+      d += ` L ${leftPts[j].x} ${leftPts[j].y}`;
+    }
+    d += ` L ${rightPts[rightPts.length - 1].x} ${rightPts[rightPts.length - 1].y}`;
+    for (let j = rightPts.length - 2; j >= 0; j--) {
+      d += ` L ${rightPts[j].x} ${rightPts[j].y}`;
+    }
+    d += ' Z';
+    roots.push(d);
+
+    // Sub-roots: 1-2 smaller branches off each main root
+    const subCount = 1 + Math.floor(r() * 2);
+    for (let si = 0; si < subCount; si++) {
+      const branchT = 0.3 + r() * 0.5; // branch off at 30-80% along main root
+      const bs = branchT;
+      const bs1 = 1 - bs, bs2 = bs1 * bs1, bs3 = bs2 * bs1;
+      const bt1 = bs, bt2 = bt1 * bt1, bt3 = bt2 * bt1;
+      const brX = bs3 * startX + 3 * bs2 * bt1 * cp1X + 3 * bs1 * bt2 * cp2X + bt3 * endX;
+      const brY = bs3 * startY + 3 * bs2 * bt1 * cp1Y + 3 * bs1 * bt2 * cp2Y + bt3 * endY;
+
+      const subAngle = angle + (r() - 0.5) * 1.2;
+      const subReach = 15 + r() * 30;
+      const subEndX = brX + Math.sin(subAngle) * subReach;
+      const subEndY = brY + flip * Math.abs(Math.cos(subAngle)) * subReach * 0.5 + flip * subReach * 0.3;
+      const subStartW = lerp(startW, endW, branchT * branchT) * 0.6;
+      const subEndW = 0.3 + r() * 0.5;
+
+      const subCpX = lerp(brX, subEndX, 0.5) + (r() - 0.5) * 8;
+      const subCpY = lerp(brY, subEndY, 0.5) + flip * r() * 5;
+
+      // Simplified sub-root shape
+      const subSegs = 6;
+      const sLeftPts: { x: number; y: number }[] = [];
+      const sRightPts: { x: number; y: number }[] = [];
+      for (let j = 0; j <= subSegs; j++) {
+        const ss = j / subSegs;
+        const sx = (1 - ss) * (1 - ss) * brX + 2 * (1 - ss) * ss * subCpX + ss * ss * subEndX;
+        const sy = (1 - ss) * (1 - ss) * brY + 2 * (1 - ss) * ss * subCpY + ss * ss * subEndY;
+        const sw = lerp(subStartW, subEndW, ss * ss);
+        const sdx = ss < 0.99 ? (2 * (1 - ss) * (subCpX - brX) + 2 * ss * (subEndX - subCpX)) : 1;
+        const sdy = ss < 0.99 ? (2 * (1 - ss) * (subCpY - brY) + 2 * ss * (subEndY - subCpY)) : 0;
+        const slen = Math.sqrt(sdx * sdx + sdy * sdy) || 1;
+        const spx = -sdy / slen, spy = sdx / slen;
+        sLeftPts.push({ x: sx - spx * sw / 2, y: sy - spy * sw / 2 });
+        sRightPts.push({ x: sx + spx * sw / 2, y: sy + spy * sw / 2 });
+      }
+      let sd = `M ${sLeftPts[0].x} ${sLeftPts[0].y}`;
+      for (let j = 1; j < sLeftPts.length; j++) sd += ` L ${sLeftPts[j].x} ${sLeftPts[j].y}`;
+      sd += ` L ${sRightPts[sRightPts.length - 1].x} ${sRightPts[sRightPts.length - 1].y}`;
+      for (let j = sRightPts.length - 2; j >= 0; j--) sd += ` L ${sRightPts[j].x} ${sRightPts[j].y}`;
+      sd += ' Z';
+      roots.push(sd);
     }
   }
-  path += ' Z';
-
-  const barkLines: { d: string; w: number; op: number }[] = [];
-  for (let i = 0; i < 5; i++) {
-    const t1 = r() * 0.3, t2 = t1 + 0.15 + r() * 0.45;
-    const offRatio = (r() - 0.5) * 0.5;
-    let d = '';
-    for (let j = 0; j <= 4; j++) {
-      const t = lerp(t1, t2, j / 4), idx = Math.min(Math.floor(t * sg), sg);
-      const px = pts[idx].x + offRatio * pts[idx].w + (r() - 0.5) * 0.6;
-      d += j === 0 ? `M ${px} ${pts[idx].y}` : ` L ${px} ${pts[idx].y}`;
-    }
-    barkLines.push({ d, w: 0.2 + r() * 0.5, op: 0.08 + r() * 0.12 });
-  }
-
-  return { path, barkLines };
+  return roots;
 }
 
 // ======================== BRANCH GENERATION ========================

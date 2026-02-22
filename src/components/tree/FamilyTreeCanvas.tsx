@@ -15,7 +15,7 @@ import type { FamilyState } from '../../types';
 import { buildTree, buildAncestorTree, layoutTree, flipLayoutY, getTreePersonIds, NODE_R } from '../../utils/treeLayout';
 import type { TreeMode } from '../../utils/treeLayout';
 import { P, mkPath, mkPara } from './constants';
-import { genTrunk, genBranch, genCanopy, leafPath, leafVeinPath, placeAnimals } from './geometry';
+import { genTrunk, genBranch, genCanopy, leafPath, leafVeinPath, placeAnimals, genRoots } from './geometry';
 import { OwlComponent, BirdComponent, SquirrelComponent } from './animals';
 
 // ======================== PROPS ========================
@@ -83,10 +83,10 @@ export function FamilyTreeCanvas({ state, rootId, mode, onNodePress, onNodeLongP
         cracks: raw.cracks.map(cr => ({ ...cr, path: mkPath(cr.d) })),
         highlights: raw.highlights.map(h => ({ ...h, path: mkPath(h.d) })),
         knots: raw.knots, moss: raw.moss,
-        roots: raw.roots.map(r => ({
-          path: mkPath(r.path),
-          barkLines: r.barkLines.map(bl => ({ ...bl, path: mkPath(bl.d) })),
-        })),
+        rootDir: raw.rootDir,
+        roots: raw.rootDir
+          ? genRoots(c.x1, raw.rootDir === 'up' ? topY : botY, 48, c.seed, raw.rootDir).map(d => mkPath(d))
+          : [],
         topLeaves: genCanopy(c.x1, topY + 10, 28, 18, 30, c.seed + 7000),
       };
     });
@@ -105,11 +105,17 @@ export function FamilyTreeCanvas({ state, rootId, mode, onNodePress, onNodeLongP
 
     const couples = layout.conns.filter(c => c.type === 'couple');
     const animals = placeAnimals(layout.conns);
-    const labels = layout.nodes.map(n => ({
-      id: n.id,
-      name: mkPara(n.name.split(' ')[0], 10, P.ink, 80, true),
-      born: mkPara(n.born ? `ur. ${n.born}` : '', 8, P.inkFade, 80),
-    }));
+    const labels = layout.nodes.map(n => {
+      const parts = n.name.split(' ');
+      const first = parts[0] || '';
+      const last = parts.slice(1).join(' ') || '';
+      return {
+        id: n.id,
+        name: mkPara(first, 10, P.ink, 80, true),
+        surname: mkPara(last, 9, P.ink, 80),
+        born: mkPara(n.born ? `ur. ${n.born}` : '', 8, P.inkFade, 80),
+      };
+    });
     return { trunks, branches, couples, animals, labels };
   }, [layout, mode]);
 
@@ -254,16 +260,18 @@ export function FamilyTreeCanvas({ state, rootId, mode, onNodePress, onNodeLongP
                   </Group>
                 ))}
                 {t.moss.map((m, mi) => <Oval key={mi} x={m.cx - m.rx} y={m.cy - m.ry} width={m.rx * 2} height={m.ry * 2} color={m.col} opacity={m.op} />)}
-                {t.roots.map((r, ri) => (
-                  <Group key={`r${ri}`}>
-                    <Group transform={[{ translateX: 1.5 }, { translateY: 2 }]}>
-                      <Path path={r.path} color="rgba(15,8,0,0.08)" />
+                {/* Roots: organic paths growing from trunk base */}
+                {t.roots.map((rp, ri) => (
+                  <Group key={`root${ri}`}>
+                    <Group transform={[{ translateX: 2 }, { translateY: 3 }]}>
+                      <Path path={rp} color="rgba(15,8,0,0.1)" />
                     </Group>
-                    <Path path={r.path} style="fill" color={P.bark.dark} />
-                    <Path path={r.path} style="fill" opacity={0.25}>
-                      <LinearGradient start={vec(0, 0)} end={vec(0, 30)} colors={[P.bark.mid, P.bark.shadow]} />
+                    <Path path={rp} style="fill">
+                      <LinearGradient start={vec(t.x1 - 15, t.y1)} end={vec(t.x1 + 15, t.y1)} colors={[P.bark.light, P.bark.mid, P.bark.dark, P.bark.mid, P.bark.light]} />
                     </Path>
-                    {r.barkLines.map((bl, bi) => <Path key={bi} path={bl.path} style="stroke" color={P.bark.deep} strokeWidth={bl.w} opacity={bl.op} strokeCap="round" />)}
+                    <Path path={rp} style="fill" opacity={0.15}>
+                      <LinearGradient start={vec(t.x1, t.y1)} end={vec(t.x1, t.y2)} colors={[P.bark.highlight, 'transparent', P.bark.shadow]} />
+                    </Path>
                   </Group>
                 ))}
                 <Group transform={leafSway[i % 3]} origin={vec(t.x1, t.y2 - 10)}>
@@ -340,11 +348,12 @@ export function FamilyTreeCanvas({ state, rootId, mode, onNodePress, onNodeLongP
                   <Circle cx={n.x} cy={n.y} r={NODE_R} color={P.cream} />
                   <Circle cx={n.x} cy={n.y} r={NODE_R} color={isRoot ? P.hl.ring : P.sepia} style="stroke" strokeWidth={isRoot ? 2.5 : 1.5} />
                   <Circle cx={n.x} cy={n.y} r={NODE_R - 3} color={P.parchDk} style="stroke" strokeWidth={0.4} opacity={0.4} />
-                  <RoundedRect x={n.x - 40} y={n.y + NODE_R + 3} width={80} height={32} r={5} color={P.cream} />
-                  <RoundedRect x={n.x - 40} y={n.y + NODE_R + 3} width={80} height={32} r={5} color={P.parchEdge} style="stroke" strokeWidth={0.6} />
+                  <RoundedRect x={n.x - 40} y={n.y + NODE_R + 3} width={80} height={44} r={5} color={P.cream} />
+                  <RoundedRect x={n.x - 40} y={n.y + NODE_R + 3} width={80} height={44} r={5} color={P.parchEdge} style="stroke" strokeWidth={0.6} />
                   {lb && <>
-                    <Paragraph paragraph={lb.name} x={n.x - 40} y={n.y + NODE_R + 6} width={80} />
-                    <Paragraph paragraph={lb.born} x={n.x - 40} y={n.y + NODE_R + 19} width={80} />
+                    <Paragraph paragraph={lb.name} x={n.x - 40} y={n.y + NODE_R + 5} width={80} />
+                    <Paragraph paragraph={lb.surname} x={n.x - 40} y={n.y + NODE_R + 18} width={80} />
+                    <Paragraph paragraph={lb.born} x={n.x - 40} y={n.y + NODE_R + 30} width={80} />
                   </>}
                 </Group>
               );
