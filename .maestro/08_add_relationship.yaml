@@ -1,0 +1,73 @@
+appId: com.mateuszbialowas.FamilyTree
+name: Add parent-child relationship between two people
+---
+- launchApp:
+    clearState: true
+- extendedWaitUntil:
+    visible: "Lista, tab.*"
+    timeout: 10000
+
+- tapOn: "Lista, tab.*"
+
+# --- Add parent: Jan Kowalski ---
+- tapOn:
+    id: "fab-add-person"
+- tapOn:
+    id: "input-first-name"
+- inputText: "Jan"
+- tapOn:
+    id: "input-last-name"
+- inputText: "Kowalski"
+- hideKeyboard
+- scrollUntilVisible:
+    element:
+      id: "btn-save-person"
+    direction: DOWN
+- tapOn:
+    id: "btn-save-person"
+
+# --- Add child: Piotr Kowalski ---
+- tapOn:
+    id: "fab-add-person"
+- tapOn:
+    id: "input-first-name"
+- inputText: "Piotr"
+- tapOn:
+    id: "input-last-name"
+- inputText: "Kowalski"
+- hideKeyboard
+- scrollUntilVisible:
+    element:
+      id: "btn-save-person"
+    direction: DOWN
+- tapOn:
+    id: "btn-save-person"
+
+# Go to Jan's detail
+- tapOn: "Jan Kowalski"
+
+# Add relationship
+- scrollUntilVisible:
+    element:
+      id: "btn-add-relationship"
+    direction: DOWN
+- tapOn:
+    id: "btn-add-relationship"
+
+# "Jan jest rodzicem" should be selected by default
+- assertVisible: ".*jest rodzicem"
+
+# Select Piotr from list
+- tapOn: "Piotr Kowalski"
+
+# Save relationship
+- scrollUntilVisible:
+    element:
+      id: "btn-save-relationship"
+    direction: DOWN
+- tapOn:
+    id: "btn-save-relationship"
+
+# Back on Jan's detail - should show Piotr as child
+- assertVisible: "Dzieci"
+- assertVisible: "Piotr Kowalski"

@@ -1,0 +1,23 @@
+appId: com.mateuszbialowas.FamilyTree
+name: Navigate between all tabs
+---
+- launchApp
+- extendedWaitUntil:
+    visible: "Drzewo, tab.*"
+    timeout: 10000
+
+# Start on Tree tab (default)
+- assertVisible: "Drzewo"
+
+# Go to List
+- tapOn: "Lista, tab.*"
+- assertVisible: "Lista osób"
+
+# Go to Settings
+- tapOn: "Ustawienia, tab.*"
+- assertVisible: "Importuj dane (JSON)"
+- assertVisible: "Eksportuj dane (JSON)"
+- assertVisible: "Wyczyść wszystkie dane"
+
+# Back to Tree
+- tapOn: "Drzewo, tab.*"

@@ -1,0 +1,42 @@
+appId: com.mateuszbialowas.FamilyTree
+name: Clear all data from settings
+---
+- launchApp:
+    clearState: true
+- extendedWaitUntil:
+    visible: "Lista, tab.*"
+    timeout: 10000
+
+- tapOn: "Lista, tab.*"
+
+# Add a person first
+- tapOn:
+    id: "fab-add-person"
+- tapOn:
+    id: "input-first-name"
+- inputText: "Jan"
+- tapOn:
+    id: "input-last-name"
+- inputText: "Kowalski"
+- hideKeyboard
+- scrollUntilVisible:
+    element:
+      id: "btn-save-person"
+    direction: DOWN
+- tapOn:
+    id: "btn-save-person"
+
+# Confirm person exists
+- assertVisible: "Jan Kowalski"
+
+# Go to settings and clear data
+- tapOn: "Ustawienia, tab.*"
+- tapOn:
+    id: "btn-clear-data"
+
+# Confirm in alert
+- tapOn: "Wyczyść"
+
+# Go back to list - should be empty
+- tapOn: "Lista, tab.*"
+- assertVisible: "Twoja kronika jest pusta"

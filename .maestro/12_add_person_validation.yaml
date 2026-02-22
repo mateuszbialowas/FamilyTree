@@ -1,0 +1,44 @@
+appId: com.mateuszbialowas.FamilyTree
+name: Validate required fields when adding person
+---
+- launchApp:
+    clearState: true
+- extendedWaitUntil:
+    visible: "Lista, tab.*"
+    timeout: 10000
+
+- tapOn: "Lista, tab.*"
+
+# Open add person form
+- tapOn:
+    id: "fab-add-person"
+
+# Try to save without filling anything - center button in viewport
+- scrollUntilVisible:
+    element:
+      id: "btn-save-person"
+    direction: DOWN
+    centerElement: true
+- tapOn:
+    id: "btn-save-person"
+
+# Should show validation alert
+- assertVisible: "Imię i nazwisko są wymagane."
+- tapOn: "OK"
+
+# Fill only first name and try again
+- tapOn:
+    id: "input-first-name"
+- inputText: "Jan"
+- hideKeyboard
+- scrollUntilVisible:
+    element:
+      id: "btn-save-person"
+    direction: DOWN
+    centerElement: true
+- tapOn:
+    id: "btn-save-person"
+
+# Should still show error (last name missing)
+- assertVisible: "Imię i nazwisko są wymagane."
+- tapOn: "OK"

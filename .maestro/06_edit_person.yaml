@@ -1,0 +1,56 @@
+appId: com.mateuszbialowas.FamilyTree
+name: Edit an existing person
+---
+- launchApp:
+    clearState: true
+- extendedWaitUntil:
+    visible: "Lista, tab.*"
+    timeout: 10000
+
+- tapOn: "Lista, tab.*"
+
+# Add a person
+- tapOn:
+    id: "fab-add-person"
+- tapOn:
+    id: "input-first-name"
+- inputText: "Jan"
+- tapOn:
+    id: "input-last-name"
+- inputText: "Kowalski"
+- hideKeyboard
+- scrollUntilVisible:
+    element:
+      id: "btn-save-person"
+    direction: DOWN
+- tapOn:
+    id: "btn-save-person"
+
+# Go to detail
+- tapOn: "Jan Kowalski"
+
+# Tap edit
+- scrollUntilVisible:
+    element:
+      id: "btn-edit-person"
+    direction: DOWN
+- tapOn:
+    id: "btn-edit-person"
+
+# Clear and change last name
+- tapOn:
+    id: "edit-input-last-name"
+- eraseText: 9
+- inputText: "Nowak"
+
+# Save
+- hideKeyboard
+- scrollUntilVisible:
+    element:
+      id: "btn-save-edit"
+    direction: DOWN
+- tapOn:
+    id: "btn-save-edit"
+
+# Verify updated name on detail screen
+- assertVisible: "Jan Nowak"

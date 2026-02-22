@@ -1,7 +1,7 @@
 {
   "expo": {
-    "name": "FamilyTreePOC",
-    "slug": "FamilyTreePOC",
+    "name": "FamilyTree",
+    "slug": "FamilyTree",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
@@ -14,7 +14,7 @@
     },
     "ios": {
       "supportsTablet": true,
-      "bundleIdentifier": "com.anonymous.FamilyTreePOC"
+      "bundleIdentifier": "com.mateuszbialowas.FamilyTree"
     },
     "android": {
       "adaptiveIcon": {
@@ -26,6 +26,10 @@
     },
     "web": {
       "favicon": "./assets/favicon.png"
-    }
+    },
+    "plugins": [
+      "expo-font",
+      "@react-native-community/datetimepicker"
+    ]
   }
 }

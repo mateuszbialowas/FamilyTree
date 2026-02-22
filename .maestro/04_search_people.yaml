@@ -1,0 +1,67 @@
+appId: com.mateuszbialowas.FamilyTree
+name: Search people by name
+---
+- launchApp:
+    clearState: true
+- extendedWaitUntil:
+    visible: "Lista, tab.*"
+    timeout: 10000
+
+- tapOn: "Lista, tab.*"
+
+# Add two people first
+- tapOn:
+    id: "fab-add-person"
+- tapOn:
+    id: "input-first-name"
+- inputText: "Jan"
+- tapOn:
+    id: "input-last-name"
+- inputText: "Kowalski"
+- hideKeyboard
+- scrollUntilVisible:
+    element:
+      id: "btn-save-person"
+    direction: DOWN
+- tapOn:
+    id: "btn-save-person"
+
+- tapOn:
+    id: "fab-add-person"
+- tapOn:
+    id: "input-first-name"
+- inputText: "Anna"
+- tapOn:
+    id: "input-last-name"
+- inputText: "Nowak"
+- hideKeyboard
+- tapOn:
+    id: "gender-female"
+- hideKeyboard
+- scrollUntilVisible:
+    element:
+      id: "btn-save-person"
+    direction: DOWN
+- tapOn:
+    id: "btn-save-person"
+
+# Search for "Kowalski"
+- tapOn:
+    id: "search-input"
+- inputText: "Kowalski"
+
+# Only Jan should be visible
+- assertVisible: "Jan Kowalski"
+- assertNotVisible: "Anna Nowak"
+
+# Clear search
+- tapOn:
+    id: "search-input"
+- eraseText: 9
+
+# Search case-insensitive by first name
+- tapOn:
+    id: "search-input"
+- inputText: "anna"
+- assertVisible: "Anna Nowak"
+- assertNotVisible: "Jan Kowalski"

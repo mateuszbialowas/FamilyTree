@@ -1,0 +1,10 @@
+appId: com.mateuszbialowas.FamilyTree
+name: App launches and shows tabs
+---
+- launchApp
+- extendedWaitUntil:
+    visible: "Drzewo, tab.*"
+    timeout: 10000
+- assertVisible: "Drzewo, tab.*"
+- assertVisible: "Lista, tab.*"
+- assertVisible: "Ustawienia, tab.*"

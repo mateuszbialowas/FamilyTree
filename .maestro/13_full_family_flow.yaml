@@ -1,0 +1,118 @@
+appId: com.mateuszbialowas.FamilyTree
+name: Full family creation flow - parents, marriage, child
+---
+- launchApp:
+    clearState: true
+- extendedWaitUntil:
+    visible: "Lista, tab.*"
+    timeout: 10000
+
+- tapOn: "Lista, tab.*"
+
+# ===== Create father =====
+- tapOn:
+    id: "fab-add-person"
+- tapOn:
+    id: "input-first-name"
+- inputText: "Jan"
+- tapOn:
+    id: "input-last-name"
+- inputText: "Kowalski"
+- hideKeyboard
+- scrollUntilVisible:
+    element:
+      id: "btn-save-person"
+    direction: DOWN
+- tapOn:
+    id: "btn-save-person"
+
+# ===== Create mother =====
+- tapOn:
+    id: "fab-add-person"
+- tapOn:
+    id: "input-first-name"
+- inputText: "Anna"
+- tapOn:
+    id: "input-last-name"
+- inputText: "Kowalska"
+- hideKeyboard
+- tapOn:
+    id: "gender-female"
+- hideKeyboard
+- scrollUntilVisible:
+    element:
+      id: "btn-save-person"
+    direction: DOWN
+- tapOn:
+    id: "btn-save-person"
+
+# ===== Create child =====
+- tapOn:
+    id: "fab-add-person"
+- tapOn:
+    id: "input-first-name"
+- inputText: "Piotr"
+- tapOn:
+    id: "input-last-name"
+- inputText: "Kowalski"
+- hideKeyboard
+- scrollUntilVisible:
+    element:
+      id: "btn-save-person"
+    direction: DOWN
+- tapOn:
+    id: "btn-save-person"
+
+# ===== Add marriage: Jan + Anna =====
+- tapOn: "Jan Kowalski"
+- scrollUntilVisible:
+    element:
+      id: "btn-add-relationship"
+    direction: DOWN
+- tapOn:
+    id: "btn-add-relationship"
+- tapOn: "Małżeństwo"
+- scrollUntilVisible:
+    element: "Anna Kowalska"
+    direction: DOWN
+- tapOn: "Anna Kowalska"
+- scrollUntilVisible:
+    element:
+      id: "btn-save-relationship"
+    direction: DOWN
+- tapOn:
+    id: "btn-save-relationship"
+
+# Verify marriage on detail
+- assertVisible: "Małżonkowie"
+- assertVisible: "Anna Kowalska"
+
+# ===== Add parent-child: Jan -> Piotr =====
+- scrollUntilVisible:
+    element:
+      id: "btn-add-relationship"
+    direction: DOWN
+- tapOn:
+    id: "btn-add-relationship"
+# "Jan jest rodzicem" is default
+- scrollUntilVisible:
+    element: "Piotr Kowalski"
+    direction: DOWN
+- tapOn: "Piotr Kowalski"
+- scrollUntilVisible:
+    element:
+      id: "btn-save-relationship"
+    direction: DOWN
+- tapOn:
+    id: "btn-save-relationship"
+
+# Verify child on Jan's detail
+- assertVisible: "Dzieci"
+- assertVisible: "Piotr Kowalski"
+
+# ===== Navigate to Piotr's detail via relationship card =====
+- tapOn: "Piotr Kowalski"
+
+# Piotr should show Jan as parent
+- assertVisible: "Rodzice"
+- assertVisible: "Jan Kowalski"

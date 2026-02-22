@@ -1,0 +1,79 @@
+appId: com.mateuszbialowas.FamilyTree
+name: Add marriage relationship
+---
+- launchApp:
+    clearState: true
+- extendedWaitUntil:
+    visible: "Lista, tab.*"
+    timeout: 10000
+
+- tapOn: "Lista, tab.*"
+
+# --- Add Jan ---
+- tapOn:
+    id: "fab-add-person"
+- tapOn:
+    id: "input-first-name"
+- inputText: "Jan"
+- tapOn:
+    id: "input-last-name"
+- inputText: "Kowalski"
+- hideKeyboard
+- scrollUntilVisible:
+    element:
+      id: "btn-save-person"
+    direction: DOWN
+- tapOn:
+    id: "btn-save-person"
+
+# --- Add Anna ---
+- tapOn:
+    id: "fab-add-person"
+- tapOn:
+    id: "input-first-name"
+- inputText: "Anna"
+- tapOn:
+    id: "input-last-name"
+- inputText: "Kowalska"
+- hideKeyboard
+- tapOn:
+    id: "gender-female"
+- hideKeyboard
+- scrollUntilVisible:
+    element:
+      id: "btn-save-person"
+    direction: DOWN
+- tapOn:
+    id: "btn-save-person"
+
+# Go to Jan's detail
+- tapOn: "Jan Kowalski"
+
+# Add relationship
+- scrollUntilVisible:
+    element:
+      id: "btn-add-relationship"
+    direction: DOWN
+- tapOn:
+    id: "btn-add-relationship"
+
+# Select marriage type
+- tapOn: "Małżeństwo"
+
+# Select Anna
+- scrollUntilVisible:
+    element: "Anna Kowalska"
+    direction: DOWN
+- tapOn: "Anna Kowalska"
+
+# Save
+- scrollUntilVisible:
+    element:
+      id: "btn-save-relationship"
+    direction: DOWN
+- tapOn:
+    id: "btn-save-relationship"
+
+# Back on Jan's detail - should show Anna as spouse
+- assertVisible: "Małżonkowie"
+- assertVisible: "Anna Kowalska"

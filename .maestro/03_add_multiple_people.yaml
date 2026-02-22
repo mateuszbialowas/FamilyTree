@@ -1,0 +1,69 @@
+appId: com.mateuszbialowas.FamilyTree
+name: Add multiple people and verify list sorting
+---
+- launchApp:
+    clearState: true
+- extendedWaitUntil:
+    visible: "Lista, tab.*"
+    timeout: 10000
+
+- tapOn: "Lista, tab.*"
+
+# --- Add first person: Jan Kowalski ---
+- tapOn:
+    id: "fab-add-person"
+- tapOn:
+    id: "input-first-name"
+- inputText: "Jan"
+- tapOn:
+    id: "input-last-name"
+- inputText: "Kowalski"
+- hideKeyboard
+- scrollUntilVisible:
+    element:
+      id: "btn-save-person"
+    direction: DOWN
+- tapOn:
+    id: "btn-save-person"
+
+# --- Add second person: Anna Nowak ---
+- tapOn:
+    id: "fab-add-person"
+- tapOn:
+    id: "input-first-name"
+- inputText: "Anna"
+- tapOn:
+    id: "input-last-name"
+- inputText: "Nowak"
+- hideKeyboard
+- tapOn:
+    id: "gender-female"
+- hideKeyboard
+- scrollUntilVisible:
+    element:
+      id: "btn-save-person"
+    direction: DOWN
+- tapOn:
+    id: "btn-save-person"
+
+# --- Add third person: Piotr Adamski ---
+- tapOn:
+    id: "fab-add-person"
+- tapOn:
+    id: "input-first-name"
+- inputText: "Piotr"
+- tapOn:
+    id: "input-last-name"
+- inputText: "Adamski"
+- hideKeyboard
+- scrollUntilVisible:
+    element:
+      id: "btn-save-person"
+    direction: DOWN
+- tapOn:
+    id: "btn-save-person"
+
+# Verify all 3 people visible
+- assertVisible: "Piotr Adamski"
+- assertVisible: "Jan Kowalski"
+- assertVisible: "Anna Nowak"

@@ -1,0 +1,41 @@
+appId: com.mateuszbialowas.FamilyTree
+name: Add a new person
+---
+- launchApp:
+    clearState: true
+- extendedWaitUntil:
+    visible: "Lista, tab.*"
+    timeout: 10000
+
+# Navigate to List tab
+- tapOn: "Lista, tab.*"
+
+# Verify empty state
+- assertVisible: "Twoja kronika jest pusta"
+
+# Tap FAB to add person
+- tapOn:
+    id: "fab-add-person"
+
+# Fill in form
+- tapOn:
+    id: "input-first-name"
+- inputText: "Jan"
+
+- tapOn:
+    id: "input-last-name"
+- inputText: "Kowalski"
+
+# Dismiss keyboard and scroll to save button
+- hideKeyboard
+- scrollUntilVisible:
+    element:
+      id: "btn-save-person"
+    direction: DOWN
+
+# Save
+- tapOn:
+    id: "btn-save-person"
+
+# Verify person appears in list
+- assertVisible: "Jan Kowalski"
