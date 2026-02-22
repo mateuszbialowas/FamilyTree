@@ -1,6 +1,7 @@
 import React, { useMemo } from 'react';
 import { Group, Path, Circle, Oval, vec } from '@shopify/react-native-skia';
-import { P, mkPath } from './constants';
+import { P } from './palette';
+import { mkPath } from './skiaHelpers';
 
 export function OwlComponent({ x, y, flip, eyeScale }: { x: number; y: number; flip: boolean; eyeScale: any }) {
   const s = flip ? -1 : 1;

@@ -1,4 +1,4 @@
-import React, { useState, useCallback, useMemo, useEffect } from 'react';
+import React, { useState, useCallback, useMemo } from 'react';
 import {
   View, Text, TouchableOpacity, Modal, FlatList, Alert, StyleSheet,
 } from 'react-native';
@@ -9,7 +9,6 @@ import { useFamily } from '../context/FamilyContext';
 import { FamilyTreeCanvas } from '../components/tree/FamilyTreeCanvas';
 import { EmptyState } from '../components/ui/EmptyState';
 import { detectTreeMode } from '../utils/treeLayout';
-import type { TreeMode } from '../utils/treeLayout';
 import { colors } from '../theme/colors';
 import { fonts, fontSizes } from '../theme/typography';
 import { spacing, borderRadius } from '../theme/spacing';
@@ -19,7 +18,6 @@ export function TreeScreen() {
   const navigation = useNavigation<NativeStackNavigationProp<any>>();
   const [rootId, setRootId] = useState<string | null>(null);
   const [pickerVisible, setPickerVisible] = useState(false);
-  const [modeOverride, setModeOverride] = useState<TreeMode | null>(null);
 
   const effectiveRootId = rootId && state.people.some(p => p.id === rootId)
     ? rootId
@@ -27,13 +25,10 @@ export function TreeScreen() {
 
   const rootPerson = state.people.find(p => p.id === effectiveRootId);
 
-  const autoMode = useMemo(
-    () => effectiveRootId ? detectTreeMode(state, effectiveRootId) : 'descendants' as TreeMode,
+  const currentMode = useMemo(
+    () => effectiveRootId ? detectTreeMode(state, effectiveRootId) : 'descendants' as const,
     [state, effectiveRootId],
   );
-  const currentMode = modeOverride ?? autoMode;
-
-  useEffect(() => { setModeOverride(null); }, [effectiveRootId]);
 
   const handleNodePress = useCallback((personId: string) => {
     navigation.navigate('PersonDetail', { personId });
@@ -91,36 +86,6 @@ export function TreeScreen() {
         </Text>
         <MaterialCommunityIcons name="chevron-down" size={20} color={colors.textMuted} />
       </TouchableOpacity>
-
-      {/* Mode toggle */}
-      <View style={styles.modeToggle}>
-        <TouchableOpacity
-          style={[styles.modeBtn, currentMode === 'descendants' && styles.modeBtnActive]}
-          onPress={() => setModeOverride('descendants')}
-        >
-          <MaterialCommunityIcons
-            name="file-tree"
-            size={15}
-            color={currentMode === 'descendants' ? '#fff' : colors.text}
-          />
-          <Text style={[styles.modeBtnText, currentMode === 'descendants' && styles.modeBtnTextActive]}>
-            Potomkowie
-          </Text>
-        </TouchableOpacity>
-        <TouchableOpacity
-          style={[styles.modeBtn, currentMode === 'ancestors' && styles.modeBtnActive]}
-          onPress={() => setModeOverride('ancestors')}
-        >
-          <MaterialCommunityIcons
-            name="file-tree-outline"
-            size={15}
-            color={currentMode === 'ancestors' ? '#fff' : colors.text}
-          />
-          <Text style={[styles.modeBtnText, currentMode === 'ancestors' && styles.modeBtnTextActive]}>
-            Przodkowie
-          </Text>
-        </TouchableOpacity>
-      </View>
 
       {/* Tree canvas */}
       {effectiveRootId && (
@@ -203,40 +168,6 @@ const styles = StyleSheet.create({
     fontFamily: fonts.bodyBold,
     fontSize: fontSizes.md,
     color: colors.text,
-  },
-  modeToggle: {
-    flexDirection: 'row',
-    paddingHorizontal: spacing.lg,
-    paddingVertical: spacing.xs,
-    backgroundColor: colors.surface,
-    borderBottomWidth: 1,
-    borderBottomColor: colors.border,
-    gap: spacing.xs,
-  },
-  modeBtn: {
-    flex: 1,
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
-    paddingVertical: 6,
-    borderRadius: borderRadius.md,
-    backgroundColor: colors.background,
-    borderWidth: 1,
-    borderColor: colors.border,
-    gap: 4,
-  },
-  modeBtnActive: {
-    backgroundColor: colors.primary,
-    borderColor: colors.primary,
-  },
-  modeBtnText: {
-    fontFamily: fonts.body,
-    fontSize: fontSizes.xs,
-    color: colors.text,
-  },
-  modeBtnTextActive: {
-    color: '#fff',
-    fontFamily: fonts.bodyBold,
   },
   modalOverlay: {
     flex: 1,

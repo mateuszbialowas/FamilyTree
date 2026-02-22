@@ -5,7 +5,6 @@ import {
   ScrollView,
   Alert,
   TouchableOpacity,
-  FlatList,
   StyleSheet,
   Platform,
 } from 'react-native';
@@ -14,10 +13,11 @@ import { useRoute, useNavigation } from '@react-navigation/native';
 import type { RouteProp } from '@react-navigation/native';
 import { useFamily } from '../context/FamilyContext';
 import { generateId } from '../utils/uuid';
+import { formatDateISO } from '../utils/date';
 import { ScreenHeader } from '../components/ui/ScreenHeader';
 import { Button } from '../components/ui/Button';
 import { TextInput } from '../components/ui/TextInput';
-import { Card } from '../components/ui/Card';
+import { formStyles } from '../theme/formStyles';
 import { colors } from '../theme/colors';
 import { fonts, fontSizes } from '../theme/typography';
 import { spacing, borderRadius } from '../theme/spacing';
@@ -54,7 +54,6 @@ export function AddRelationshipScreen() {
     }
 
     if (relType === 'parent-child') {
-      // Current person is parent of selected
       const exists = state.parentChildRelationships.some(
         (r) => r.parentId === person.id && r.childId === selectedPersonId
       );
@@ -67,7 +66,6 @@ export function AddRelationshipScreen() {
         payload: { id: generateId(), parentId: person.id, childId: selectedPersonId },
       });
     } else if (relType === 'child-parent') {
-      // Current person is child of selected
       const exists = state.parentChildRelationships.some(
         (r) => r.parentId === selectedPersonId && r.childId === person.id
       );
@@ -80,7 +78,6 @@ export function AddRelationshipScreen() {
         payload: { id: generateId(), parentId: selectedPersonId, childId: person.id },
       });
     } else {
-      // Marriage
       const exists = state.marriages.some(
         (m) =>
           (m.spouse1Id === person.id && m.spouse2Id === selectedPersonId) ||
@@ -96,7 +93,7 @@ export function AddRelationshipScreen() {
           id: generateId(),
           spouse1Id: person.id,
           spouse2Id: selectedPersonId,
-          marriageDate: marriageDate ? marriageDate.toISOString().split('T')[0] : null,
+          marriageDate: marriageDate ? formatDateISO(marriageDate) : null,
           divorceDate: null,
         },
       });
@@ -112,15 +109,14 @@ export function AddRelationshipScreen() {
   ];
 
   return (
-    <ScrollView style={styles.container} contentContainerStyle={styles.content}>
+    <ScrollView style={formStyles.container} contentContainerStyle={formStyles.content}>
       <ScreenHeader
         title="Dodaj relację"
         subtitle={`dla ${person.firstName} ${person.lastName}`}
       />
 
-      <View style={styles.form}>
-        {/* Relationship type */}
-        <Text style={styles.label}>Typ relacji</Text>
+      <View style={formStyles.form}>
+        <Text style={formStyles.label}>Typ relacji</Text>
         {relTypes.map((rt) => (
           <TouchableOpacity
             key={rt.key}
@@ -133,13 +129,12 @@ export function AddRelationshipScreen() {
           </TouchableOpacity>
         ))}
 
-        {/* Marriage date */}
         {relType === 'marriage' && (
           <>
-            <Text style={[styles.label, { marginTop: spacing.lg }]}>Data ślubu (opcjonalne)</Text>
-            <TouchableOpacity style={styles.dateBtn} onPress={() => setShowMarriagePicker(true)}>
-              <Text style={marriageDate ? styles.dateText : styles.datePlaceholder}>
-                {marriageDate ? marriageDate.toISOString().split('T')[0] : 'Wybierz datę'}
+            <Text style={[formStyles.label, { marginTop: spacing.lg }]}>Data ślubu (opcjonalne)</Text>
+            <TouchableOpacity style={formStyles.dateBtn} onPress={() => setShowMarriagePicker(true)}>
+              <Text style={marriageDate ? formStyles.dateText : formStyles.datePlaceholder}>
+                {marriageDate ? formatDateISO(marriageDate) : 'Wybierz datę'}
               </Text>
             </TouchableOpacity>
             {showMarriagePicker && (
@@ -156,8 +151,7 @@ export function AddRelationshipScreen() {
           </>
         )}
 
-        {/* Person selector */}
-        <Text style={[styles.label, { marginTop: spacing.lg }]}>Wybierz osobę</Text>
+        <Text style={[formStyles.label, { marginTop: spacing.lg }]}>Wybierz osobę</Text>
         <TextInput
           placeholder="Szukaj..."
           value={search}
@@ -199,23 +193,6 @@ export function AddRelationshipScreen() {
 }
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: colors.background,
-  },
-  content: {
-    paddingBottom: 200,
-  },
-  form: {
-    paddingHorizontal: spacing.lg,
-    paddingTop: spacing.md,
-  },
-  label: {
-    fontFamily: fonts.body,
-    fontSize: fontSizes.sm,
-    color: colors.text,
-    marginBottom: spacing.xs,
-  },
   typeBtn: {
     paddingVertical: spacing.md,
     paddingHorizontal: spacing.lg,
@@ -237,27 +214,6 @@ const styles = StyleSheet.create({
   typeTextActive: {
     color: colors.background,
     fontFamily: fonts.bodyBold,
-  },
-  dateBtn: {
-    borderWidth: 1,
-    borderColor: colors.border,
-    backgroundColor: colors.white,
-    borderRadius: borderRadius.md,
-    paddingHorizontal: spacing.md,
-    paddingVertical: spacing.md,
-    marginBottom: spacing.lg,
-    minHeight: 48,
-    justifyContent: 'center',
-  },
-  dateText: {
-    fontFamily: fonts.body,
-    fontSize: fontSizes.md,
-    color: colors.text,
-  },
-  datePlaceholder: {
-    fontFamily: fonts.body,
-    fontSize: fontSizes.md,
-    color: colors.textMuted,
   },
   personRow: {
     flexDirection: 'row',
