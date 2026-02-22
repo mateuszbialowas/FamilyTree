@@ -9,9 +9,18 @@ import {
   Platform,
 } from 'react-native';
 import DateTimePicker from '@react-native-community/datetimepicker';
-import { useNavigation } from '@react-navigation/native';
+import { useNavigation, useRoute } from '@react-navigation/native';
+import type { RouteProp } from '@react-navigation/native';
 import { useFamily } from '../context/FamilyContext';
+import { getParents } from '../utils/relationships';
 import { generateId } from '../utils/uuid';
+
+type AddPersonParams = {
+  AddPerson: {
+    relatedPersonId?: string;
+    relationType?: 'parent' | 'child' | 'spouse' | 'sibling';
+  };
+};
 import { ScreenHeader } from '../components/ui/ScreenHeader';
 import { TextInput } from '../components/ui/TextInput';
 import { Button } from '../components/ui/Button';
@@ -19,9 +28,21 @@ import { colors } from '../theme/colors';
 import { fonts, fontSizes } from '../theme/typography';
 import { spacing, borderRadius } from '../theme/spacing';
 
+const REL_LABELS: Record<string, string> = {
+  parent: 'Rodzic dla',
+  child: 'Dziecko dla',
+  spouse: 'Małżonek dla',
+  sibling: 'Rodzeństwo dla',
+};
+
 export function AddPersonScreen() {
   const navigation = useNavigation();
-  const { dispatch } = useFamily();
+  const route = useRoute<RouteProp<AddPersonParams, 'AddPerson'>>();
+  const { state, dispatch } = useFamily();
+
+  const relatedPersonId = route.params?.relatedPersonId;
+  const relationType = route.params?.relationType;
+  const relatedPerson = relatedPersonId ? state.people.find(p => p.id === relatedPersonId) : null;
 
   const [firstName, setFirstName] = useState('');
   const [lastName, setLastName] = useState('');
@@ -38,10 +59,12 @@ export function AddPersonScreen() {
       return;
     }
 
+    const newPersonId = generateId();
+
     dispatch({
       type: 'ADD_PERSON',
       payload: {
-        id: generateId(),
+        id: newPersonId,
         firstName: firstName.trim(),
         lastName: lastName.trim(),
         gender,
@@ -51,12 +74,55 @@ export function AddPersonScreen() {
       },
     });
 
+    // Auto-create relationship if coming from tree long-press
+    if (relatedPersonId && relationType) {
+      if (relationType === 'parent') {
+        // New person is parent of related person
+        dispatch({
+          type: 'ADD_PARENT_CHILD',
+          payload: { id: generateId(), parentId: newPersonId, childId: relatedPersonId },
+        });
+      } else if (relationType === 'child') {
+        // Related person is parent of new person
+        dispatch({
+          type: 'ADD_PARENT_CHILD',
+          payload: { id: generateId(), parentId: relatedPersonId, childId: newPersonId },
+        });
+      } else if (relationType === 'spouse') {
+        dispatch({
+          type: 'ADD_MARRIAGE',
+          payload: {
+            id: generateId(),
+            spouse1Id: relatedPersonId,
+            spouse2Id: newPersonId,
+            marriageDate: null,
+            divorceDate: null,
+          },
+        });
+      } else if (relationType === 'sibling') {
+        // Add same parents as the related person
+        const parents = getParents(relatedPersonId, state);
+        parents.forEach(parent => {
+          dispatch({
+            type: 'ADD_PARENT_CHILD',
+            payload: { id: generateId(), parentId: parent.id, childId: newPersonId },
+          });
+        });
+      }
+    }
+
     navigation.goBack();
   };
 
   return (
     <ScrollView style={styles.container} contentContainerStyle={styles.content}>
-      <ScreenHeader title="Dodaj osobę" />
+      <ScreenHeader
+        title="Dodaj osobę"
+        subtitle={relatedPerson && relationType
+          ? `${REL_LABELS[relationType]} ${relatedPerson.firstName} ${relatedPerson.lastName}`
+          : undefined
+        }
+      />
 
       <View style={styles.form}>
         <TextInput

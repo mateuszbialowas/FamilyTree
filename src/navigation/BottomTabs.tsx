@@ -1,6 +1,7 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { View, StyleSheet } from 'react-native';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
+import { getFocusedRouteNameFromRoute } from '@react-navigation/native';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { TreeStack } from './TreeStack';
 import { ListStack } from './ListStack';
@@ -11,11 +12,25 @@ import { fonts } from '../theme/typography';
 
 const Tab = createBottomTabNavigator();
 
+const HIDE_FAB_SCREENS = ['AddPerson', 'EditPerson', 'AddRelationship'];
+
 export function BottomTabs() {
+  const [nestedRoute, setNestedRoute] = useState('');
+
   return (
     <View style={styles.container}>
       <Tab.Navigator
         initialRouteName="Drzewo"
+        screenListeners={{
+          state: (e) => {
+            const tabState = (e.data as any)?.state;
+            if (tabState) {
+              const activeTabRoute = tabState.routes[tabState.index];
+              const nested = getFocusedRouteNameFromRoute(activeTabRoute) || '';
+              setNestedRoute(nested);
+            }
+          },
+        }}
         screenOptions={{
           headerShown: false,
           tabBarStyle: {
@@ -62,7 +77,7 @@ export function BottomTabs() {
           }}
         />
       </Tab.Navigator>
-      <FAB />
+      {!HIDE_FAB_SCREENS.includes(nestedRoute) && <FAB />}
     </View>
   );
 }
