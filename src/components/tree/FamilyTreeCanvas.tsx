@@ -3,7 +3,8 @@ import { View, StyleSheet, TouchableOpacity } from 'react-native';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import {
   Canvas, Path, Group, Circle, RoundedRect, Oval,
-  LinearGradient, vec, Paragraph,
+  LinearGradient, vec, Paragraph, ImageSVG,
+  Image as SkiaImage, useImage, Skia,
 } from '@shopify/react-native-skia';
 import { GestureDetector, Gesture } from 'react-native-gesture-handler';
 import {
@@ -21,6 +22,7 @@ import { computeRelationshipLabels } from '../../utils/relationshipLabels';
 import { P } from './palette';
 import { mkPath } from './skiaHelpers';
 import { mkPara } from './skiaHelpers';
+import { MOURNING_RIBBON_SVG, WEDDING_RINGS_SVG } from './svgAssets';
 import { genTrunk, genBranch, genCanopy, leafPath, leafVeinPath, placeAnimals, genRoots } from './geometry';
 import { OwlComponent, BirdComponent, SquirrelComponent } from './animals';
 
@@ -35,12 +37,8 @@ const SHADOW_OFFSET = { trunk: { x: 3, y: 4 }, branch: { x: 2, y: 3 }, root: { x
 /** Node label box dimensions */
 const LABEL_BOX = { width: 80, height: 54, radius: 5 };
 
-/** Couple line visual constants */
-const COUPLE_LINE = { offset: 3, circleR: 7 };
-
 /** Node circle sizes */
 const NODE_GLOW_R = NODE_R + 5;
-const NODE_INNER_R = NODE_R - 3;
 
 /** Stroke widths */
 const STROKE = { rootRing: 2.5, nodeRing: 1.5, innerRing: 0.4, labelBox: 0.6, coupleLine: 1 };
@@ -73,6 +71,41 @@ type Props = {
   onNodePress: (personId: string) => void;
   onNodeLongPress: (personId: string) => void;
 };
+
+// ======================== PERSON PHOTO (circular clipped) ========================
+function PersonPhoto({ uri, x, y }: { uri?: string | null; x: number; y: number }) {
+  const image = useImage(uri ?? undefined);
+  if (!image) return null;
+  const clip = Skia.Path.Make();
+  clip.addCircle(x, y, NODE_R - 1);
+  const sz = NODE_R * 2;
+  return (
+    <Group clip={clip}>
+      <SkiaImage image={image} x={x - NODE_R} y={y - NODE_R} width={sz} height={sz} fit="cover" />
+    </Group>
+  );
+}
+
+// ======================== MOURNING RIBBON (awareness ribbon, Polish convention) ========================
+const mourningRibbonSvg = Skia.SVG.MakeFromString(MOURNING_RIBBON_SVG);
+const weddingRingsSvg = Skia.SVG.MakeFromString(WEDDING_RINGS_SVG);
+
+function MourningRibbon({ x, y }: { x: number; y: number }) {
+  if (!mourningRibbonSvg) return null;
+  const r = NODE_R;
+  const ribbonH = r * 0.9;
+  const ribbonW = ribbonH * (887 / 1280);
+  const clip = Skia.Path.Make();
+  clip.addCircle(x, y, r);
+  // Position at upper-right corner
+  const rx = x + r * 0.55 - ribbonW / 2;
+  const ry = y - r * 0.8;
+  return (
+    <Group clip={clip} opacity={0.85}>
+      <ImageSVG svg={mourningRibbonSvg} x={rx} y={ry} width={ribbonW} height={ribbonH} />
+    </Group>
+  );
+}
 
 // ======================== MAIN COMPONENT ========================
 export function FamilyTreeCanvas({ state, rootId, onNodePress, onNodeLongPress }: Props) {
@@ -341,17 +374,18 @@ export function FamilyTreeCanvas({ state, rootId, onNodePress, onNodeLongPress }
               return null;
             })}
 
-            {/* COUPLES */}
+            {/* COUPLES — interlinked rings SVG */}
             {geo.couples.map((c, i) => {
               const mx = (c.x1 + c.x2) / 2;
-              const line1 = mkPath(`M ${c.x1 + NODE_R},${c.y1} L ${c.x2 - NODE_R},${c.y2}`);
-              const line2 = mkPath(`M ${c.x1 + NODE_R},${c.y1 + COUPLE_LINE.offset} L ${c.x2 - NODE_R},${c.y2 + COUPLE_LINE.offset}`);
+              const line = mkPath(`M ${c.x1 + NODE_R},${c.y1} L ${c.x2 - NODE_R},${c.y2}`);
+              const ringsW = 20;
+              const ringsH = ringsW * (836 / 801);
               return (
                 <Group key={`c${i}`}>
-                  <Path path={line1} style="stroke" color={P.sepia} strokeWidth={STROKE.coupleLine} />
-                  <Path path={line2} style="stroke" color={P.sepia} strokeWidth={STROKE.coupleLine} />
-                  <Circle cx={mx} cy={c.y1} r={COUPLE_LINE.circleR} color={P.cream} />
-                  <Circle cx={mx} cy={c.y1} r={COUPLE_LINE.circleR} color={P.red} style="stroke" strokeWidth={STROKE.coupleLine} />
+                  <Path path={line} style="stroke" color={P.sepia} strokeWidth={STROKE.coupleLine} />
+                  {weddingRingsSvg && (
+                    <ImageSVG svg={weddingRingsSvg} x={mx - ringsW / 2} y={c.y1 - ringsH / 2} width={ringsW} height={ringsH} />
+                  )}
                 </Group>
               );
             })}
@@ -365,8 +399,9 @@ export function FamilyTreeCanvas({ state, rootId, onNodePress, onNodeLongPress }
                   <Circle cx={n.x + SHADOW_OFFSET.node.x} cy={n.y + SHADOW_OFFSET.node.y} r={NODE_R} color={P.shadow.node} />
                   {isRoot && <Circle cx={n.x} cy={n.y} r={NODE_GLOW_R} color={P.hl.glow} />}
                   <Circle cx={n.x} cy={n.y} r={NODE_R} color={P.cream} />
+                  <PersonPhoto uri={n.photoUri} x={n.x} y={n.y} />
+                  {n.isDead && <MourningRibbon x={n.x} y={n.y} />}
                   <Circle cx={n.x} cy={n.y} r={NODE_R} color={isRoot ? P.hl.ring : P.sepia} style="stroke" strokeWidth={isRoot ? STROKE.rootRing : STROKE.nodeRing} />
-                  <Circle cx={n.x} cy={n.y} r={NODE_INNER_R} color={P.parchDk} style="stroke" strokeWidth={STROKE.innerRing} opacity={0.4} />
                   <RoundedRect x={n.x - LABEL_BOX.width / 2} y={n.y + NODE_R + 3} width={LABEL_BOX.width} height={LABEL_BOX.height} r={LABEL_BOX.radius} color={P.cream} />
                   <RoundedRect x={n.x - LABEL_BOX.width / 2} y={n.y + NODE_R + 3} width={LABEL_BOX.width} height={LABEL_BOX.height} r={LABEL_BOX.radius} color={P.parchEdge} style="stroke" strokeWidth={STROKE.labelBox} />
                   {lb && <>

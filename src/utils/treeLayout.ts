@@ -11,6 +11,8 @@ export interface LNode {
   depth: number;
   partnerId?: string;
   label?: string;
+  photoUri?: string | null;
+  isDead?: boolean;
 }
 
 export interface Conn {
@@ -190,6 +192,8 @@ export function computeUnifiedLayout(
       name: `${p.firstName} ${p.lastName}`,
       born: p.birthDate || '',
       label: labels?.get(id),
+      photoUri: p.photoUri ?? null,
+      isDead: !!p.deathDate,
     };
     if (partnerId) node.partnerId = partnerId;
     return node;

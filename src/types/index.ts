@@ -6,6 +6,7 @@ export type Person = {
   birthDate: string | null;
   deathDate: string | null;
   notes: string;
+  photoUri?: string | null;
 };
 
 export type ParentChildRelationship = {

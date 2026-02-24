@@ -2,6 +2,22 @@ import React, { createContext, useContext, useReducer, useEffect, useRef, useCal
 import type { FamilyState, FamilyAction } from '../types';
 import { loadData, saveData } from '../utils/storage';
 
+/** Assign sample portrait URLs to people without photos */
+function assignSamplePhotos(state: FamilyState): FamilyState {
+  let changed = false;
+  const people = state.people.map(p => {
+    if (p.photoUri) return p;
+    changed = true;
+    // Derive a stable number 0-99 from person id
+    let h = 0;
+    for (let i = 0; i < p.id.length; i++) h = ((h << 5) - h + p.id.charCodeAt(i)) | 0;
+    const idx = Math.abs(h) % 100;
+    const folder = p.gender === 'male' ? 'men' : 'women';
+    return { ...p, photoUri: `https://randomuser.me/api/portraits/${folder}/${idx}.jpg` };
+  });
+  return changed ? { ...state, people } : state;
+}
+
 const initialState: FamilyState = {
   people: [],
   parentChildRelationships: [],
@@ -11,7 +27,7 @@ const initialState: FamilyState = {
 function familyReducer(state: FamilyState, action: FamilyAction): FamilyState {
   switch (action.type) {
     case 'ADD_PERSON':
-      return { ...state, people: [...state.people, action.payload] };
+      return assignSamplePhotos({ ...state, people: [...state.people, action.payload] });
 
     case 'UPDATE_PERSON':
       return {
@@ -91,7 +107,7 @@ export function FamilyProvider({ children }: { children: React.ReactNode }) {
     (async () => {
       const saved = await loadData();
       if (saved) {
-        dispatch({ type: 'IMPORT_DATA', payload: saved });
+        dispatch({ type: 'IMPORT_DATA', payload: assignSamplePhotos(saved) });
       }
       isInitialized.current = true;
       setIsLoading(false);
