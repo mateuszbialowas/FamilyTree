@@ -146,7 +146,7 @@ export function FamilyTreeCanvas({ state, rootId, onNodePress, onNodeLongPress }
         roots: raw.rootDir
           ? genRoots(c.x1, raw.rootDir === 'up' ? topY : botY, TRUNK_BASE_WIDTH, c.seed, raw.rootDir).map(d => mkPath(d))
           : [],
-        topLeaves: genCanopy(c.x1, topY + 10, 28, 18, 30, c.seed + 7000),
+        topLeaves: genCanopy(c.x1, topY - 8, 28, 18, 30, c.seed + 7000),
       };
     });
 
@@ -157,8 +157,8 @@ export function FamilyTreeCanvas({ state, rootId, onNodePress, onNodeLongPress }
         path: mkPath(raw.path),
         barkLines: raw.barkLines.map(bl => ({ ...bl, path: mkPath(bl.d) })),
         twigs: raw.twigs.map(tw => ({ ...tw, path: mkPath(tw.d) })),
-        midLeaves: genCanopy((c.x1 + c.x2) / 2, (c.y1 + c.y2) / 2, 20, 14, 20, c.seed + 4000),
-        tipLeaves: genCanopy(c.x2, c.y2 - 14, 18, 12, 18, c.seed + 5000),
+        midLeaves: genCanopy((c.x1 + c.x2) / 2, (c.y1 + c.y2) / 2 - 16, 20, 14, 20, c.seed + 4000),
+        tipLeaves: genCanopy(c.x2, c.y2 - 30, 18, 12, 18, c.seed + 5000),
       };
     });
 

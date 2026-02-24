@@ -295,10 +295,10 @@ export function genBranch(x1: number, y1: number, x2: number, y2: number, seed: 
     const grav = Math.sin(t * Math.PI) * len * 0.035;
     const bend = (x2 > x1 ? 1 : -1) * Math.sin(t * Math.PI) * 7;
     const sCurve = Math.sin(t * Math.PI * 2.3) * 2.5 * (r() - 0.3);
-    const jBulge = t < 0.1 ? 1 + (1 - t / 0.1) * 0.5 : 1;
+    const jBulge = t > 0.9 ? 1 + ((t - 0.9) / 0.1) * 0.5 : 1;
     const midBulge = 1 + Math.sin(t * Math.PI) * 0.08;
-    const tipTaper = t > 0.8 ? Math.pow(1 - (t - 0.8) / 0.2, 0.5) : 1;
-    const w = thick * (1 - t * 0.5) * jBulge * midBulge * tipTaper;
+    const tipTaper = t < 0.2 ? Math.pow(t / 0.2, 0.5) : 1;
+    const w = thick * (0.5 + t * 0.5) * jBulge * midBulge * tipTaper;
     pts.push({ x: cx + bend + sCurve + (r() - 0.5) * 1.5, y: cy + grav, w });
   }
 
@@ -398,14 +398,31 @@ export function placeAnimals(conns: Conn[]): AnimalD[] {
   const tr = conns.filter(c => c.type === 'trunk');
   const r = sr(br.length * 7 + 42);
   const types: AnimalD['type'][] = ['bird', 'squirrel', 'bird'];
-  if (tr.length > 0) a.push({ type: 'owl', x: tr[0].x1 + 16, y: (tr[0].y1 + tr[0].y2) / 2 + 40, flip: false, seed: tr[0].seed });
+  const MIN_DIST = 40; // minimum distance between animals
+
+  const tooClose = (x: number, y: number) =>
+    a.some(e => Math.abs(e.x - x) < MIN_DIST && Math.abs(e.y - y) < MIN_DIST);
+
+  // Place owl on a branch (not trunk) so it sits naturally
+  if (br.length > 0) {
+    const owlBr = br[Math.floor(br.length / 2)];
+    const t = 0.55;
+    const ox = lerp(owlBr.x1, owlBr.x2, t);
+    const oy = lerp(owlBr.y1, owlBr.y2, t) - 14;
+    a.push({ type: 'owl', x: ox, y: oy, flip: owlBr.x2 < owlBr.x1, seed: owlBr.seed });
+  } else if (tr.length > 0) {
+    a.push({ type: 'owl', x: tr[0].x1 + 20, y: (tr[0].y1 + tr[0].y2) / 2 - 10, flip: false, seed: tr[0].seed });
+  }
   for (let i = 0; i < br.length; i++) {
     if (r() > ANIMAL_SKIP_THRESHOLD) continue;
     const b = br[i];
     const t = ANIMAL_BRANCH_POSITION + r() * 0.3;
     const type = types[Math.floor(r() * types.length)];
     const yOff = type === 'squirrel' ? -11 : -9;
-    a.push({ type, x: lerp(b.x1, b.x2, t), y: lerp(b.y1, b.y2, t) + yOff, flip: r() > 0.5, seed: b.seed + i * 13 });
+    const ax = lerp(b.x1, b.x2, t);
+    const ay = lerp(b.y1, b.y2, t) + yOff;
+    if (tooClose(ax, ay)) continue;
+    a.push({ type, x: ax, y: ay, flip: r() > 0.5, seed: b.seed + i * 13 });
   }
   return a;
 }
