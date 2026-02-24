@@ -1,4 +1,4 @@
-import React, { useState, useCallback, useMemo } from 'react';
+import React, { useState, useCallback } from 'react';
 import {
   View, Text, TouchableOpacity, Modal, FlatList, Alert, StyleSheet,
 } from 'react-native';
@@ -8,7 +8,6 @@ import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { useFamily } from '../context/FamilyContext';
 import { FamilyTreeCanvas } from '../components/tree/FamilyTreeCanvas';
 import { EmptyState } from '../components/ui/EmptyState';
-import { detectTreeMode } from '../utils/treeLayout';
 import { colors } from '../theme/colors';
 import { fonts, fontSizes } from '../theme/typography';
 import { spacing, borderRadius } from '../theme/spacing';
@@ -24,11 +23,6 @@ export function TreeScreen() {
     : state.people[0]?.id ?? null;
 
   const rootPerson = state.people.find(p => p.id === effectiveRootId);
-
-  const currentMode = useMemo(
-    () => effectiveRootId ? detectTreeMode(state, effectiveRootId) : 'descendants' as const,
-    [state, effectiveRootId],
-  );
 
   const handleNodePress = useCallback((personId: string) => {
     navigation.navigate('PersonDetail', { personId });
@@ -92,7 +86,6 @@ export function TreeScreen() {
         <FamilyTreeCanvas
           state={state}
           rootId={effectiveRootId}
-          mode={currentMode}
           onNodePress={handleNodePress}
           onNodeLongPress={handleNodeLongPress}
         />

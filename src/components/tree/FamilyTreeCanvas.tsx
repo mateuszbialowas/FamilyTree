@@ -13,11 +13,11 @@ import {
 } from 'react-native-reanimated';
 import type { FamilyState } from '../../types';
 import {
-  buildTree, buildAncestorTree, addAncestorCoupleConns, layoutTree, flipLayoutY,
-  getTreePersonIds, hsh, NODE_R, GEN_H,
-  COUPLE_SPACING, CHILD_GAP, COUPLE_WIDTH, SOLO_WIDTH, TRUNK_OFFSET, INITIAL_Y, MIN_EDGE_X,
+  computeUnifiedLayout, hsh, NODE_R,
+  COUPLE_SPACING, TRUNK_OFFSET,
 } from '../../utils/treeLayout';
-import type { TreeMode, LNode, Conn } from '../../utils/treeLayout';
+import type { LNode, Conn } from '../../utils/treeLayout';
+import { computeRelationshipLabels } from '../../utils/relationshipLabels';
 import { P } from './palette';
 import { mkPath } from './skiaHelpers';
 import { mkPara } from './skiaHelpers';
@@ -33,7 +33,7 @@ const TRUNK_BASE_WIDTH = 48;
 const SHADOW_OFFSET = { trunk: { x: 3, y: 4 }, branch: { x: 2, y: 3 }, root: { x: 2, y: 3 }, node: { x: 1.5, y: 2.5 } };
 
 /** Node label box dimensions */
-const LABEL_BOX = { width: 80, height: 44, radius: 5 };
+const LABEL_BOX = { width: 80, height: 54, radius: 5 };
 
 /** Couple line visual constants */
 const COUPLE_LINE = { offset: 3, circleR: 7 };
@@ -45,9 +45,6 @@ const NODE_INNER_R = NODE_R - 3;
 /** Stroke widths */
 const STROKE = { rootRing: 2.5, nodeRing: 1.5, innerRing: 0.4, labelBox: 0.6, coupleLine: 1 };
 
-/** Disconnected people layout */
-const DISCONNECTED_GAP = 100;
-const DISCONNECTED_MARGIN = 120;
 
 /** Gesture zoom limits */
 const ZOOM_MIN = 0.3;
@@ -73,227 +70,16 @@ const ANIM = {
 type Props = {
   state: FamilyState;
   rootId: string;
-  mode: TreeMode;
   onNodePress: (personId: string) => void;
   onNodeLongPress: (personId: string) => void;
 };
 
 // ======================== MAIN COMPONENT ========================
-export function FamilyTreeCanvas({ state, rootId, mode, onNodePress, onNodeLongPress }: Props) {
+export function FamilyTreeCanvas({ state, rootId, onNodePress, onNodeLongPress }: Props) {
   const layout = useMemo(() => {
-    let result: { nodes: LNode[]; conns: Conn[] };
-    let inTree: Set<string>;
-
-    if (mode === 'both') {
-      // === Step 1: Build descendants from root (one trunk, normal layout) ===
-      const descTree = buildTree(state, rootId);
-      const desc = layoutTree(descTree);
-      const allNodes: LNode[] = [...desc.nodes];
-      const allConns: Conn[] = [...desc.conns];
-      const placed = new Set(allNodes.map(n => n.id));
-      const nodeMap = new Map<string, LNode>();
-      allNodes.forEach(n => nodeMap.set(n.id, n));
-      inTree = getTreePersonIds(descTree);
-
-      const pMap = new Map(state.people.map(p => [p.id, p]));
-
-      const spouseOf = (id: string): string | null => {
-        const m = state.marriages.find(mg => mg.spouse1Id === id || mg.spouse2Id === id);
-        return m ? (m.spouse1Id === id ? m.spouse2Id : m.spouse1Id) : null;
-      };
-
-      const parentsOf = (cid: string): string[] =>
-        state.parentChildRelationships
-          .filter(r => r.childId === cid)
-          .map(r => r.parentId)
-          .filter(pid => pMap.has(pid));
-
-      const childrenOf = (...pids: string[]): string[] => {
-        const s = new Set<string>();
-        state.parentChildRelationships
-          .filter(r => pids.includes(r.parentId))
-          .forEach(r => s.add(r.childId));
-        return [...s];
-      };
-
-      const mkNode = (id: string, x: number, y: number, depth: number, partnerId?: string): LNode => {
-        const p = pMap.get(id)!;
-        const node: LNode = { id, x, y, depth, name: `${p.firstName} ${p.lastName}`, born: p.birthDate || '' };
-        if (partnerId) node.partnerId = partnerId;
-        return node;
-      };
-
-      const addNode = (n: LNode) => {
-        allNodes.push(n);
-        nodeMap.set(n.id, n);
-        placed.add(n.id);
-        inTree.add(n.id);
-      };
-
-      // === Step 2: Walk up ancestors using only branches (no extra trunks) ===
-      const doneGroups = new Set<string>();
-
-      const findNeedingParents = (): string[] =>
-        allNodes
-          .filter(n => placed.has(n.id) && parentsOf(n.id).some(pid => !placed.has(pid)))
-          .map(n => n.id);
-
-      let queue = findNeedingParents();
-
-      while (queue.length > 0) {
-        const next: string[] = [];
-
-        for (const personId of queue) {
-          const pn = nodeMap.get(personId);
-          if (!pn) continue;
-
-          const ups = parentsOf(personId).filter(id => !placed.has(id));
-          if (ups.length === 0) continue;
-
-          // Determine parent couple
-          const g1 = ups[0];
-          const g1s = spouseOf(g1);
-          const g2 = g1s && ups.includes(g1s) ? g1s : null;
-
-          const gk = g2 ? [g1, g2].sort().join('+') : g1;
-          if (doneGroups.has(gk)) continue;
-          doneGroups.add(gk);
-
-          // All children of these parents (discovers siblings)
-          const allKids = childrenOf(...(g2 ? [g1, g2] : [g1]));
-          const existingKids = allKids.filter(id => placed.has(id)).map(id => nodeMap.get(id)!);
-          const newKids = allKids.filter(id => !placed.has(id));
-
-          const childY = pn.y;
-          const parentY = childY - GEN_H;
-
-          // Place new siblings to the right of existing children
-          let edge = -Infinity;
-          for (const ck of existingKids) {
-            edge = Math.max(edge, ck.x);
-            const cs = spouseOf(ck.id);
-            if (cs && nodeMap.has(cs)) edge = Math.max(edge, nodeMap.get(cs)!.x);
-          }
-
-          const sibNodes: LNode[] = [];
-          let sx = edge + CHILD_GAP + COUPLE_SPACING * 2;
-
-          for (const kid of newKids) {
-            const ks = spouseOf(kid);
-            if (ks && !placed.has(ks) && pMap.has(ks)) {
-              // Sibling with spouse
-              const sn = mkNode(kid, sx, childY, pn.depth);
-              const spn = mkNode(ks, sx + COUPLE_SPACING * 2, childY, pn.depth, kid);
-              addNode(sn);
-              addNode(spn);
-              sibNodes.push(sn);
-              allConns.push({
-                x1: sn.x, y1: sn.y, x2: spn.x, y2: spn.y,
-                type: 'couple', seed: hsh(kid + ks), depth: sn.depth,
-              });
-              sx += COUPLE_WIDTH + CHILD_GAP;
-            } else {
-              // Solo sibling
-              const sn = mkNode(kid, sx, childY, pn.depth);
-              addNode(sn);
-              sibNodes.push(sn);
-              sx += SOLO_WIDTH + CHILD_GAP;
-            }
-          }
-
-          // Center parents above all children
-          const allChildNodes = [...existingKids, ...sibNodes];
-          const xs = allChildNodes.map(n => n.x);
-          const center = (Math.min(...xs) + Math.max(...xs)) / 2;
-
-          if (g2) {
-            // Couple parents
-            const n1 = mkNode(g1, center - COUPLE_SPACING, parentY, pn.depth - 1);
-            const n2 = mkNode(g2, center + COUPLE_SPACING, parentY, pn.depth - 1, g1);
-            addNode(n1);
-            addNode(n2);
-            allConns.push({
-              x1: n1.x, y1: n1.y, x2: n2.x, y2: n2.y,
-              type: 'couple', seed: hsh(g1 + g2), depth: n1.depth,
-            });
-            // Branch from couple center to each child
-            for (const cn of allChildNodes) {
-              allConns.push({
-                x1: center, y1: parentY + NODE_R + TRUNK_OFFSET,
-                x2: cn.x, y2: cn.y - NODE_R - TRUNK_OFFSET,
-                type: 'branch', seed: hsh(cn.id + 'anc'), depth: cn.depth,
-              });
-            }
-            next.push(g1, g2);
-          } else {
-            // Single parent
-            const n1 = mkNode(g1, center, parentY, pn.depth - 1);
-            addNode(n1);
-            for (const cn of allChildNodes) {
-              allConns.push({
-                x1: center, y1: parentY + NODE_R + TRUNK_OFFSET,
-                x2: cn.x, y2: cn.y - NODE_R - TRUNK_OFFSET,
-                type: 'branch', seed: hsh(cn.id + 'anc'), depth: cn.depth,
-              });
-            }
-            next.push(g1);
-          }
-        }
-
-        // Next round: newly placed parents + anyone else with unplaced parents
-        const nextSet = new Set(next);
-        findNeedingParents().forEach(id => nextSet.add(id));
-        queue = [...nextSet].filter(id => parentsOf(id).some(pid => !placed.has(pid)));
-      }
-
-      // Normalize: shift so topmost node is at INITIAL_Y and leftmost at MIN_EDGE_X
-      let minY = Infinity, minX = Infinity;
-      allNodes.forEach(n => { if (n.y < minY) minY = n.y; if (n.x < minX) minX = n.x; });
-      const yShift = INITIAL_Y - minY;
-      const xShift = MIN_EDGE_X - minX;
-      if (yShift !== 0 || xShift !== 0) {
-        allNodes.forEach(n => { n.x += xShift; n.y += yShift; });
-        allConns.forEach(c => { c.x1 += xShift; c.y1 += yShift; c.x2 += xShift; c.y2 += yShift; });
-      }
-
-      result = { nodes: allNodes, conns: allConns };
-    } else if (mode === 'ancestors') {
-      const tree = buildAncestorTree(state, rootId);
-      const raw = layoutTree(tree);
-      const flipped = flipLayoutY(raw.nodes, raw.conns);
-      const coupleConns = addAncestorCoupleConns(flipped.nodes, state);
-      result = { nodes: flipped.nodes, conns: [...flipped.conns, ...coupleConns] };
-      inTree = getTreePersonIds(tree);
-    } else {
-      const tree = buildTree(state, rootId);
-      result = layoutTree(tree);
-      inTree = getTreePersonIds(tree);
-    }
-
-    // Add disconnected people as standalone nodes
-    const disconnected = state.people.filter(p => !inTree.has(p.id));
-    if (disconnected.length > 0) {
-      let maxX = 0;
-      result.nodes.forEach(n => { if (n.x > maxX) maxX = n.x; });
-      let offsetX = maxX + DISCONNECTED_MARGIN;
-      const baseY = mode === 'ancestors'
-        ? Math.max(...result.nodes.map(n => n.y), 80)
-        : 80;
-      disconnected.forEach(p => {
-        result.nodes.push({
-          id: p.id,
-          name: `${p.firstName} ${p.lastName}`,
-          born: p.birthDate || '',
-          x: offsetX,
-          y: baseY,
-          depth: 0,
-        });
-        offsetX += DISCONNECTED_GAP;
-      });
-    }
-
-    return result;
-  }, [state.people, state.parentChildRelationships, state.marriages, rootId, mode]);
+    const labels = computeRelationshipLabels(rootId, state);
+    return computeUnifiedLayout(rootId, state, labels);
+  }, [state.people, state.parentChildRelationships, state.marriages, rootId]);
 
   const geo = useMemo(() => {
     const trunkConns = layout.conns.filter(c => c.type === 'trunk');
@@ -301,7 +87,7 @@ export function FamilyTreeCanvas({ state, rootId, mode, onNodePress, onNodeLongP
       const topY = Math.min(c.y1, c.y2);
       const botY = Math.max(c.y1, c.y2);
       const isRootTrunk = c.depth === 0;
-      const rootDir = isRootTrunk && mode !== 'both' ? (mode === 'ancestors' ? 'down' : 'up') : null;
+      const rootDir: 'up' | 'down' | null = isRootTrunk ? 'up' : null;
       const raw = genTrunk(c.x1, topY, botY, TRUNK_BASE_WIDTH, c.seed, rootDir);
       return {
         ...c, bw: TRUNK_BASE_WIDTH, midW: raw.midW,
@@ -332,7 +118,7 @@ export function FamilyTreeCanvas({ state, rootId, mode, onNodePress, onNodeLongP
 
     const couples = layout.conns.filter(c => c.type === 'couple');
     const animals = placeAnimals(layout.conns);
-    const labels = layout.nodes.map(n => {
+    const nodeLabels = layout.nodes.map(n => {
       const parts = n.name.split(' ');
       const first = parts[0] || '';
       const last = parts.slice(1).join(' ') || '';
@@ -341,10 +127,11 @@ export function FamilyTreeCanvas({ state, rootId, mode, onNodePress, onNodeLongP
         name: mkPara(first, 10, P.ink, LABEL_BOX.width, true),
         surname: mkPara(last, 9, P.ink, LABEL_BOX.width),
         born: mkPara(n.born ? `ur. ${n.born}` : '', 8, P.inkFade, LABEL_BOX.width),
+        relation: n.label ? mkPara(n.label, 7, P.sepia, LABEL_BOX.width) : null,
       };
     });
-    return { trunks, branches, couples, animals, labels };
-  }, [layout, mode]);
+    return { trunks, branches, couples, animals, labels: nodeLabels };
+  }, [layout]);
 
   // === ANIMATIONS ===
   const windPhase = useSharedValue(0);
@@ -582,6 +369,7 @@ export function FamilyTreeCanvas({ state, rootId, mode, onNodePress, onNodeLongP
                     <Paragraph paragraph={lb.name} x={n.x - LABEL_BOX.width / 2} y={n.y + NODE_R + 5} width={LABEL_BOX.width} />
                     <Paragraph paragraph={lb.surname} x={n.x - LABEL_BOX.width / 2} y={n.y + NODE_R + 18} width={LABEL_BOX.width} />
                     <Paragraph paragraph={lb.born} x={n.x - LABEL_BOX.width / 2} y={n.y + NODE_R + 30} width={LABEL_BOX.width} />
+                    {lb.relation && <Paragraph paragraph={lb.relation} x={n.x - LABEL_BOX.width / 2} y={n.y + NODE_R + 41} width={LABEL_BOX.width} />}
                   </>}
                 </Group>
               );
