@@ -22,7 +22,7 @@ import { computeRelationshipLabels } from '../../utils/relationshipLabels';
 import { P } from './palette';
 import { mkPath } from './skiaHelpers';
 import { mkPara } from './skiaHelpers';
-import { MOURNING_RIBBON_SVG, WEDDING_RINGS_SVG } from './svgAssets';
+import { WEDDING_RINGS_SVG } from './svgAssets';
 import { genTrunk, genBranch, genCanopy, leafPath, leafVeinPath, placeAnimals, genRoots } from './geometry';
 import { OwlComponent, BirdComponent, SquirrelComponent } from './animals';
 
@@ -72,37 +72,46 @@ type Props = {
   onNodeLongPress: (personId: string) => void;
 };
 
-// ======================== PERSON PHOTO (circular clipped) ========================
-function PersonPhoto({ uri, x, y }: { uri?: string | null; x: number; y: number }) {
+// ======================== PERSON PHOTO (circular clipped) or INITIALS PLACEHOLDER ========================
+function PersonPhoto({ uri, x, y, name }: { uri?: string | null; x: number; y: number; name: string }) {
   const image = useImage(uri ?? undefined);
-  if (!image) return null;
-  const clip = Skia.Path.Make();
-  clip.addCircle(x, y, NODE_R - 1);
-  const sz = NODE_R * 2;
+  if (image) {
+    const clip = Skia.Path.Make();
+    clip.addCircle(x, y, NODE_R - 1);
+    const sz = NODE_R * 2;
+    return (
+      <Group clip={clip}>
+        <SkiaImage image={image} x={x - NODE_R} y={y - NODE_R} width={sz} height={sz} fit="cover" />
+      </Group>
+    );
+  }
+  // Initials placeholder
+  const parts = name.trim().split(/\s+/);
+  const initials = (parts[0]?.[0] ?? '') + (parts[1]?.[0] ?? '');
+  const para = mkPara(initials.toUpperCase(), 16, P.sepia, NODE_R * 2, true);
   return (
-    <Group clip={clip}>
-      <SkiaImage image={image} x={x - NODE_R} y={y - NODE_R} width={sz} height={sz} fit="cover" />
-    </Group>
+    <Paragraph paragraph={para} x={x - NODE_R} y={y - 6} width={NODE_R * 2} />
   );
 }
 
-// ======================== MOURNING RIBBON (awareness ribbon, Polish convention) ========================
-const mourningRibbonSvg = Skia.SVG.MakeFromString(MOURNING_RIBBON_SVG);
+// ======================== MOURNING BAND (thin diagonal strip, lower-right) ========================
 const weddingRingsSvg = Skia.SVG.MakeFromString(WEDDING_RINGS_SVG);
 
-function MourningRibbon({ x, y }: { x: number; y: number }) {
-  if (!mourningRibbonSvg) return null;
+function MourningBand({ x, y }: { x: number; y: number }) {
   const r = NODE_R;
-  const ribbonH = r * 0.9;
-  const ribbonW = ribbonH * (887 / 1280);
+  const w = 4; // band thickness
+  // Diagonal strip from bottom-center to right-center, clipped to circle
+  const half = w / 2;
+  const d = `M ${x + r * 0.05 - half} ${y + r * 1.0}
+    L ${x + r * 0.05 + half} ${y + r * 1.0}
+    L ${x + r * 1.0} ${y + r * 0.05 + half}
+    L ${x + r * 1.0} ${y + r * 0.05 - half} Z`;
+  const bandPath = Skia.Path.MakeFromSVGString(d) ?? Skia.Path.Make();
   const clip = Skia.Path.Make();
-  clip.addCircle(x, y, r);
-  // Position at upper-right corner
-  const rx = x + r * 0.55 - ribbonW / 2;
-  const ry = y - r * 0.8;
+  clip.addCircle(x, y, r - 1);
   return (
-    <Group clip={clip} opacity={0.85}>
-      <ImageSVG svg={mourningRibbonSvg} x={rx} y={ry} width={ribbonW} height={ribbonH} />
+    <Group clip={clip}>
+      <Path path={bandPath} color="rgba(0,0,0,0.8)" />
     </Group>
   );
 }
@@ -374,22 +383,6 @@ export function FamilyTreeCanvas({ state, rootId, onNodePress, onNodeLongPress }
               return null;
             })}
 
-            {/* COUPLES — interlinked rings SVG */}
-            {geo.couples.map((c, i) => {
-              const mx = (c.x1 + c.x2) / 2;
-              const line = mkPath(`M ${c.x1 + NODE_R},${c.y1} L ${c.x2 - NODE_R},${c.y2}`);
-              const ringsW = 20;
-              const ringsH = ringsW * (836 / 801);
-              return (
-                <Group key={`c${i}`}>
-                  <Path path={line} style="stroke" color={P.sepia} strokeWidth={STROKE.coupleLine} />
-                  {weddingRingsSvg && (
-                    <ImageSVG svg={weddingRingsSvg} x={mx - ringsW / 2} y={c.y1 - ringsH / 2} width={ringsW} height={ringsH} />
-                  )}
-                </Group>
-              );
-            })}
-
             {/* NODES */}
             {layout.nodes.map(n => {
               const lb = geo.labels.find(l => l.id === n.id);
@@ -399,8 +392,8 @@ export function FamilyTreeCanvas({ state, rootId, onNodePress, onNodeLongPress }
                   <Circle cx={n.x + SHADOW_OFFSET.node.x} cy={n.y + SHADOW_OFFSET.node.y} r={NODE_R} color={P.shadow.node} />
                   {isRoot && <Circle cx={n.x} cy={n.y} r={NODE_GLOW_R} color={P.hl.glow} />}
                   <Circle cx={n.x} cy={n.y} r={NODE_R} color={P.cream} />
-                  <PersonPhoto uri={n.photoUri} x={n.x} y={n.y} />
-                  {n.isDead && <MourningRibbon x={n.x} y={n.y} />}
+                  <PersonPhoto uri={n.photoUri} x={n.x} y={n.y} name={n.name} />
+                  {n.isDead && <MourningBand x={n.x} y={n.y} />}
                   <Circle cx={n.x} cy={n.y} r={NODE_R} color={isRoot ? P.hl.ring : P.sepia} style="stroke" strokeWidth={isRoot ? STROKE.rootRing : STROKE.nodeRing} />
                   <RoundedRect x={n.x - LABEL_BOX.width / 2} y={n.y + NODE_R + 3} width={LABEL_BOX.width} height={LABEL_BOX.height} r={LABEL_BOX.radius} color={P.cream} />
                   <RoundedRect x={n.x - LABEL_BOX.width / 2} y={n.y + NODE_R + 3} width={LABEL_BOX.width} height={LABEL_BOX.height} r={LABEL_BOX.radius} color={P.parchEdge} style="stroke" strokeWidth={STROKE.labelBox} />
@@ -410,6 +403,22 @@ export function FamilyTreeCanvas({ state, rootId, onNodePress, onNodeLongPress }
                     <Paragraph paragraph={lb.born} x={n.x - LABEL_BOX.width / 2} y={n.y + NODE_R + 30} width={LABEL_BOX.width} />
                     {lb.relation && <Paragraph paragraph={lb.relation} x={n.x - LABEL_BOX.width / 2} y={n.y + NODE_R + 41} width={LABEL_BOX.width} />}
                   </>}
+                </Group>
+              );
+            })}
+
+            {/* COUPLES — interlinked rings SVG, rendered ON TOP of nodes */}
+            {geo.couples.map((c, i) => {
+              const mx = (c.x1 + c.x2) / 2;
+              const ringsW = 28;
+              const ringsH = ringsW * (836 / 801);
+              const rx = mx - ringsW / 2;
+              const ry = c.y1 - ringsH / 2;
+              return (
+                <Group key={`cr${i}`}>
+                  {weddingRingsSvg && (
+                    <ImageSVG svg={weddingRingsSvg} x={rx} y={ry} width={ringsW} height={ringsH} />
+                  )}
                 </Group>
               );
             })}

@@ -6,7 +6,7 @@ import { loadData, saveData } from '../utils/storage';
 function assignSamplePhotos(state: FamilyState): FamilyState {
   let changed = false;
   const people = state.people.map(p => {
-    if (p.photoUri) return p;
+    if (p.photoUri !== undefined) return p;
     changed = true;
     // Derive a stable number 0-99 from person id
     let h = 0;
@@ -34,6 +34,14 @@ function familyReducer(state: FamilyState, action: FamilyAction): FamilyState {
         ...state,
         people: state.people.map((p) =>
           p.id === action.payload.id ? action.payload : p
+        ),
+      };
+
+    case 'CLEAR_PHOTO':
+      return {
+        ...state,
+        people: state.people.map((p) =>
+          p.id === action.payload ? { ...p, photoUri: null } : p
         ),
       };
 

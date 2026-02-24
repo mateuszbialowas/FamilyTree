@@ -35,6 +35,21 @@ export function PersonDetailScreen() {
   const spouses = getSpouses(person.id, state);
   const siblings = getSiblings(person.id, state);
 
+  const handleClearPhoto = () => {
+    Alert.alert(
+      'Usuń zdjęcie',
+      `Czy na pewno chcesz usunąć zdjęcie ${person.firstName} ${person.lastName}?`,
+      [
+        { text: 'Anuluj', style: 'cancel' },
+        {
+          text: 'Usuń',
+          style: 'destructive',
+          onPress: () => dispatch({ type: 'CLEAR_PHOTO', payload: person.id }),
+        },
+      ]
+    );
+  };
+
   const handleDelete = () => {
     Alert.alert(
       'Usuń osobę',
@@ -176,6 +191,17 @@ export function PersonDetailScreen() {
           variant="outline"
         />
         <View style={styles.gap} />
+        {person.photoUri && person.photoUri !== null && (
+          <>
+            <Button
+              testID="btn-clear-photo"
+              title="Usuń zdjęcie"
+              onPress={handleClearPhoto}
+              variant="ghost"
+            />
+            <View style={styles.gap} />
+          </>
+        )}
         <Button
           testID="btn-delete-person"
           title="Usuń osobę"
