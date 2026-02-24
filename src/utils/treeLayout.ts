@@ -245,6 +245,29 @@ export function computeUnifiedLayout(
     return w;
   }
 
+  /**
+   * Order children to minimize edge crossings.
+   * Widest subtrees go to the outside edges, leaf/narrow nodes
+   * stay in the center. This prevents branches from crossing
+   * sibling trunks.
+   */
+  function orderChildren(kids: DescNode[]): DescNode[] {
+    if (kids.length <= 1) return kids;
+    const sorted = [...kids].sort((a, b) => subWidth(b) - subWidth(a));
+    const result: DescNode[] = new Array(sorted.length);
+    let left = 0, right = sorted.length - 1;
+    let pickRight = true;
+    for (const child of sorted) {
+      if (pickRight) {
+        result[right--] = child;
+      } else {
+        result[left++] = child;
+      }
+      pickRight = !pickRight;
+    }
+    return result;
+  }
+
   function placeDesc(node: DescNode, cx: number) {
     if (node.spouseId) {
       addNode(mkNode(node.id, cx - COUPLE_SPACING, node.gen));
@@ -254,11 +277,12 @@ export function computeUnifiedLayout(
     }
 
     if (node.children.length > 0) {
-      const totalW = node.children.reduce(
+      const ordered = orderChildren(node.children);
+      const totalW = ordered.reduce(
         (s, c, i) => s + subWidth(c) + (i > 0 ? CHILD_GAP : 0), 0,
       );
       let cursor = cx - totalW / 2;
-      for (const child of node.children) {
+      for (const child of ordered) {
         const cw = subWidth(child);
         placeDesc(child, cursor + cw / 2);
         cursor += cw + CHILD_GAP;
@@ -325,35 +349,59 @@ export function computeUnifiedLayout(
         const newKids = allKids.filter(id => !placed.has(id));
         const childGen = genOf.get(pn.id)!;
 
-        // Place new siblings — to the right of ALL existing nodes at child's generation
-        const existingEdge = rightmostAtGen(childGen);
-        let sx = existingKids.length > 0
-          ? Math.max(...existingKids.map(k => {
-              const ks = spouseOf(k.id);
-              return ks && nodeMap.has(ks) ? Math.max(k.x, nodeMap.get(ks)!.x) : k.x;
-            })) + CHILD_GAP + COUPLE_SPACING * 2
-          : existingEdge + CHILD_GAP + COUPLE_SPACING * 2;
-
-        // Ensure we don't overlap with ANY node at this gen
-        if (sx < existingEdge + MIN_NODE_DIST) {
-          sx = existingEdge + MIN_NODE_DIST;
-        }
-
+        // Place new siblings to the LEFT of existing children.
+        // This avoids crossings: branches to leaf siblings go left,
+        // while the existing child (with descendants below) stays right.
         const sibNodes: LNode[] = [];
-        for (const kid of newKids) {
-          const ks = spouseOf(kid);
-          if (ks && !placed.has(ks) && pMap.has(ks)) {
-            const sn = mkNode(kid, sx, childGen);
-            const spn = mkNode(ks, sx + COUPLE_SPACING * 2, childGen, kid);
-            addNode(sn);
-            addNode(spn);
-            sibNodes.push(sn);
-            sx += COUPLE_WIDTH + CHILD_GAP;
-          } else {
-            const sn = mkNode(kid, sx, childGen);
-            addNode(sn);
-            sibNodes.push(sn);
-            sx += SOLO_WIDTH + CHILD_GAP;
+
+        if (existingKids.length > 0 && newKids.length > 0) {
+          // Find leftmost X of existing kids (including their spouses)
+          const existingLeftX = Math.min(...existingKids.map(k => {
+            const ks = spouseOf(k.id);
+            return ks && nodeMap.has(ks) ? Math.min(k.x, nodeMap.get(ks)!.x) : k.x;
+          }));
+
+          // Place new siblings right-to-left, starting just left of existing kids
+          let sx = existingLeftX - CHILD_GAP;
+          for (let i = newKids.length - 1; i >= 0; i--) {
+            const kid = newKids[i];
+            const ks = spouseOf(kid);
+            if (ks && !placed.has(ks) && pMap.has(ks)) {
+              const spn = mkNode(ks, sx, childGen, kid);
+              const sn = mkNode(kid, sx - COUPLE_SPACING * 2, childGen);
+              addNode(sn);
+              addNode(spn);
+              sibNodes.push(sn);
+              sx = sn.x - CHILD_GAP;
+            } else {
+              const sn = mkNode(kid, sx, childGen);
+              addNode(sn);
+              sibNodes.push(sn);
+              sx -= SOLO_WIDTH + CHILD_GAP;
+            }
+          }
+        } else {
+          // No existing kids — place to the right of everything at this gen
+          const existingEdge = rightmostAtGen(childGen);
+          let sx = existingEdge > -Infinity
+            ? existingEdge + MIN_NODE_DIST
+            : INITIAL_MARGIN;
+
+          for (const kid of newKids) {
+            const ks = spouseOf(kid);
+            if (ks && !placed.has(ks) && pMap.has(ks)) {
+              const sn = mkNode(kid, sx, childGen);
+              const spn = mkNode(ks, sx + COUPLE_SPACING * 2, childGen, kid);
+              addNode(sn);
+              addNode(spn);
+              sibNodes.push(sn);
+              sx += COUPLE_WIDTH + CHILD_GAP;
+            } else {
+              const sn = mkNode(kid, sx, childGen);
+              addNode(sn);
+              sibNodes.push(sn);
+              sx += SOLO_WIDTH + CHILD_GAP;
+            }
           }
         }
 
