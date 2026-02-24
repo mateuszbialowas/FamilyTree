@@ -410,11 +410,25 @@ export function computeUnifiedLayout(
         const xs = allChildNodes.map(n => n.x);
         let center = (Math.min(...xs) + Math.max(...xs)) / 2;
 
-        // Check parents don't overlap with existing nodes at parent generation
-        const parentEdge = rightmostAtGen(parentGen);
+        // Check parents don't actually overlap with existing nodes at parent generation
         const parentHalfWidth = g2 ? COUPLE_SPACING : 0;
-        if (center - parentHalfWidth < parentEdge + MIN_NODE_DIST && parentEdge > -Infinity) {
-          center = parentEdge + MIN_NODE_DIST + parentHalfWidth;
+        const existingAtParentGen = nodes.filter(n =>
+          (genOf.get(n.id) ?? -9999) === parentGen
+        );
+        for (const en of existingAtParentGen) {
+          const enLeft = en.x;
+          const enRight = en.partnerId && nodeMap.has(en.partnerId)
+            ? Math.max(en.x, nodeMap.get(en.partnerId)!.x) : en.x;
+          const myLeft = center - parentHalfWidth;
+          const myRight = center + parentHalfWidth;
+          // Only adjust if there's real overlap
+          if (myRight + MIN_NODE_DIST > enLeft && myLeft - MIN_NODE_DIST < enRight) {
+            const pushRight = enRight + MIN_NODE_DIST + parentHalfWidth;
+            const pushLeft = enLeft - MIN_NODE_DIST - parentHalfWidth;
+            // Choose direction closer to natural center (above children)
+            center = Math.abs(pushRight - center) < Math.abs(pushLeft - center)
+              ? pushRight : pushLeft;
+          }
         }
 
         if (g2) {
@@ -430,6 +444,68 @@ export function computeUnifiedLayout(
   }
 
   processAncestors();
+
+  // ============================================================
+  // PHASE 4b: Barycenter reordering of ancestor generations
+  // ============================================================
+  // For each ancestor generation, sort family units (couples/solos) by the
+  // average X of their children. This eliminates crossings between different
+  // family units whose branches would otherwise intersect.
+
+  for (let g = -1; g >= minGen; g--) {
+    const genNodes = nodes.filter(n => (genOf.get(n.id) ?? 0) === g);
+    if (genNodes.length <= 1) continue;
+
+    // Group into family units (couple or solo)
+    interface FamilyUnit { nodeIds: string[]; center: number; barycenter: number }
+    const units: FamilyUnit[] = [];
+    const seen = new Set<string>();
+
+    for (const n of genNodes) {
+      if (seen.has(n.id)) continue;
+      seen.add(n.id);
+      const partner = n.partnerId ? nodeMap.get(n.partnerId) : null;
+      const ids = [n.id];
+      if (partner && !seen.has(partner.id)) {
+        ids.push(partner.id);
+        seen.add(partner.id);
+      }
+      const xs = ids.map(id => nodeMap.get(id)!.x);
+      const unitCenter = (Math.min(...xs) + Math.max(...xs)) / 2;
+
+      // Barycenter = average X of all children at the next generation (gen + 1)
+      const childXs: number[] = [];
+      for (const uid of ids) {
+        for (const cid of childrenOf.get(uid) ?? []) {
+          const cn = nodeMap.get(cid);
+          if (cn && (genOf.get(cid) ?? 0) === g + 1) childXs.push(cn.x);
+        }
+      }
+      const bc = childXs.length > 0
+        ? childXs.reduce((s, x) => s + x, 0) / childXs.length
+        : unitCenter;
+
+      units.push({ nodeIds: ids, center: unitCenter, barycenter: bc });
+    }
+
+    if (units.length <= 1) continue;
+
+    // Current positions sorted left-to-right
+    units.sort((a, b) => a.center - b.center);
+    const slots = units.map(u => u.center);
+
+    // Sort by barycenter and assign to slots
+    const sorted = [...units].sort((a, b) => a.barycenter - b.barycenter);
+    for (let i = 0; i < sorted.length; i++) {
+      const unit = sorted[i];
+      const shift = slots[i] - unit.center;
+      if (Math.abs(shift) < 0.5) continue;
+      for (const id of unit.nodeIds) {
+        const n = nodeMap.get(id);
+        if (n) n.x += shift;
+      }
+    }
+  }
 
   // ============================================================
   // PHASE 5: Fix any remaining horizontal overlaps (safety sweep)
