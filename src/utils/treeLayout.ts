@@ -575,6 +575,28 @@ export function computeUnifiedLayout(
     }
   }
 
+  // 6c: Ensure root always has a trunk (tree base)
+  const rootNode = nodeMap.get(rootId);
+  if (rootNode) {
+    const rootSp = spouseOf(rootId);
+    const rootCenterX = rootSp && nodeMap.has(rootSp)
+      ? (rootNode.x + nodeMap.get(rootSp)!.x) / 2
+      : rootNode.x;
+    const hasDownwardTrunk = conns.some(c =>
+      c.type === 'trunk' && Math.abs(c.x1 - rootCenterX) < 5 && c.depth === 0
+    );
+    if (!hasDownwardTrunk) {
+      const ry = rootNode.y;
+      conns.push({
+        x1: rootCenterX, y1: ry + NODE_R + TRUNK_OFFSET,
+        x2: rootCenterX, y2: ry + NODE_R + ROOT_TRUNK_LEN,
+        type: 'trunk',
+        seed: hsh(rootId + 'rootTrunk'),
+        depth: 0,
+      });
+    }
+  }
+
   // ============================================================
   // PHASE 7: Normalize coordinates + add disconnected people
   // ============================================================

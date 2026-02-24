@@ -83,11 +83,15 @@ export function FamilyTreeCanvas({ state, rootId, onNodePress, onNodeLongPress }
 
   const geo = useMemo(() => {
     const trunkConns = layout.conns.filter(c => c.type === 'trunk');
+    const branchConns = layout.conns.filter(c => c.type === 'branch');
     const trunks = trunkConns.map(c => {
       const topY = Math.min(c.y1, c.y2);
       const botY = Math.max(c.y1, c.y2);
       const isRootTrunk = c.depth === 0;
-      const rootDir: 'up' | 'down' | null = isRootTrunk ? 'up' : null;
+      const hasBranches = branchConns.some(b => Math.abs(b.x1 - c.x1) < 5);
+      const rootDir: 'up' | 'down' | null = isRootTrunk
+        ? (hasBranches ? 'up' : 'down')
+        : null;
       const raw = genTrunk(c.x1, topY, botY, TRUNK_BASE_WIDTH, c.seed, rootDir);
       return {
         ...c, bw: TRUNK_BASE_WIDTH, midW: raw.midW,
@@ -264,11 +268,11 @@ export function FamilyTreeCanvas({ state, rootId, onNodePress, onNodeLongPress }
                 <Path path={t.path} style="fill">
                   <LinearGradient start={vec(t.x1 - 12, t.y1)} end={vec(t.x1 + 12, t.y1)} colors={[P.bark.light, P.bark.mid, P.bark.dark, P.bark.mid, P.bark.light]} />
                 </Path>
-                <Path path={t.path} style="fill" opacity={0.2}>
-                  <LinearGradient start={vec(t.x1, t.y1)} end={vec(t.x1, t.y2)} colors={[P.bark.highlight, 'transparent', P.bark.shadow]} />
+                <Path path={t.path} style="fill" opacity={0.3}>
+                  <LinearGradient start={vec(t.x1, t.y1)} end={vec(t.x1, t.y2)} colors={['rgba(200,180,150,0.5)', 'transparent', P.bark.shadow]} />
                 </Path>
                 {t.furrows.map((f, fi) => <Path key={fi} path={f.path} style="stroke" color={P.bark.deep} strokeWidth={f.w} opacity={f.op} strokeCap="round" />)}
-                {t.highlights.map((h, hi) => <Path key={hi} path={h.path} style="stroke" color="rgba(255,255,240,0.06)" strokeWidth={h.w} opacity={h.op} strokeCap="round" />)}
+                {t.highlights.map((h, hi) => <Path key={hi} path={h.path} style="stroke" color="rgba(255,252,235,0.35)" strokeWidth={h.w} opacity={h.op} strokeCap="round" />)}
                 {t.knots.map((k, ki) => (
                   <Group key={ki}>
                     <Oval x={k.cx - k.rx} y={k.cy - k.ry} width={k.rx * 2} height={k.ry * 2} color={P.bark.shadow} opacity={k.op} />

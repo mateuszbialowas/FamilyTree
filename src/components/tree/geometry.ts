@@ -19,7 +19,7 @@ const FURROW_COUNT = 16;
 const CRACK_COUNT = 8;
 
 /** Number of light highlight lines on each trunk */
-const HIGHLIGHT_COUNT = 3;
+const HIGHLIGHT_COUNT = 5;
 
 /** Number of knot circles on each trunk */
 const KNOT_COUNT = 3;
@@ -115,15 +115,16 @@ export function genTrunk(x: number, y1: number, y2: number, bw: number, seed: nu
 
   const highlights: { d: string; w: number; op: number }[] = [];
   for (let i = 0; i < HIGHLIGHT_COUNT; i++) {
-    const t1 = 0.05 + r() * 0.3, t2 = t1 + 0.15 + r() * 0.3;
-    const xRatio = 0.15 + r() * 0.15;
+    const t1 = 0.05 + r() * 0.3, t2 = t1 + 0.2 + r() * 0.35;
+    const side = r() > 0.6 ? 1 : -1;
+    const xRatio = side * (0.12 + r() * 0.18);
     let d = '';
     for (let j = 0; j <= 5; j++) {
       const t = lerp(t1, t2, j / 5), idx = Math.min(Math.floor(t * TRUNK_SEGMENTS), TRUNK_SEGMENTS);
       const px = ctr[idx].x + xRatio * ctr[idx].w + (r() - 0.5) * 1;
       d += j === 0 ? `M ${px} ${ctr[idx].y}` : ` L ${px} ${ctr[idx].y}`;
     }
-    highlights.push({ d, w: 1 + r() * 2, op: 0.04 + r() * 0.04 });
+    highlights.push({ d, w: 1.5 + r() * 2.5, op: 0.12 + r() * 0.1 });
   }
 
   const knots = Array.from({ length: KNOT_COUNT }, () => {
