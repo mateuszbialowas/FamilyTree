@@ -20,24 +20,9 @@
   font-family: 'Georgia', serif;
 }
 
-.VPHero .image-container .image-bg {
-  max-width: 448px;
-  max-height: 448px;
-}
-
-.VPHero .image-container img {
-  max-width: 448px;
-  max-height: 448px;
-}
-
 @media (min-width: 960px) {
-  .VPHero .image-container .image-bg {
-    max-width: 512px;
-    max-height: 512px;
-  }
-
-  .VPHero .image-container img {
-    max-width: 512px;
-    max-height: 512px;
+  .VPHero .image-container {
+    transform: scale(2);
+    transform-origin: center center;
   }
 }
