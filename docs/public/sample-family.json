@@ -1,0 +1,134 @@
+{
+  "people": [
+    {
+      "id": "p1",
+      "firstName": "Stanisław",
+      "lastName": "Kowalski",
+      "gender": "male",
+      "birthDate": "1935-03-12",
+      "deathDate": "2010-11-05",
+      "notes": "Nauczyciel historii w liceum w Krakowie."
+    },
+    {
+      "id": "p2",
+      "firstName": "Helena",
+      "lastName": "Kowalska",
+      "gender": "female",
+      "birthDate": "1938-07-22",
+      "deathDate": null,
+      "notes": "Z domu Wiśniewska. Emerytowana pielęgniarka."
+    },
+    {
+      "id": "p3",
+      "firstName": "Jan",
+      "lastName": "Nowak",
+      "gender": "male",
+      "birthDate": "1933-01-08",
+      "deathDate": "2005-04-17",
+      "notes": "Inżynier budownictwa. Budował mosty na Wiśle."
+    },
+    {
+      "id": "p4",
+      "firstName": "Maria",
+      "lastName": "Nowak",
+      "gender": "female",
+      "birthDate": "1936-09-30",
+      "deathDate": "2018-12-01",
+      "notes": "Z domu Zielińska. Kochała gotowanie i ogrodnictwo."
+    },
+    {
+      "id": "p5",
+      "firstName": "Andrzej",
+      "lastName": "Kowalski",
+      "gender": "male",
+      "birthDate": "1962-05-15",
+      "deathDate": null,
+      "notes": "Architekt. Prowadzi własną pracownię w Warszawie."
+    },
+    {
+      "id": "p6",
+      "firstName": "Anna",
+      "lastName": "Kowalska",
+      "gender": "female",
+      "birthDate": "1965-11-28",
+      "deathDate": null,
+      "notes": "Z domu Nowak. Lekarka pediatra."
+    },
+    {
+      "id": "p7",
+      "firstName": "Tomasz",
+      "lastName": "Kowalski",
+      "gender": "male",
+      "birthDate": "1968-02-10",
+      "deathDate": null,
+      "notes": "Młodszy brat Andrzeja. Muzyk jazzowy."
+    },
+    {
+      "id": "p8",
+      "firstName": "Katarzyna",
+      "lastName": "Kowalska",
+      "gender": "female",
+      "birthDate": "1970-08-03",
+      "deathDate": null,
+      "notes": "Z domu Wójcik. Właścicielka kwiaciarni."
+    },
+    {
+      "id": "p9",
+      "firstName": "Michał",
+      "lastName": "Kowalski",
+      "gender": "male",
+      "birthDate": "1990-04-20",
+      "deathDate": null,
+      "notes": "Syn Andrzeja i Anny. Programista."
+    },
+    {
+      "id": "p10",
+      "firstName": "Zofia",
+      "lastName": "Kowalska",
+      "gender": "female",
+      "birthDate": "1993-12-14",
+      "deathDate": null,
+      "notes": "Córka Andrzeja i Anny. Studentka medycyny."
+    },
+    {
+      "id": "p11",
+      "firstName": "Jakub",
+      "lastName": "Kowalski",
+      "gender": "male",
+      "birthDate": "1996-06-30",
+      "deathDate": null,
+      "notes": "Syn Tomasza i Katarzyny. Studiuje architekturę."
+    },
+    {
+      "id": "p12",
+      "firstName": "Ewa",
+      "lastName": "Kowalska",
+      "gender": "female",
+      "birthDate": "1999-03-08",
+      "deathDate": null,
+      "notes": "Córka Tomasza i Katarzyny. Gra na skrzypcach."
+    }
+  ],
+  "parentChildRelationships": [
+    { "id": "r1", "parentId": "p1", "childId": "p5" },
+    { "id": "r2", "parentId": "p2", "childId": "p5" },
+    { "id": "r3", "parentId": "p1", "childId": "p7" },
+    { "id": "r4", "parentId": "p2", "childId": "p7" },
+    { "id": "r5", "parentId": "p3", "childId": "p6" },
+    { "id": "r6", "parentId": "p4", "childId": "p6" },
+    { "id": "r7", "parentId": "p5", "childId": "p9" },
+    { "id": "r8", "parentId": "p6", "childId": "p9" },
+    { "id": "r9", "parentId": "p5", "childId": "p10" },
+    { "id": "r10", "parentId": "p6", "childId": "p10" },
+    { "id": "r11", "parentId": "p7", "childId": "p11" },
+    { "id": "r12", "parentId": "p8", "childId": "p11" },
+    { "id": "r13", "parentId": "p7", "childId": "p12" },
+    { "id": "r14", "parentId": "p8", "childId": "p12" }
+  ],
+  "marriages": [
+    { "id": "m1", "spouse1Id": "p1", "spouse2Id": "p2", "marriageDate": "1960-06-15", "divorceDate": null },
+    { "id": "m2", "spouse1Id": "p3", "spouse2Id": "p4", "marriageDate": "1958-09-20", "divorceDate": null },
+    { "id": "m3", "spouse1Id": "p5", "spouse2Id": "p6", "marriageDate": "1988-07-10", "divorceDate": null },
+    { "id": "m4", "spouse1Id": "p7", "spouse2Id": "p8", "marriageDate": "1994-05-25", "divorceDate": null }
+  ]
+}
