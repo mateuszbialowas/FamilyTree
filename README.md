@@ -1,164 +1,158 @@
-# FamilyTree
+<p align="center">
+  <img src="assets/icon.png" width="120" alt="FamilyTree logo" />
+</p>
 
-A mobile genealogy app for creating and managing family trees. Built with React Native (Expo), it lets users add family members, define relationships, and visualize their family tree as an organic, animated tree.
+<h1 align="center">FamilyTree</h1>
 
-**UI Language:** Polish
+<p align="center">
+  <strong>Your family history, beautifully preserved.</strong>
+  <br />
+  A mobile genealogy app with organic tree visualization — built with React Native & Expo.
+</p>
+
+<p align="center">
+  <a href="https://github.com/mateuszbialowas/FamilyTree/actions/workflows/docs.yml"><img src="https://github.com/mateuszbialowas/FamilyTree/actions/workflows/docs.yml/badge.svg" alt="Docs" /></a>
+  <img src="https://img.shields.io/badge/platform-iOS%20%7C%20Android-lightgrey?logo=apple&logoColor=white" alt="Platform" />
+  <img src="https://img.shields.io/badge/expo-~54-000020?logo=expo&logoColor=white" alt="Expo" />
+  <img src="https://img.shields.io/badge/react_native-0.81-61DAFB?logo=react&logoColor=white" alt="React Native" />
+  <img src="https://img.shields.io/badge/typescript-~5.9-3178C6?logo=typescript&logoColor=white" alt="TypeScript" />
+  <img src="https://img.shields.io/badge/license-MIT-green" alt="License" />
+</p>
+
+<p align="center">
+  <a href="https://mateuszbialowas.github.io/FamilyTree/">Documentation</a> &bull;
+  <a href="https://mateuszbialowas.github.io/FamilyTree/privacy-policy">Privacy Policy</a> &bull;
+  <a href="#-getting-started">Getting Started</a>
+</p>
+
+---
+
+<!-- Add your screenshots here
+<p align="center">
+  <img src="docs/public/screenshots/tree.png" width="250" />
+  &nbsp;&nbsp;
+  <img src="docs/public/screenshots/list.png" width="250" />
+  &nbsp;&nbsp;
+  <img src="docs/public/screenshots/detail.png" width="250" />
+</p>
+-->
+
+## Highlights
+
+- **Organic tree visualization** — procedurally generated trunks, branches, leaves, and animals rendered with Skia
+- **Smart relationship engine** — define parents, children, and spouses; the app infers grandparents, cousins, uncles, and more
+- **100% offline** — all data stays on your device, no accounts, no cloud
+- **Import & export** — back up and share family data as JSON
+- **Animated details** — swaying leaves, blinking owls, bobbing birds, and wagging squirrel tails
 
 ## Features
 
-### People Management
-- **Add a person** — first name, last name, gender (male/female), birth date, death date, notes
-- **Edit a person** — modify any field of an existing person
-- **Delete a person** — removes the person and all associated relationships
-- **Search** — filter people list by first or last name
+| Feature | Description |
+|---------|-------------|
+| **Tree view** | Interactive canvas with pinch-to-zoom, pan, and tap-to-navigate |
+| **People list** | Searchable list with initials avatars |
+| **Relationships** | Parent-child, marriage (with dates), inferred siblings |
+| **Tree modes** | Ancestors, descendants, or both — auto-detected based on data |
+| **Long press** | Quick-add a relative directly from the tree |
+| **Mourning band** | Deceased family members shown with a black band |
+| **Data management** | Export, import, and clear all data from Settings |
 
-### Relationships
-- **Parent-Child** — define who is the parent of whom
-- **Marriage** — link two people as spouses, optionally with marriage/divorce dates
-- **Sibling** — auto-created by sharing the same parent(s)
-- **Remove relationship** — delete any individual relationship without affecting the people
+## Getting Started
 
-### Tree Visualization
+### Prerequisites
 
-The tree is rendered on an interactive Skia canvas with procedurally generated organic visuals (bark, leaves, animals).
+- [Node.js](https://nodejs.org/) 18+
+- [Expo CLI](https://docs.expo.dev/get-started/installation/)
+- iOS Simulator (macOS) or Android Emulator
 
-#### Tree Root & Direction
+### Installation
 
-| Concept | Description |
-|---|---|
-| **Root** | The selected person from whom the tree grows. Users pick the root via a dropdown at the top of the Tree screen. |
-| **Descendants mode** | The root is at the **top**. Children grow **downward**. Each generation is placed below its parents. |
-| **Ancestors mode** | The root is at the **bottom**. Parents grow **upward**. Each generation of ancestors is placed above. The layout is computed top-down then vertically flipped. |
-| **Both mode** | The root is in the **middle**. Ancestors grow **upward**, descendants grow **downward**. Both trees are computed independently and merged at the root node. |
-| **Auto-detection** | The app auto-detects the best mode: root has both children and parents → both; only children → descendants; only parents → ancestors. The user can override manually (tap the active button again to return to auto). |
-
-#### Layout Algorithm (`treeLayout.ts`)
-
-```
-                 Root (depth 0)
-                   |
-              [TRUNK — vertical line from root]
-             /           \
-        Child A         Child B        ← depth 1
-        (solo)        + Spouse
-                         |
-                    [TRUNK from couple midpoint]
-                   /          \
-             Grandchild 1   Grandchild 2   ← depth 2
+```bash
+git clone https://github.com/mateuszbialowas/FamilyTree.git
+cd FamilyTree
+npm install
 ```
 
-**How it works:**
+### Run
 
-1. **Build tree** — Starting from the root, recursively collects spouse + children (descendants mode), parents (ancestors mode), or both directions into a `TreePerson` hierarchy.
-2. **Calculate widths** — `subW()` computes the horizontal space each subtree needs. A couple needs 160px minimum, a solo node needs 80px. Children are spaced with a 40px gap between them.
-3. **Place nodes** — `place()` positions each node at (x, y):
-   - **Couples** are placed side by side, 40px left and right of center.
-   - **Solo nodes** are centered.
-   - A **trunk** (vertical line) extends from the node/couple downward.
-   - **Branches** (curved lines) fan out from the trunk bottom to each child.
-4. **Generation height** — Each generation is 200px apart vertically. The root generation gets an extra 60px to make the trunk more prominent.
-5. **Normalize** — All nodes are shifted so the leftmost node is at x=60 (left margin).
-6. **Flip for ancestors** — In ancestor mode, the Y-axis is mirrored so ancestors appear above the root.
-7. **Disconnected people** — Anyone not in the tree is shown as standalone nodes to the right of the tree.
+```bash
+# iOS
+npx expo run:ios
 
-#### Connections Between Nodes
+# Android
+npx expo run:android
 
-| Connection | Visual | When |
+# Expo dev server (press i/a to pick platform)
+npm start
+```
+
+### Sample data
+
+Want to see the tree in action? Import the sample family file:
+
+1. Download [`sample-family.json`](docs/public/sample-family.json)
+2. Open the app → **Ustawienia** (Settings) → **Importuj dane**
+3. Select the file — a 3-generation Polish family will appear
+
+## Tech Stack
+
+| | Technology | Version |
 |---|---|---|
-| **Couple line** | Double red horizontal line with gold circle at center | Two people are married |
-| **Trunk** | Thick vertical organic bark shape | Connects a parent (or couple midpoint) to the branch junction below |
-| **Branch** | Curved organic bark shape with bezier curves | Connects the trunk bottom to each child node |
-
-#### Organic Visuals (procedural generation)
-
-- **Trunks** — 28-segment shapes with taper, root flare, bark furrows, cracks, highlights, knots, and moss patches
-- **Roots** — 6-8 organic root paths growing from the trunk base (direction depends on tree mode: up for descendants, down for ancestors, omitted in both mode)
-- **Branches** — 18-segment curves with gravity droop, S-curves, bark lines, and twigs
-- **Leaves** — 3-layer canopy system (deep/mid/light colors) with 3 leaf shape variants, placed around trunks and branches
-- **Animals** — Owl on the main trunk, birds and squirrels scattered on branches (seeded randomization)
-
-#### Animations
-- Leaf sway (5s wind cycle)
-- Owl blinking (every 3.5s)
-- Bird bobbing
-- Squirrel tail wagging
-
-#### Gestures
-- **Tap** a node → navigate to person detail
-- **Long press** a node → quick-add a relative (parent/child/spouse/sibling)
-- **Pan** → move around the tree (with momentum decay)
-- **Pinch** → zoom (0.3x to 4x)
-- **Center button** → reset view to the root node
-
-### Data Management
-- **Auto-save** — state persists to AsyncStorage with 500ms debounce
-- **Export** — save family data as JSON file (via sharing)
-- **Import** — load family data from a JSON file
-- **Clear all** — delete all people and relationships (with confirmation)
-
-## Data Model
-
-```typescript
-Person {
-  id, firstName, lastName, gender, birthDate, deathDate, notes
-}
-
-ParentChildRelationship {
-  id, parentId, childId
-}
-
-Marriage {
-  id, spouse1Id, spouse2Id, marriageDate, divorceDate
-}
-```
+| **Framework** | Expo + React Native | ~54 / 0.81 |
+| **Language** | TypeScript | ~5.9 |
+| **UI** | React | 19.1 |
+| **Canvas** | @shopify/react-native-skia | 2.2 |
+| **Navigation** | React Navigation | v7 |
+| **Storage** | AsyncStorage | 2.2 |
+| **Fonts** | Playfair Display, Lora | Google Fonts |
+| **E2E Tests** | Maestro | CLI |
 
 ## Architecture
 
 ```
 src/
 ├── components/
-│   ├── tree/          — Canvas rendering (Skia), geometry generation, animals
-│   │   ├── palette.ts        — Color constants for tree visuals
-│   │   ├── mathHelpers.ts    — Seeded random, lerp, pick
-│   │   ├── skiaHelpers.ts    — Skia path/paragraph builders
-│   │   ├── geometry.ts       — Trunk, branch, leaf, root, animal generation
-│   │   ├── animals.tsx       — Owl, bird, squirrel Skia components
-│   │   └── FamilyTreeCanvas.tsx — Main tree canvas with gestures & animations
-│   ├── ui/            — Reusable primitives (Button, TextInput, Card, etc.)
-│   ├── PersonForm.tsx — Shared form for adding/editing a person
+│   ├── tree/            # Skia canvas, geometry, animals
+│   ├── ui/              # Button, TextInput, Card, etc.
 │   ├── PersonListItem.tsx
 │   └── RelationshipCard.tsx
 ├── context/
-│   └── FamilyContext.tsx — Global state (useReducer + AsyncStorage persistence)
-├── navigation/
-│   ├── stackConfig.ts — Shared navigation options and screen registrations
-│   ├── BottomTabs.tsx — 3 tabs: Drzewo, Lista, Ustawienia
-│   ├── TreeStack.tsx / ListStack.tsx / SettingsStack.tsx
-│   └── RootNavigator.tsx
-├── screens/           — Screen components (Tree, PeopleList, PersonDetail, etc.)
-├── theme/             — Colors, typography, spacing, shared form styles
-├── types/             — TypeScript type definitions
-└── utils/             — UUID generator, storage, date helpers, relationships, tree layout
+│   └── FamilyContext.tsx # useReducer + AsyncStorage (500ms debounce)
+├── navigation/          # Bottom tabs + native stacks
+├── screens/             # All app screens
+├── theme/               # Colors, typography, spacing
+├── types/               # Person, Relationship, Marriage
+└── utils/               # UUID, tree layout, relationship labels
 ```
 
-## Tech Stack
-
-| Tool | Version |
-|---|---|
-| Expo | ~54.0.33 |
-| React | 19.1.0 |
-| React Native | 0.81.5 |
-| TypeScript | ~5.9.2 |
-| @shopify/react-native-skia | 2.2.12 |
-| React Navigation | v7 |
-| AsyncStorage | 2.2.0 |
+> Full architecture docs: [mateuszbialowas.github.io/FamilyTree/guide/architecture](https://mateuszbialowas.github.io/FamilyTree/guide/architecture)
 
 ## Commands
 
-```bash
-npm start                        # Start Expo dev server
-npx expo run:ios                 # Build & run on iOS simulator
-npx expo run:android             # Build & run on Android emulator
-npm run test:e2e                 # Run all Maestro E2E tests
-npm run test:e2e:single <file>   # Run a single Maestro test
-```
+| Command | Description |
+|---------|-------------|
+| `npm start` | Start Expo dev server |
+| `npx expo run:ios` | Build & run on iOS simulator |
+| `npx expo run:android` | Build & run on Android emulator |
+| `npm run test:e2e` | Run all Maestro E2E tests |
+| `npm run test:e2e:single <file>` | Run a single Maestro test |
+| `npx expo prebuild --clean` | Regenerate native projects |
+
+## Contributing
+
+Contributions are welcome! Please read the [contributing guide](https://mateuszbialowas.github.io/FamilyTree/guide/contributing) before submitting a PR.
+
+1. Fork the repo
+2. Create your branch (`git checkout -b feature/amazing-feature`)
+3. Commit your changes
+4. Push and open a Pull Request
+
+## License
+
+Distributed under the MIT License. See `LICENSE` for more information.
+
+---
+
+<p align="center">
+  Made with &#10084; by <a href="https://github.com/mateuszbialowas">Mateusz Białowąs</a>
+</p>
