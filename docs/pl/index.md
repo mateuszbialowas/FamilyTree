@@ -4,7 +4,7 @@ layout: home
 hero:
   name: FamilyTree
   text: Historia Twojej Rodziny, Pięknie Zachowana
-  tagline: Mobilna aplikacja genealogiczna do tworzenia i zarządzania drzewami rodzinnymi — zbudowana z React Native i Expo
+  tagline: Odkryj swoje korzenie, celebruj dziedzictwo i przekaż swoją historię kolejnym pokoleniom.
   image:
     src: /screenshots/hero.png
     alt: Zrzuty ekranu aplikacji FamilyTree
@@ -18,11 +18,11 @@ hero:
 
 features:
   - title: Piękna Wizualizacja Drzewa
-    details: Interaktywne drzewo rodzinne renderowane za pomocą Skia — organiczne gałęzie, sowy i ciepła paleta sepii.
+    details: Zobacz, jak historia Twojej rodziny ożywa dzięki eleganckiemu drzewu — ciepłe kolory, organiczne gałęzie i design, który jest naprawdę osobisty.
   - title: Zarządzanie Relacjami
-    details: Dodawaj rodziców, dzieci, małżonków i rodzeństwo. Aplikacja automatycznie wnioskuje relacje rozszerzone, takie jak dziadkowie czy kuzyni.
-  - title: Import i Eksport
-    details: Twórz kopie zapasowe danych w formacie JSON lub udostępniaj je członkom rodziny. Importuj istniejące drzewa jednym dotknięciem.
-  - title: Całkowicie Offline
-    details: Wszystkie dane pozostają na Twoim urządzeniu dzięki AsyncStorage. Bez konta, bez chmury, pełna prywatność.
+    details: Dodawaj rodziców, dzieci, małżonków i rodzeństwo. Aplikacja automatycznie odkrywa dalsze powiązania, takie jak dziadkowie czy kuzyni.
+  - title: Udostępniaj Rodzinie
+    details: Eksportuj swoje drzewo i podziel się nim z bliskimi. Importuj drzewa od rodziny, by połączyć wasze historie w jednym miejscu.
+  - title: Prywatność i Tryb Offline
+    details: Dane Twojej rodziny nigdy nie opuszczają urządzenia. Bez konta, bez chmury — pełna prywatność i spokój ducha.
 ---
