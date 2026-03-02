@@ -1,10 +1,11 @@
-import React from 'react';
+import React, { useMemo } from 'react';
 import { View, Text, ScrollView, Alert, StyleSheet } from 'react-native';
 import { useRoute, useNavigation } from '@react-navigation/native';
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import type { RouteProp } from '@react-navigation/native';
 import { useFamily } from '../context/FamilyContext';
 import { getParents, getChildren, getSpouses, getSiblings } from '../utils/relationships';
+import { computeRelationshipLabels } from '../utils/relationshipLabels';
 import { ScreenHeader } from '../components/ui/ScreenHeader';
 import { Button } from '../components/ui/Button';
 import { Card } from '../components/ui/Card';
@@ -14,7 +15,7 @@ import { colors } from '../theme/colors';
 import { fonts, fontSizes } from '../theme/typography';
 import { spacing } from '../theme/spacing';
 
-type RouteParams = { PersonDetail: { personId: string } };
+type RouteParams = { PersonDetail: { personId: string; rootId?: string } };
 
 export function PersonDetailScreen() {
   const route = useRoute<RouteProp<RouteParams, 'PersonDetail'>>();
@@ -30,25 +31,17 @@ export function PersonDetailScreen() {
     );
   }
 
+  const rootId = route.params.rootId;
+  const formalLabel = useMemo(() => {
+    if (!rootId || rootId === person.id) return null;
+    const labels = computeRelationshipLabels(rootId, state, 'formal');
+    return labels.get(person.id) ?? null;
+  }, [rootId, person.id, state]);
+
   const parents = getParents(person.id, state);
   const children = getChildren(person.id, state);
   const spouses = getSpouses(person.id, state);
   const siblings = getSiblings(person.id, state);
-
-  const handleClearPhoto = () => {
-    Alert.alert(
-      'Usuń zdjęcie',
-      `Czy na pewno chcesz usunąć zdjęcie ${person.firstName} ${person.lastName}?`,
-      [
-        { text: 'Anuluj', style: 'cancel' },
-        {
-          text: 'Usuń',
-          style: 'destructive',
-          onPress: () => dispatch({ type: 'CLEAR_PHOTO', payload: person.id }),
-        },
-      ]
-    );
-  };
 
   const handleDelete = () => {
     Alert.alert(
@@ -87,7 +80,9 @@ export function PersonDetailScreen() {
     <ScrollView style={styles.container} contentContainerStyle={styles.content}>
       <ScreenHeader
         title={`${person.firstName} ${person.lastName}`}
-        subtitle={person.gender === 'male' ? 'Mężczyzna' : 'Kobieta'}
+        subtitle={formalLabel
+          ? `${person.gender === 'male' ? 'Mężczyzna' : 'Kobieta'} · ${formalLabel}`
+          : person.gender === 'male' ? 'Mężczyzna' : 'Kobieta'}
       />
 
       <Card style={styles.card}>
@@ -191,17 +186,6 @@ export function PersonDetailScreen() {
           variant="outline"
         />
         <View style={styles.gap} />
-        {person.photoUri && person.photoUri !== null && (
-          <>
-            <Button
-              testID="btn-clear-photo"
-              title="Usuń zdjęcie"
-              onPress={handleClearPhoto}
-              variant="ghost"
-            />
-            <View style={styles.gap} />
-          </>
-        )}
         <Button
           testID="btn-delete-person"
           title="Usuń osobę"

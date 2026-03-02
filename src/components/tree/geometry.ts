@@ -27,11 +27,7 @@ const KNOT_COUNT = 3;
 /** Number of moss patches on each trunk */
 const MOSS_COUNT = 5;
 
-/** Minimum number of main roots generated per trunk */
-const ROOT_MAIN_COUNT_MIN = 6;
-
-/** Additional random roots (0 to ROOT_MAIN_COUNT_RANGE) */
-const ROOT_MAIN_COUNT_RANGE = 3;
+/** (unused, kept for reference) */
 
 /** Number of segments per sub-root */
 const ROOT_SUB_SEGMENTS = 6;
@@ -150,45 +146,88 @@ export function genRoots(
   const flip = dir === 'up' ? -1 : 1;
   const roots: string[] = [];
 
-  const mainCount = ROOT_MAIN_COUNT_MIN + Math.floor(r() * ROOT_MAIN_COUNT_RANGE);
+  // 4-6 primary roots with asymmetric spread
+  const mainCount = 4 + Math.floor(r() * 3);
+  const angleOffsets: number[] = [];
   for (let i = 0; i < mainCount; i++) {
-    const t = i / (mainCount - 1);
-    const angle = (t - 0.5) * Math.PI * 0.8;
+    // Irregular angular distribution (not evenly spaced)
+    const base = (i / (mainCount - 1) - 0.5) * Math.PI * 0.85;
+    angleOffsets.push(base + (r() - 0.5) * 0.25);
+  }
 
-    const startX = x + (t - 0.5) * bw * 0.8;
-    const startY = baseY - flip * 5;
+  for (let i = 0; i < mainCount; i++) {
+    const angle = angleOffsets[i];
+    const centerWeight = 1 - Math.abs(angle) / (Math.PI * 0.5);
 
-    const reach = 50 + r() * 70;
-    const endX = startX + Math.sin(angle) * reach;
-    const endY = baseY + flip * Math.abs(Math.cos(angle)) * reach * 0.6 + flip * reach * 0.4;
+    // Start from trunk base with slight inset
+    const startX = x + Math.sin(angle) * bw * 0.35;
+    const startY = baseY - flip * 2;
 
-    const startW = 6 + r() * 6 + (1 - Math.abs(t - 0.5) * 2) * 4;
-    const endW = 0.5 + r() * 1;
+    // Varied reach — center roots go deeper, side roots spread wider
+    const baseReach = 45 + r() * 55;
+    const reach = baseReach * (0.8 + centerWeight * 0.4);
+    const spreadFactor = 1.2 - centerWeight * 0.5;
 
-    const cp1X = lerp(startX, endX, 0.3) + (r() - 0.5) * 15;
-    const cp1Y = lerp(startY, endY, 0.25) + flip * r() * 8;
-    const cp2X = lerp(startX, endX, 0.65) + (r() - 0.5) * 12;
-    const cp2Y = lerp(startY, endY, 0.7) + flip * r() * 6;
+    const endX = startX + Math.sin(angle) * reach * spreadFactor;
+    const endY = baseY + flip * (reach * 0.5 + Math.abs(Math.cos(angle)) * reach * 0.35);
+
+    // Thick at trunk, tapering with center roots being thickest
+    const startW = 5 + r() * 4 + centerWeight * 5;
+    const endW = 0.3 + r() * 0.7;
+
+    // S-curve: first control point curves one way, second curves the other
+    const sCurveStrength = (r() - 0.3) * 18;
+    const cp1X = lerp(startX, endX, 0.25) + sCurveStrength + (r() - 0.5) * 8;
+    const cp1Y = lerp(startY, endY, 0.2) + flip * r() * 6;
+    const cp2X = lerp(startX, endX, 0.7) - sCurveStrength * 0.6 + (r() - 0.5) * 10;
+    const cp2Y = lerp(startY, endY, 0.75) + flip * r() * 8;
 
     roots.push(buildFilledCubicBezier(startX, startY, cp1X, cp1Y, cp2X, cp2Y, endX, endY, startW, endW, ROOT_MAIN_SEGMENTS, r));
 
-    // Sub-roots branching off each main root
-    const subCount = 1 + Math.floor(r() * 2);
+    // Secondary roots — 1-3 per primary, branching off at natural points
+    const subCount = 1 + Math.floor(r() * 2.5);
     for (let si = 0; si < subCount; si++) {
-      const branchT = 0.3 + r() * 0.5;
+      const branchT = 0.25 + r() * 0.5;
       const [brX, brY] = evalCubicBezier(branchT, startX, startY, cp1X, cp1Y, cp2X, cp2Y, endX, endY);
 
-      const subAngle = angle + (r() - 0.5) * 1.2;
-      const subReach = 15 + r() * 30;
+      // Branch angle diverges from parent
+      const side = r() > 0.5 ? 1 : -1;
+      const subAngle = angle + side * (0.3 + r() * 0.8);
+      const subReach = 12 + r() * 28;
       const subEndX = brX + Math.sin(subAngle) * subReach;
-      const subEndY = brY + flip * Math.abs(Math.cos(subAngle)) * subReach * 0.5 + flip * subReach * 0.3;
-      const subStartW = lerp(startW, endW, branchT * branchT) * 0.6;
-      const subEndW = 0.3 + r() * 0.5;
+      const subEndY = brY + flip * (Math.abs(Math.cos(subAngle)) * subReach * 0.4 + subReach * 0.35);
 
-      const subCpX = lerp(brX, subEndX, 0.5) + (r() - 0.5) * 8;
-      const subCpY = lerp(brY, subEndY, 0.5) + flip * r() * 5;
+      // Width follows 60% reduction rule
+      const parentW = lerp(startW, endW, branchT * branchT);
+      const subStartW = parentW * (0.5 + r() * 0.2);
+      const subEndW = 0.2 + r() * 0.4;
+
+      const subCpX = lerp(brX, subEndX, 0.5) + (r() - 0.5) * 10;
+      const subCpY = lerp(brY, subEndY, 0.5) + flip * r() * 6;
 
       roots.push(buildFilledQuadBezier(brX, brY, subCpX, subCpY, subEndX, subEndY, subStartW, subEndW, ROOT_SUB_SEGMENTS, r));
+
+      // Tertiary rootlets — fine hair-like tips from secondary ends
+      if (r() > 0.4) {
+        const tAngle = subAngle + (r() - 0.5) * 1.0;
+        const tReach = 6 + r() * 14;
+        const tEndX = subEndX + Math.sin(tAngle) * tReach;
+        const tEndY = subEndY + flip * (Math.abs(Math.cos(tAngle)) * tReach * 0.3 + tReach * 0.4);
+        const tCpX = (subEndX + tEndX) / 2 + (r() - 0.5) * 5;
+        const tCpY = (subEndY + tEndY) / 2 + flip * r() * 3;
+        roots.push(buildFilledQuadBezier(subEndX, subEndY, tCpX, tCpY, tEndX, tEndY, subEndW * 0.8, 0.15, 4, r));
+      }
+    }
+
+    // Tertiary rootlets directly from primary root tips
+    if (r() > 0.3) {
+      const tipAngle = angle + (r() - 0.5) * 0.6;
+      const tipReach = 8 + r() * 16;
+      const tipEndX = endX + Math.sin(tipAngle) * tipReach;
+      const tipEndY = endY + flip * (tipReach * 0.5);
+      const tipCpX = (endX + tipEndX) / 2 + (r() - 0.5) * 4;
+      const tipCpY = (endY + tipEndY) / 2 + flip * r() * 3;
+      roots.push(buildFilledQuadBezier(endX, endY, tipCpX, tipCpY, tipEndX, tipEndY, endW * 0.7, 0.1, 4, r));
     }
   }
   return roots;

@@ -21,11 +21,9 @@ export function PersonListItem({ person, onPress }: Props) {
   return (
     <TouchableOpacity testID={`person-item-${person.id}`} style={styles.container} onPress={onPress} activeOpacity={0.7} accessible={false}>
       <View style={styles.iconWrap}>
-        <MaterialCommunityIcons
-          name={person.gender === 'male' ? 'account' : 'account-outline'}
-          size={24}
-          color={colors.primary}
-        />
+        <Text style={styles.initials}>
+          {(person.firstName?.[0] ?? '').toUpperCase()}{(person.lastName?.[0] ?? '').toUpperCase()}
+        </Text>
       </View>
       <View style={styles.info}>
         <Text style={styles.name}>
@@ -69,6 +67,11 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     marginRight: spacing.md,
+  },
+  initials: {
+    fontFamily: fonts.bodyBold,
+    fontSize: fontSizes.sm,
+    color: colors.primary,
   },
   info: {
     flex: 1,

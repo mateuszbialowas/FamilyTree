@@ -47,7 +47,6 @@ export function EditPersonScreen() {
         birthDate: data.birthDate ? formatDateISO(data.birthDate) : null,
         deathDate: data.deathDate ? formatDateISO(data.deathDate) : null,
         notes: data.notes.trim(),
-        photoUri: person.photoUri,
       },
     });
 

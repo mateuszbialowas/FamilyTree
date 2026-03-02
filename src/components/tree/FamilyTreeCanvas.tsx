@@ -4,7 +4,7 @@ import { MaterialCommunityIcons } from '@expo/vector-icons';
 import {
   Canvas, Path, Group, Circle, RoundedRect, Oval,
   LinearGradient, vec, Paragraph, ImageSVG,
-  Image as SkiaImage, useImage, Skia,
+  Skia,
 } from '@shopify/react-native-skia';
 import { GestureDetector, Gesture } from 'react-native-gesture-handler';
 import {
@@ -22,8 +22,8 @@ import { computeRelationshipLabels } from '../../utils/relationshipLabels';
 import { P } from './palette';
 import { mkPath } from './skiaHelpers';
 import { mkPara } from './skiaHelpers';
-import { WEDDING_RINGS_SVG } from './svgAssets';
-import { genTrunk, genBranch, genCanopy, leafPath, leafVeinPath, placeAnimals, genRoots } from './geometry';
+import { WEDDING_RINGS_SVG, TREE_ROOTS_SVG } from './svgAssets';
+import { genTrunk, genBranch, genCanopy, leafPath, leafVeinPath, placeAnimals } from './geometry';
 import { OwlComponent, BirdComponent, SquirrelComponent } from './animals';
 
 // ======================== CANVAS CONSTANTS ========================
@@ -72,20 +72,8 @@ type Props = {
   onNodeLongPress: (personId: string) => void;
 };
 
-// ======================== PERSON PHOTO (circular clipped) or INITIALS PLACEHOLDER ========================
-function PersonPhoto({ uri, x, y, name }: { uri?: string | null; x: number; y: number; name: string }) {
-  const image = useImage(uri ?? undefined);
-  if (image) {
-    const clip = Skia.Path.Make();
-    clip.addCircle(x, y, NODE_R - 1);
-    const sz = NODE_R * 2;
-    return (
-      <Group clip={clip}>
-        <SkiaImage image={image} x={x - NODE_R} y={y - NODE_R} width={sz} height={sz} fit="cover" />
-      </Group>
-    );
-  }
-  // Initials placeholder
+// ======================== PERSON INITIALS ========================
+function PersonInitials({ x, y, name }: { x: number; y: number; name: string }) {
   const parts = name.trim().split(/\s+/);
   const initials = (parts[0]?.[0] ?? '') + (parts[1]?.[0] ?? '');
   const para = mkPara(initials.toUpperCase(), 16, P.sepia, NODE_R * 2, true);
@@ -96,6 +84,7 @@ function PersonPhoto({ uri, x, y, name }: { uri?: string | null; x: number; y: n
 
 // ======================== MOURNING BAND (thin diagonal strip, lower-right) ========================
 const weddingRingsSvg = Skia.SVG.MakeFromString(WEDDING_RINGS_SVG);
+const treeRootsSvg = Skia.SVG.MakeFromString(TREE_ROOTS_SVG);
 
 function MourningBand({ x, y }: { x: number; y: number }) {
   const r = NODE_R;
@@ -143,9 +132,7 @@ export function FamilyTreeCanvas({ state, rootId, onNodePress, onNodeLongPress }
         highlights: raw.highlights.map(h => ({ ...h, path: mkPath(h.d) })),
         knots: raw.knots, moss: raw.moss,
         rootDir: raw.rootDir,
-        roots: raw.rootDir
-          ? genRoots(c.x1, raw.rootDir === 'up' ? topY : botY, TRUNK_BASE_WIDTH, c.seed, raw.rootDir).map(d => mkPath(d))
-          : [],
+        rootBaseY: raw.rootDir === 'up' ? topY : botY,
         topLeaves: genCanopy(c.x1, topY - 8, 28, 18, 30, c.seed + 7000),
       };
     });
@@ -304,6 +291,27 @@ export function FamilyTreeCanvas({ state, rootId, onNodePress, onNodeLongPress }
             {/* TRUNKS */}
             {geo.trunks.map((t, i) => (
               <Group key={`t${i}`}>
+                {/* Roots — rendered BEFORE trunk so trunk overlaps them */}
+                {t.rootDir && treeRootsSvg && (() => {
+                  const rootsW = 160;
+                  const rootsH = rootsW * (233 / 355);
+                  const flipY = t.rootDir === 'up' ? -1 : 1;
+                  const rx = t.x1 - rootsW / 2;
+                  // Both cases: SVG starts 12px above rootBaseY, extends downward.
+                  // For 'up', the scaleY=-1 flip mirrors it upward above the trunk.
+                  const ry = t.rootBaseY - 12;
+                  return (
+                    <Group transform={[
+                      { translateX: t.x1 },
+                      { translateY: t.rootBaseY },
+                      { scaleY: flipY },
+                      { translateX: -t.x1 },
+                      { translateY: -t.rootBaseY },
+                    ]}>
+                      <ImageSVG svg={treeRootsSvg} x={rx} y={ry} width={rootsW} height={rootsH} />
+                    </Group>
+                  );
+                })()}
                 <Group transform={[{ translateX: SHADOW_OFFSET.trunk.x }, { translateY: SHADOW_OFFSET.trunk.y }]}>
                   <Path path={t.path} color={P.shadow.trunk} />
                 </Group>
@@ -322,19 +330,6 @@ export function FamilyTreeCanvas({ state, rootId, onNodePress, onNodeLongPress }
                   </Group>
                 ))}
                 {t.moss.map((m, mi) => <Oval key={mi} x={m.cx - m.rx} y={m.cy - m.ry} width={m.rx * 2} height={m.ry * 2} color={m.col} opacity={m.op} />)}
-                {t.roots.map((rp, ri) => (
-                  <Group key={`root${ri}`}>
-                    <Group transform={[{ translateX: SHADOW_OFFSET.root.x }, { translateY: SHADOW_OFFSET.root.y }]}>
-                      <Path path={rp} color={P.shadow.trunk} />
-                    </Group>
-                    <Path path={rp} style="fill">
-                      <LinearGradient start={vec(t.x1 - 15, t.y1)} end={vec(t.x1 + 15, t.y1)} colors={[P.bark.light, P.bark.mid, P.bark.dark, P.bark.mid, P.bark.light]} />
-                    </Path>
-                    <Path path={rp} style="fill" opacity={0.15}>
-                      <LinearGradient start={vec(t.x1, t.y1)} end={vec(t.x1, t.y2)} colors={[P.bark.highlight, 'transparent', P.bark.shadow]} />
-                    </Path>
-                  </Group>
-                ))}
                 <Group transform={leafSway[i % 3]} origin={vec(t.x1, t.y2 - 10)}>
                   {t.topLeaves.map((l, li) => (
                     <Group key={li} transform={[{ translateX: l.x }, { translateY: l.y }, { rotate: (l.rot * Math.PI) / 180 }]}>
@@ -392,7 +387,7 @@ export function FamilyTreeCanvas({ state, rootId, onNodePress, onNodeLongPress }
                   <Circle cx={n.x + SHADOW_OFFSET.node.x} cy={n.y + SHADOW_OFFSET.node.y} r={NODE_R} color={P.shadow.node} />
                   {isRoot && <Circle cx={n.x} cy={n.y} r={NODE_GLOW_R} color={P.hl.glow} />}
                   <Circle cx={n.x} cy={n.y} r={NODE_R} color={P.cream} />
-                  <PersonPhoto uri={n.photoUri} x={n.x} y={n.y} name={n.name} />
+                  <PersonInitials x={n.x} y={n.y} name={n.name} />
                   {n.isDead && <MourningBand x={n.x} y={n.y} />}
                   <Circle cx={n.x} cy={n.y} r={NODE_R} color={isRoot ? P.hl.ring : P.sepia} style="stroke" strokeWidth={isRoot ? STROKE.rootRing : STROKE.nodeRing} />
                   <RoundedRect x={n.x - LABEL_BOX.width / 2} y={n.y + NODE_R + 3} width={LABEL_BOX.width} height={LABEL_BOX.height} r={LABEL_BOX.radius} color={P.cream} />

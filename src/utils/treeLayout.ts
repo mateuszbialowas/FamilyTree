@@ -11,7 +11,6 @@ export interface LNode {
   depth: number;
   partnerId?: string;
   label?: string;
-  photoUri?: string | null;
   isDead?: boolean;
 }
 
@@ -48,8 +47,6 @@ export const SOLO_WIDTH = COUPLE_SPACING * 2; // 80
 /** Trunk length from root-level nodes (longer for visual prominence) */
 const ROOT_TRUNK_LEN = 120;
 
-/** Trunk length from deeper-level nodes */
-const INNER_TRUNK_LEN = 60;
 
 /** Extra vertical space added to root generation height */
 const ROOT_GEN_EXTRA_H = 60;
@@ -192,7 +189,6 @@ export function computeUnifiedLayout(
       name: `${p.firstName} ${p.lastName}`,
       born: p.birthDate || '',
       label: labels?.get(id),
-      photoUri: p.photoUri ?? null,
       isDead: !!p.deathDate,
     };
     if (partnerId) node.partnerId = partnerId;
@@ -409,6 +405,27 @@ export function computeUnifiedLayout(
           }
         }
 
+        // Recursively place descendants of newly-placed siblings
+        // (e.g. Teresa's children like Maja, who aren't descendants of the root)
+        for (const sib of sibNodes) {
+          const sibDesc = buildDesc(sib.id);
+          // sib itself is already placed, but we need to place its children
+          if (sibDesc.children.length > 0) {
+            const sibSp = sibDesc.spouseId ? nodeMap.get(sibDesc.spouseId) : null;
+            const sibCx = sibSp ? (sib.x + sibSp.x) / 2 : sib.x;
+            const ordered = orderChildren(sibDesc.children);
+            const totalW = ordered.reduce(
+              (s, c, idx) => s + subWidth(c) + (idx > 0 ? CHILD_GAP : 0), 0,
+            );
+            let cursor = sibCx - totalW / 2;
+            for (const child of ordered) {
+              const cw = subWidth(child);
+              placeDesc(child, cursor + cw / 2);
+              cursor += cw + CHILD_GAP;
+            }
+          }
+        }
+
         // Center parents above ALL their children
         const allChildNodes = [...existingKids, ...sibNodes];
         const xs = allChildNodes.map(n => n.x);
@@ -608,18 +625,16 @@ export function computeUnifiedLayout(
 
     // Direction: parent above children (parentY < childY) or below
     const downward = parentY < childY;
-    const trunkStartY = downward
-      ? parentY + NODE_R + TRUNK_OFFSET
-      : parentY - NODE_R - TRUNK_OFFSET;
 
-    const isRootLevel = parents.some(p => p.depth === 0);
-    const trunkLen = isRootLevel ? ROOT_TRUNK_LEN : INNER_TRUNK_LEN;
-    const trunkEndY = downward
-      ? parentY + NODE_R + trunkLen
-      : parentY - NODE_R - trunkLen;
+    // Only the root person's family unit gets a trunk (bark-textured pillar + roots).
+    // All other family units use direct branches from parent to child.
+    const isRootUnit = unit.parentIds.includes(rootId) ||
+      unit.parentIds.some(pid => spouseOf(pid) === rootId);
 
-    // Only create trunk for downward connections (descendant direction)
-    if (downward) {
+    if (downward && isRootUnit) {
+      const trunkStartY = parentY + NODE_R + TRUNK_OFFSET;
+      const trunkEndY = parentY + NODE_R + ROOT_TRUNK_LEN;
+
       conns.push({
         x1: parentCenterX, y1: trunkStartY,
         x2: parentCenterX, y2: trunkEndY,
@@ -627,28 +642,28 @@ export function computeUnifiedLayout(
         seed: hsh(unit.parentIds[0] + 't'),
         depth: parents[0].depth,
       });
-    }
 
-    // Branches from trunk/parent to each child
-    for (const child of children) {
-      // Target the person node, not the couple center
-      const branchTargetX = child.x;
-
-      if (downward) {
+      for (const child of children) {
         conns.push({
           x1: parentCenterX, y1: trunkEndY,
-          x2: branchTargetX, y2: childY - NODE_R - TRUNK_OFFSET,
+          x2: child.x, y2: childY - NODE_R - TRUNK_OFFSET,
           type: 'branch',
           seed: hsh(child.id),
           depth: child.depth,
         });
-      } else {
-        // Ancestor direction: branch from parent bottom to child top
+      }
+    } else {
+      // Direct branches from parent to each child (no trunk)
+      const startY = downward
+        ? parentY + NODE_R + TRUNK_OFFSET
+        : parentY - NODE_R - TRUNK_OFFSET;
+
+      for (const child of children) {
         conns.push({
-          x1: parentCenterX, y1: parentY + NODE_R + TRUNK_OFFSET,
-          x2: branchTargetX, y2: childY - NODE_R - TRUNK_OFFSET,
+          x1: parentCenterX, y1: startY,
+          x2: child.x, y2: childY - NODE_R - TRUNK_OFFSET,
           type: 'branch',
-          seed: hsh(child.id + 'anc'),
+          seed: hsh(child.id + (downward ? '' : 'anc')),
           depth: child.depth,
         });
       }

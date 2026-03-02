@@ -6,7 +6,6 @@ export type Person = {
   birthDate: string | null;
   deathDate: string | null;
   notes: string;
-  photoUri?: string | null;
 };
 
 export type ParentChildRelationship = {
@@ -36,6 +35,5 @@ export type FamilyAction =
   | { type: 'ADD_PARENT_CHILD'; payload: ParentChildRelationship }
   | { type: 'ADD_MARRIAGE'; payload: Marriage }
   | { type: 'REMOVE_RELATIONSHIP'; payload: { id: string; kind: 'parentChild' | 'marriage' } }
-  | { type: 'CLEAR_PHOTO'; payload: string }
   | { type: 'IMPORT_DATA'; payload: FamilyState }
   | { type: 'CLEAR_DATA' };

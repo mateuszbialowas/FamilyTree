@@ -25,8 +25,8 @@ export function TreeScreen() {
   const rootPerson = state.people.find(p => p.id === effectiveRootId);
 
   const handleNodePress = useCallback((personId: string) => {
-    navigation.navigate('PersonDetail', { personId });
-  }, [navigation]);
+    navigation.navigate('PersonDetail', { personId, rootId: effectiveRootId });
+  }, [navigation, effectiveRootId]);
 
   const handleNodeLongPress = useCallback((personId: string) => {
     const person = state.people.find(p => p.id === personId);
