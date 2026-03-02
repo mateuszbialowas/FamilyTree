@@ -320,11 +320,11 @@ function buildFilledPathFromEdges(
 }
 
 // ======================== BRANCH GENERATION ========================
-export function genBranch(x1: number, y1: number, x2: number, y2: number, seed: number) {
+export function genBranch(x1: number, y1: number, x2: number, y2: number, seed: number, thickAtStart = true) {
   const r = sr(seed);
   const dx = x2 - x1, dy = y2 - y1;
   const len = Math.sqrt(dx * dx + dy * dy);
-  const thick = Math.max(4, 12 - len / 40);
+  const thick = Math.max(7, 18 - len / 40);
   const ang = Math.atan2(dy, dx), pA = ang + Math.PI / 2;
 
   const pts: { x: number; y: number; w: number }[] = [];
@@ -334,10 +334,12 @@ export function genBranch(x1: number, y1: number, x2: number, y2: number, seed: 
     const grav = Math.sin(t * Math.PI) * len * 0.035;
     const bend = (x2 > x1 ? 1 : -1) * Math.sin(t * Math.PI) * 7;
     const sCurve = Math.sin(t * Math.PI * 2.3) * 2.5 * (r() - 0.3);
-    const jBulge = t > 0.9 ? 1 + ((t - 0.9) / 0.1) * 0.5 : 1;
+    // Taper direction: tw goes 1→0 from thick end to thin end
+    const tw = thickAtStart ? 1 - t : t;
+    const jBulge = tw > 0.9 ? 1 + ((tw - 0.9) / 0.1) * 0.3 : 1;
     const midBulge = 1 + Math.sin(t * Math.PI) * 0.08;
-    const tipTaper = t < 0.2 ? Math.pow(t / 0.2, 0.5) : 1;
-    const w = thick * (0.5 + t * 0.5) * jBulge * midBulge * tipTaper;
+    const tipTaper = tw < 0.2 ? Math.pow(tw / 0.2, 0.5) : 1;
+    const w = thick * (0.35 + tw * 0.45) * jBulge * midBulge * tipTaper;
     pts.push({ x: cx + bend + sCurve + (r() - 0.5) * 1.5, y: cy + grav, w });
   }
 
@@ -447,7 +449,7 @@ export function placeAnimals(conns: Conn[]): AnimalD[] {
     const owlBr = br[Math.floor(br.length / 2)];
     const t = 0.55;
     const ox = lerp(owlBr.x1, owlBr.x2, t);
-    const oy = lerp(owlBr.y1, owlBr.y2, t) - 14;
+    const oy = lerp(owlBr.y1, owlBr.y2, t) - 4;
     a.push({ type: 'owl', x: ox, y: oy, flip: owlBr.x2 < owlBr.x1, seed: owlBr.seed });
   } else if (tr.length > 0) {
     a.push({ type: 'owl', x: tr[0].x1 + 20, y: (tr[0].y1 + tr[0].y2) / 2 - 10, flip: false, seed: tr[0].seed });

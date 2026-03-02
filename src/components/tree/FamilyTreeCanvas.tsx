@@ -15,7 +15,7 @@ import {
 import type { FamilyState } from '../../types';
 import {
   computeUnifiedLayout, hsh, NODE_R,
-  COUPLE_SPACING, TRUNK_OFFSET,
+  COUPLE_SPACING,
 } from '../../utils/treeLayout';
 import type { LNode, Conn } from '../../utils/treeLayout';
 import { computeRelationshipLabels } from '../../utils/relationshipLabels';
@@ -137,8 +137,12 @@ export function FamilyTreeCanvas({ state, rootId, onNodePress, onNodeLongPress }
       };
     });
 
+    const rootNode = layout.nodes.find(n => n.id === rootId);
+    const rootY = rootNode?.y ?? 0;
+
     const branches = layout.conns.filter(c => c.type === 'branch').map(c => {
-      const raw = genBranch(c.x1, c.y1, c.x2, c.y2, c.seed);
+      const thickAtStart = Math.abs(c.y1 - rootY) <= Math.abs(c.y2 - rootY);
+      const raw = genBranch(c.x1, c.y1, c.x2, c.y2, c.seed, thickAtStart);
       return {
         ...c,
         path: mkPath(raw.path),

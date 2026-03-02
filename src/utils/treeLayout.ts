@@ -632,7 +632,7 @@ export function computeUnifiedLayout(
       unit.parentIds.some(pid => spouseOf(pid) === rootId);
 
     if (downward && isRootUnit) {
-      const trunkStartY = parentY + NODE_R + TRUNK_OFFSET;
+      const trunkStartY = parentY + NODE_R;
       const trunkEndY = parentY + NODE_R + ROOT_TRUNK_LEN;
 
       conns.push({
@@ -646,7 +646,7 @@ export function computeUnifiedLayout(
       for (const child of children) {
         conns.push({
           x1: parentCenterX, y1: trunkEndY,
-          x2: child.x, y2: childY - NODE_R - TRUNK_OFFSET,
+          x2: child.x, y2: childY - NODE_R,
           type: 'branch',
           seed: hsh(child.id),
           depth: child.depth,
@@ -655,13 +655,13 @@ export function computeUnifiedLayout(
     } else {
       // Direct branches from parent to each child (no trunk)
       const startY = downward
-        ? parentY + NODE_R + TRUNK_OFFSET
-        : parentY - NODE_R - TRUNK_OFFSET;
+        ? parentY + NODE_R
+        : parentY - NODE_R;
 
       for (const child of children) {
         conns.push({
           x1: parentCenterX, y1: startY,
-          x2: child.x, y2: childY - NODE_R - TRUNK_OFFSET,
+          x2: child.x, y2: childY - NODE_R,
           type: 'branch',
           seed: hsh(child.id + (downward ? '' : 'anc')),
           depth: child.depth,
@@ -683,7 +683,7 @@ export function computeUnifiedLayout(
     if (!hasDownwardTrunk) {
       const ry = rootNode.y;
       conns.push({
-        x1: rootCenterX, y1: ry + NODE_R + TRUNK_OFFSET,
+        x1: rootCenterX, y1: ry + NODE_R,
         x2: rootCenterX, y2: ry + NODE_R + ROOT_TRUNK_LEN,
         type: 'trunk',
         seed: hsh(rootId + 'rootTrunk'),
