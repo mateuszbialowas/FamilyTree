@@ -27,15 +27,9 @@
 
 ---
 
-<!-- Add your screenshots here
 <p align="center">
-  <img src="docs/public/screenshots/tree.png" width="250" />
-  &nbsp;&nbsp;
-  <img src="docs/public/screenshots/list.png" width="250" />
-  &nbsp;&nbsp;
-  <img src="docs/public/screenshots/detail.png" width="250" />
+  <img src="docs/public/screenshots/hero.png" width="800" alt="FamilyTree app screenshots" />
 </p>
--->
 
 ## Highlights
 
