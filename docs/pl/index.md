@@ -6,7 +6,7 @@ hero:
   text: Historia Twojej Rodziny, Pięknie Zachowana
   tagline: Mobilna aplikacja genealogiczna do tworzenia i zarządzania drzewami rodzinnymi — zbudowana z React Native i Expo
   image:
-    src: /FamilyTree/screenshots/hero.png
+    src: /screenshots/hero.png
     alt: Zrzuty ekranu aplikacji FamilyTree
   actions:
     - theme: brand

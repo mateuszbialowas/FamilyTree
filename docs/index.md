@@ -6,7 +6,7 @@ hero:
   text: Your Family History, Beautifully Preserved
   tagline: A mobile genealogy app for creating and managing family trees — built with React Native & Expo
   image:
-    src: /FamilyTree/screenshots/hero.png
+    src: /screenshots/hero.png
     alt: FamilyTree app screenshots
   actions:
     - theme: brand
