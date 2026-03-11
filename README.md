@@ -45,8 +45,8 @@
 |---------|-------------|
 | **Tree view** | Interactive canvas with pinch-to-zoom, pan, and tap-to-navigate |
 | **People list** | Searchable list with initials avatars |
-| **Relationships** | Parent-child, marriage (with dates), inferred siblings |
-| **Tree modes** | Ancestors, descendants, or both — auto-detected based on data |
+| **Relationships** | Parent-child, marriage (with dates), inferred siblings, cousins, uncles & more |
+| **Tree modes** | Ancestors, descendants, or full tree — auto-detected based on data |
 | **Long press** | Quick-add a relative directly from the tree |
 | **Mourning band** | Deceased family members shown with a black band |
 | **Data management** | Export, import, and clear all data from Settings |
@@ -99,24 +99,41 @@ Want to see the tree in action? Import the sample family file:
 | **Navigation** | React Navigation | v7 |
 | **Storage** | AsyncStorage | 2.2 |
 | **Fonts** | Playfair Display, Lora | Google Fonts |
-| **E2E Tests** | Maestro | CLI |
+| **E2E Tests** | Maestro (13 test suites) | CLI |
 
 ## Architecture
 
 ```
 src/
 ├── components/
-│   ├── tree/            # Skia canvas, geometry, animals
-│   ├── ui/              # Button, TextInput, Card, etc.
-│   ├── PersonListItem.tsx
-│   └── RelationshipCard.tsx
+│   ├── tree/              # Skia canvas, geometry, palette, animals
+│   │   ├── FamilyTreeCanvas.tsx   # Main Skia tree renderer
+│   │   ├── geometry.ts            # Organic branch path generation
+│   │   ├── animals.tsx            # Animated owls, birds, squirrels
+│   │   ├── palette.ts             # Tree colour schemes
+│   │   ├── svgAssets.ts           # Decorative SVG elements
+│   │   ├── constants.ts           # Rendering constants
+│   │   ├── mathHelpers.ts         # Math utilities for layout
+│   │   └── skiaHelpers.ts         # Skia drawing helpers
+│   ├── ui/                # Reusable UI primitives
+│   │   ├── Button.tsx, TextInput.tsx, Card.tsx
+│   │   ├── ScreenHeader.tsx, EmptyState.tsx, Divider.tsx
+│   ├── AnimatedPath.tsx   # Animated SVG path component
+│   ├── AnimatedSplash.tsx # Splash screen animation
+│   ├── FAB.tsx            # Floating action button
+│   ├── Logo.tsx           # App logo component
+│   ├── PersonForm.tsx     # Shared add/edit person form
+│   ├── PersonListItem.tsx # People list row
+│   └── RelationshipCard.tsx # Relationship display card
 ├── context/
-│   └── FamilyContext.tsx # useReducer + AsyncStorage (500ms debounce)
-├── navigation/          # Bottom tabs + native stacks
-├── screens/             # All app screens
-├── theme/               # Colors, typography, spacing
-├── types/               # Person, Relationship, Marriage
-└── utils/               # UUID, tree layout, relationship labels
+│   └── FamilyContext.tsx   # useReducer + AsyncStorage (500ms debounce)
+├── navigation/            # Bottom tabs + native stacks
+├── screens/               # TreeScreen, PeopleList, PersonDetail,
+│                          # AddPerson, EditPerson, AddRelationship, Settings
+├── theme/                 # Colors, typography, spacing, form styles
+├── types/                 # Person, ParentChildRelationship, Marriage
+└── utils/                 # UUID, tree layout, relationship labels,
+                           # date helpers, storage persistence
 ```
 
 > Full architecture docs: [mateuszbialowas.github.io/FamilyTree/guide/architecture](https://mateuszbialowas.github.io/FamilyTree/guide/architecture)
@@ -131,6 +148,18 @@ src/
 | `npm run test:e2e` | Run all Maestro E2E tests |
 | `npm run test:e2e:single <file>` | Run a single Maestro test |
 | `npx expo prebuild --clean` | Regenerate native projects |
+
+## Testing
+
+The project includes 13 Maestro E2E test suites covering the full user journey — from app launch and person creation to relationship management, search, data import/export, and validation.
+
+```bash
+# Run all E2E tests
+npm run test:e2e
+
+# Run a single test
+npm run test:e2e:single .maestro/02_add_person.yaml
+```
 
 ## Contributing
 
