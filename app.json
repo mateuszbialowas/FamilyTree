@@ -1,8 +1,9 @@
 {
   "expo": {
-    "name": "FamilyTree",
-    "slug": "FamilyTree",
+    "name": "Family Tree",
+    "slug": "family-tree",
     "version": "1.0.0",
+    "scheme": "family-tree",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
     "userInterfaceStyle": "light",
@@ -14,16 +15,8 @@
     },
     "ios": {
       "supportsTablet": true,
-      "bundleIdentifier": "com.mateuszbialowas.FamilyTree"
-    },
-    "android": {
-      "adaptiveIcon": {
-        "foregroundImage": "./assets/adaptive-icon.png",
-        "backgroundColor": "#FDF5E6"
-      },
-      "edgeToEdgeEnabled": true,
-      "predictiveBackGestureEnabled": false,
-      "package": "com.mateuszbialowas.FamilyTree"
+      "bundleIdentifier": "com.mateuszbialowas.FamilyTree",
+      "buildNumber": "1.0.0"
     },
     "web": {
       "favicon": "./assets/favicon.png"
