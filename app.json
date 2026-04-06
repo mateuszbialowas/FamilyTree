@@ -16,7 +16,10 @@
     "ios": {
       "supportsTablet": true,
       "bundleIdentifier": "com.mateuszbialowas.FamilyTree",
-      "buildNumber": "1.0.0"
+      "buildNumber": "1.0.0",
+      "infoPlist": {
+        "ITSAppUsesNonExemptEncryption": false
+      }
     },
     "web": {
       "favicon": "./assets/favicon.png"
@@ -25,11 +28,11 @@
       "expo-font",
       "@react-native-community/datetimepicker"
     ],
+    "owner": "mateuszbialowas",
     "extra": {
       "eas": {
-        "projectId": "320000d9-99df-46e3-b7e0-a036a58e0d06"
+        "projectId": "fa7d8a97-29fa-46f9-a3da-69a3549740d6"
       }
-    },
-    "owner": "mateuszbialowas"
+    }
   }
 }
