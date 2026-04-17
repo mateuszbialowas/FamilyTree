@@ -6,34 +6,8 @@ import type { Conn } from '../../utils/treeLayout';
 
 // ======================== GEOMETRY CONSTANTS ========================
 
-/** Number of segments used to construct trunk shape */
-const TRUNK_SEGMENTS = 28;
-
 /** Number of segments used to construct branch shape */
 const BRANCH_SEGMENTS = 18;
-
-/** Number of vertical bark furrows on each trunk */
-const FURROW_COUNT = 16;
-
-/** Number of horizontal cracks on each trunk */
-const CRACK_COUNT = 8;
-
-/** Number of light highlight lines on each trunk */
-const HIGHLIGHT_COUNT = 5;
-
-/** Number of knot circles on each trunk */
-const KNOT_COUNT = 3;
-
-/** Number of moss patches on each trunk */
-const MOSS_COUNT = 5;
-
-/** (unused, kept for reference) */
-
-/** Number of segments per sub-root */
-const ROOT_SUB_SEGMENTS = 6;
-
-/** Number of segments per main root */
-const ROOT_MAIN_SEGMENTS = 12;
 
 /** Number of bark lines on each branch */
 const BARK_LINE_COUNT = 10;
@@ -49,275 +23,6 @@ const ANIMAL_BRANCH_POSITION = 0.35;
 
 /** Probability threshold for skipping animal placement on a branch */
 const ANIMAL_SKIP_THRESHOLD = 0.6;
-
-// ======================== TRUNK GENERATION ========================
-export function genTrunk(x: number, y1: number, y2: number, bw: number, seed: number, rootDir: 'up' | 'down' | null = null) {
-  const r = sr(seed);
-  const ctr: { x: number; y: number; w: number }[] = [];
-  for (let i = 0; i <= TRUNK_SEGMENTS; i++) {
-    const t = i / TRUNK_SEGMENTS, y = lerp(y1, y2, t);
-    const rootFlare = t > 0.85 ? 1 + Math.pow((t - 0.85) / 0.15, 0.6) * 1.2 : 1;
-    const taper = Math.pow(1 - t, 0.25) * 1.15;
-    const waist = 1 - Math.sin(t * Math.PI) * 0.04;
-    const topSpread = t < 0.15 ? 1 + (1 - t / 0.15) * 0.3 : 1;
-    const bump1 = Math.sin(t * Math.PI * 5.7 + r() * 2) * 1.2 * (r() - 0.3);
-    const bump2 = Math.sin(t * Math.PI * 3.1 + r() * 3) * 0.8 * (r() - 0.4);
-    const w = bw * taper * waist * rootFlare * topSpread + bump1 + bump2;
-    const drift = Math.sin(t * Math.PI * 1.3) * 1.8 + (r() - 0.5) * 1;
-    ctr.push({ x: x + drift, y, w });
-  }
-
-  let path = `M ${ctr[0].x - ctr[0].w / 2} ${ctr[0].y}`;
-  for (let i = 1; i <= TRUNK_SEGMENTS; i++) {
-    const px = ctr[i].x - ctr[i].w / 2;
-    const ppx = ctr[i - 1].x - ctr[i - 1].w / 2;
-    const cpx = (ppx + px) / 2 + (r() - 0.5) * 1;
-    path += ` Q ${cpx} ${(ctr[i - 1].y + ctr[i].y) / 2}, ${px} ${ctr[i].y}`;
-  }
-  for (let i = TRUNK_SEGMENTS; i >= 0; i--) {
-    const px = ctr[i].x + ctr[i].w / 2;
-    if (i === TRUNK_SEGMENTS) path += ` L ${px} ${ctr[i].y}`;
-    else {
-      const npx = ctr[i + 1].x + ctr[i + 1].w / 2;
-      const cpx = (npx + px) / 2 + (r() - 0.5) * 1;
-      path += ` Q ${cpx} ${(ctr[i + 1].y + ctr[i].y) / 2}, ${px} ${ctr[i].y}`;
-    }
-  }
-  path += ' Z';
-
-  const furrows: { d: string; w: number; op: number; dark: boolean }[] = [];
-  for (let i = 0; i < FURROW_COUNT; i++) {
-    const xRatio = (r() - 0.5) * 0.7;
-    const t1 = r() * 0.3, t2 = t1 + 0.15 + r() * 0.5;
-    let d = '';
-    for (let j = 0; j <= 8; j++) {
-      const t = lerp(t1, t2, j / 8), idx = Math.min(Math.floor(t * TRUNK_SEGMENTS), TRUNK_SEGMENTS);
-      const px = ctr[idx].x + xRatio * ctr[idx].w + Math.sin(j * 1.3 + r() * 5) * 0.8;
-      d += j === 0 ? `M ${px} ${ctr[idx].y}` : ` L ${px} ${ctr[idx].y}`;
-    }
-    furrows.push({ d, w: 0.3 + r() * 1.1, op: 0.1 + r() * 0.18, dark: r() > 0.4 });
-  }
-
-  const cracks: { d: string; w: number; op: number }[] = [];
-  for (let i = 0; i < CRACK_COUNT; i++) {
-    const t = 0.08 + r() * 0.84, idx = Math.min(Math.floor(t * TRUNK_SEGMENTS), TRUNK_SEGMENTS);
-    const cy = ctr[idx].y, hw = ctr[idx].w * (0.15 + r() * 0.4);
-    const cx = ctr[idx].x + (r() - 0.5) * ctr[idx].w * 0.2;
-    cracks.push({
-      d: `M ${cx - hw} ${cy + (r() - 0.5) * 2} L ${cx} ${cy + (r() - 0.5) * 2} L ${cx + hw} ${cy + (r() - 0.5) * 2}`,
-      w: 0.2 + r() * 0.5, op: 0.06 + r() * 0.08,
-    });
-  }
-
-  const highlights: { d: string; w: number; op: number }[] = [];
-  for (let i = 0; i < HIGHLIGHT_COUNT; i++) {
-    const t1 = 0.05 + r() * 0.3, t2 = t1 + 0.2 + r() * 0.35;
-    const side = r() > 0.6 ? 1 : -1;
-    const xRatio = side * (0.12 + r() * 0.18);
-    let d = '';
-    for (let j = 0; j <= 5; j++) {
-      const t = lerp(t1, t2, j / 5), idx = Math.min(Math.floor(t * TRUNK_SEGMENTS), TRUNK_SEGMENTS);
-      const px = ctr[idx].x + xRatio * ctr[idx].w + (r() - 0.5) * 1;
-      d += j === 0 ? `M ${px} ${ctr[idx].y}` : ` L ${px} ${ctr[idx].y}`;
-    }
-    highlights.push({ d, w: 1.5 + r() * 2.5, op: 0.12 + r() * 0.1 });
-  }
-
-  const knots = Array.from({ length: KNOT_COUNT }, () => {
-    const t = 0.15 + r() * 0.6, idx = Math.min(Math.floor(t * TRUNK_SEGMENTS), TRUNK_SEGMENTS);
-    return { cx: ctr[idx].x + (r() - 0.5) * ctr[idx].w * 0.35, cy: ctr[idx].y, rx: 2 + r() * 3, ry: 1.5 + r() * 2.5, op: 0.2 + r() * 0.15, hasRing: r() > 0.3 };
-  });
-
-  const moss = Array.from({ length: MOSS_COUNT }, () => {
-    const t = 0.15 + r() * 0.55, idx = Math.min(Math.floor(t * TRUNK_SEGMENTS), TRUNK_SEGMENTS);
-    const side = r() > 0.5 ? 1 : -1;
-    return { cx: ctr[idx].x + side * ctr[idx].w * 0.35, cy: ctr[idx].y, rx: 2.5 + r() * 4.5, ry: 1.5 + r() * 3, col: pick(P.moss, r), op: 0.15 + r() * 0.2 };
-  });
-
-  const midW = ctr[Math.floor(TRUNK_SEGMENTS / 2)].w;
-  return { path, furrows, cracks, highlights, knots, moss, rootDir, midW };
-}
-
-// ======================== ROOT GENERATION ========================
-export function genRoots(
-  x: number, baseY: number, bw: number, seed: number, dir: 'up' | 'down',
-) {
-  const r = sr(seed + 777);
-  const flip = dir === 'up' ? -1 : 1;
-  const roots: string[] = [];
-
-  // 4-6 primary roots with asymmetric spread
-  const mainCount = 4 + Math.floor(r() * 3);
-  const angleOffsets: number[] = [];
-  for (let i = 0; i < mainCount; i++) {
-    // Irregular angular distribution (not evenly spaced)
-    const base = (i / (mainCount - 1) - 0.5) * Math.PI * 0.85;
-    angleOffsets.push(base + (r() - 0.5) * 0.25);
-  }
-
-  for (let i = 0; i < mainCount; i++) {
-    const angle = angleOffsets[i];
-    const centerWeight = 1 - Math.abs(angle) / (Math.PI * 0.5);
-
-    // Start from trunk base with slight inset
-    const startX = x + Math.sin(angle) * bw * 0.35;
-    const startY = baseY - flip * 2;
-
-    // Varied reach — center roots go deeper, side roots spread wider
-    const baseReach = 45 + r() * 55;
-    const reach = baseReach * (0.8 + centerWeight * 0.4);
-    const spreadFactor = 1.2 - centerWeight * 0.5;
-
-    const endX = startX + Math.sin(angle) * reach * spreadFactor;
-    const endY = baseY + flip * (reach * 0.5 + Math.abs(Math.cos(angle)) * reach * 0.35);
-
-    // Thick at trunk, tapering with center roots being thickest
-    const startW = 5 + r() * 4 + centerWeight * 5;
-    const endW = 0.3 + r() * 0.7;
-
-    // S-curve: first control point curves one way, second curves the other
-    const sCurveStrength = (r() - 0.3) * 18;
-    const cp1X = lerp(startX, endX, 0.25) + sCurveStrength + (r() - 0.5) * 8;
-    const cp1Y = lerp(startY, endY, 0.2) + flip * r() * 6;
-    const cp2X = lerp(startX, endX, 0.7) - sCurveStrength * 0.6 + (r() - 0.5) * 10;
-    const cp2Y = lerp(startY, endY, 0.75) + flip * r() * 8;
-
-    roots.push(buildFilledCubicBezier(startX, startY, cp1X, cp1Y, cp2X, cp2Y, endX, endY, startW, endW, ROOT_MAIN_SEGMENTS, r));
-
-    // Secondary roots — 1-3 per primary, branching off at natural points
-    const subCount = 1 + Math.floor(r() * 2.5);
-    for (let si = 0; si < subCount; si++) {
-      const branchT = 0.25 + r() * 0.5;
-      const [brX, brY] = evalCubicBezier(branchT, startX, startY, cp1X, cp1Y, cp2X, cp2Y, endX, endY);
-
-      // Branch angle diverges from parent
-      const side = r() > 0.5 ? 1 : -1;
-      const subAngle = angle + side * (0.3 + r() * 0.8);
-      const subReach = 12 + r() * 28;
-      const subEndX = brX + Math.sin(subAngle) * subReach;
-      const subEndY = brY + flip * (Math.abs(Math.cos(subAngle)) * subReach * 0.4 + subReach * 0.35);
-
-      // Width follows 60% reduction rule
-      const parentW = lerp(startW, endW, branchT * branchT);
-      const subStartW = parentW * (0.5 + r() * 0.2);
-      const subEndW = 0.2 + r() * 0.4;
-
-      const subCpX = lerp(brX, subEndX, 0.5) + (r() - 0.5) * 10;
-      const subCpY = lerp(brY, subEndY, 0.5) + flip * r() * 6;
-
-      roots.push(buildFilledQuadBezier(brX, brY, subCpX, subCpY, subEndX, subEndY, subStartW, subEndW, ROOT_SUB_SEGMENTS, r));
-
-      // Tertiary rootlets — fine hair-like tips from secondary ends
-      if (r() > 0.4) {
-        const tAngle = subAngle + (r() - 0.5) * 1.0;
-        const tReach = 6 + r() * 14;
-        const tEndX = subEndX + Math.sin(tAngle) * tReach;
-        const tEndY = subEndY + flip * (Math.abs(Math.cos(tAngle)) * tReach * 0.3 + tReach * 0.4);
-        const tCpX = (subEndX + tEndX) / 2 + (r() - 0.5) * 5;
-        const tCpY = (subEndY + tEndY) / 2 + flip * r() * 3;
-        roots.push(buildFilledQuadBezier(subEndX, subEndY, tCpX, tCpY, tEndX, tEndY, subEndW * 0.8, 0.15, 4, r));
-      }
-    }
-
-    // Tertiary rootlets directly from primary root tips
-    if (r() > 0.3) {
-      const tipAngle = angle + (r() - 0.5) * 0.6;
-      const tipReach = 8 + r() * 16;
-      const tipEndX = endX + Math.sin(tipAngle) * tipReach;
-      const tipEndY = endY + flip * (tipReach * 0.5);
-      const tipCpX = (endX + tipEndX) / 2 + (r() - 0.5) * 4;
-      const tipCpY = (endY + tipEndY) / 2 + flip * r() * 3;
-      roots.push(buildFilledQuadBezier(endX, endY, tipCpX, tipCpY, tipEndX, tipEndY, endW * 0.7, 0.1, 4, r));
-    }
-  }
-  return roots;
-}
-
-// ======================== BEZIER HELPERS ========================
-
-/** Evaluate a cubic bezier at parameter s */
-function evalCubicBezier(
-  s: number, x0: number, y0: number, cx1: number, cy1: number,
-  cx2: number, cy2: number, x3: number, y3: number,
-): [number, number] {
-  const s1 = 1 - s, s2 = s1 * s1, s3 = s2 * s1;
-  const t1 = s, t2 = t1 * t1, t3 = t2 * t1;
-  return [
-    s3 * x0 + 3 * s2 * t1 * cx1 + 3 * s1 * t2 * cx2 + t3 * x3,
-    s3 * y0 + 3 * s2 * t1 * cy1 + 3 * s1 * t2 * cy2 + t3 * y3,
-  ];
-}
-
-/** Build a filled shape along a cubic bezier with variable width */
-function buildFilledCubicBezier(
-  startX: number, startY: number, cp1X: number, cp1Y: number,
-  cp2X: number, cp2Y: number, endX: number, endY: number,
-  startW: number, endW: number, segments: number, r: () => number,
-): string {
-  const leftPts: { x: number; y: number }[] = [];
-  const rightPts: { x: number; y: number }[] = [];
-
-  for (let j = 0; j <= segments; j++) {
-    const s = j / segments;
-    const [bx, by] = evalCubicBezier(s, startX, startY, cp1X, cp1Y, cp2X, cp2Y, endX, endY);
-    const w = lerp(startW, endW, s * s);
-
-    const ds = 0.01;
-    const [nx, ny] = evalCubicBezier(Math.min(s + ds, 1), startX, startY, cp1X, cp1Y, cp2X, cp2Y, endX, endY);
-    const dx = nx - bx, dy = ny - by;
-    const len = Math.sqrt(dx * dx + dy * dy) || 1;
-    const px = -dy / len, py = dx / len;
-
-    const wobble = Math.sin(s * Math.PI * 3 + r() * 4) * 0.8;
-
-    leftPts.push({ x: bx - px * (w / 2 + wobble), y: by - py * (w / 2 + wobble) });
-    rightPts.push({ x: bx + px * (w / 2 + wobble), y: by + py * (w / 2 + wobble) });
-  }
-
-  return buildFilledPathFromEdges(leftPts, rightPts);
-}
-
-/** Build a filled shape along a quadratic bezier with variable width */
-function buildFilledQuadBezier(
-  startX: number, startY: number, cpX: number, cpY: number,
-  endX: number, endY: number,
-  startW: number, endW: number, segments: number, _r: () => number,
-): string {
-  const leftPts: { x: number; y: number }[] = [];
-  const rightPts: { x: number; y: number }[] = [];
-
-  for (let j = 0; j <= segments; j++) {
-    const ss = j / segments;
-    const sx = (1 - ss) * (1 - ss) * startX + 2 * (1 - ss) * ss * cpX + ss * ss * endX;
-    const sy = (1 - ss) * (1 - ss) * startY + 2 * (1 - ss) * ss * cpY + ss * ss * endY;
-    const sw = lerp(startW, endW, ss * ss);
-    const sdx = ss < 0.99 ? (2 * (1 - ss) * (cpX - startX) + 2 * ss * (endX - cpX)) : 1;
-    const sdy = ss < 0.99 ? (2 * (1 - ss) * (cpY - startY) + 2 * ss * (endY - cpY)) : 0;
-    const slen = Math.sqrt(sdx * sdx + sdy * sdy) || 1;
-    const spx = -sdy / slen, spy = sdx / slen;
-    leftPts.push({ x: sx - spx * sw / 2, y: sy - spy * sw / 2 });
-    rightPts.push({ x: sx + spx * sw / 2, y: sy + spy * sw / 2 });
-  }
-
-  return buildFilledPathFromEdges(leftPts, rightPts);
-}
-
-/** Build a closed SVG path from left and right edge points */
-function buildFilledPathFromEdges(
-  leftPts: { x: number; y: number }[],
-  rightPts: { x: number; y: number }[],
-): string {
-  let d = `M ${leftPts[0].x} ${leftPts[0].y}`;
-  for (let j = 1; j < leftPts.length; j++) {
-    d += ` L ${leftPts[j].x} ${leftPts[j].y}`;
-  }
-  d += ` L ${rightPts[rightPts.length - 1].x} ${rightPts[rightPts.length - 1].y}`;
-  for (let j = rightPts.length - 2; j >= 0; j--) {
-    d += ` L ${rightPts[j].x} ${rightPts[j].y}`;
-  }
-  d += ' Z';
-  return d;
-}
 
 // ======================== BRANCH GENERATION ========================
 export function genBranch(x1: number, y1: number, x2: number, y2: number, seed: number, thickAtStart = true) {
@@ -436,7 +141,6 @@ export function leafVeinPath(sz: number) { return mkPath(`M 0,${-sz * 0.08} L 0,
 export function placeAnimals(conns: Conn[]): AnimalD[] {
   const a: AnimalD[] = [];
   const br = conns.filter(c => c.type === 'branch');
-  const tr = conns.filter(c => c.type === 'trunk');
   const r = sr(br.length * 7 + 42);
   const types: AnimalD['type'][] = ['bird', 'squirrel', 'bird'];
   const MIN_DIST = 40; // minimum distance between animals
@@ -444,15 +148,13 @@ export function placeAnimals(conns: Conn[]): AnimalD[] {
   const tooClose = (x: number, y: number) =>
     a.some(e => Math.abs(e.x - x) < MIN_DIST && Math.abs(e.y - y) < MIN_DIST);
 
-  // Place owl on a branch (not trunk) so it sits naturally
+  // Place owl on a branch so it sits naturally
   if (br.length > 0) {
     const owlBr = br[Math.floor(br.length / 2)];
     const t = 0.55;
     const ox = lerp(owlBr.x1, owlBr.x2, t);
     const oy = lerp(owlBr.y1, owlBr.y2, t) - 4;
     a.push({ type: 'owl', x: ox, y: oy, flip: owlBr.x2 < owlBr.x1, seed: owlBr.seed });
-  } else if (tr.length > 0) {
-    a.push({ type: 'owl', x: tr[0].x1 + 20, y: (tr[0].y1 + tr[0].y2) / 2 - 10, flip: false, seed: tr[0].seed });
   }
   for (let i = 0; i < br.length; i++) {
     if (r() > ANIMAL_SKIP_THRESHOLD) continue;

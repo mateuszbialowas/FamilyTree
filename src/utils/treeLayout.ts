@@ -19,7 +19,7 @@ export interface Conn {
   y1: number;
   x2: number;
   y2: number;
-  type: 'couple' | 'trunk' | 'branch';
+  type: 'couple' | 'branch';
   seed: number;
   depth: number;
 }
@@ -43,10 +43,6 @@ export const COUPLE_WIDTH = COUPLE_SPACING * 4; // 160
 
 /** Minimum width allocated for a solo node */
 export const SOLO_WIDTH = COUPLE_SPACING * 2; // 80
-
-/** Trunk length from root-level nodes (longer for visual prominence) */
-const ROOT_TRUNK_LEN = 120;
-
 
 /** Extra vertical space added to root generation height */
 const ROOT_GEN_EXTRA_H = 60;
@@ -623,71 +619,18 @@ export function computeUnifiedLayout(
     const parentY = parents[0].y;
     const childY = children[0].y;
 
-    // Direction: parent above children (parentY < childY) or below
+    // Direct branches from parent to each child (works for both descendants and ancestors).
+    // The "tree base" (trunk + roots) is rendered as a single SVG anchored to the root person.
     const downward = parentY < childY;
+    const startY = downward ? parentY + NODE_R : parentY - NODE_R;
 
-    // Only the root person's family unit gets a trunk (bark-textured pillar + roots).
-    // All other family units use direct branches from parent to child.
-    const isRootUnit = unit.parentIds.includes(rootId) ||
-      unit.parentIds.some(pid => spouseOf(pid) === rootId);
-
-    if (downward && isRootUnit) {
-      const trunkStartY = parentY + NODE_R;
-      const trunkEndY = parentY + NODE_R + ROOT_TRUNK_LEN;
-
+    for (const child of children) {
       conns.push({
-        x1: parentCenterX, y1: trunkStartY,
-        x2: parentCenterX, y2: trunkEndY,
-        type: 'trunk',
-        seed: hsh(unit.parentIds[0] + 't'),
-        depth: parents[0].depth,
-      });
-
-      for (const child of children) {
-        conns.push({
-          x1: parentCenterX, y1: trunkEndY,
-          x2: child.x, y2: childY - NODE_R,
-          type: 'branch',
-          seed: hsh(child.id),
-          depth: child.depth,
-        });
-      }
-    } else {
-      // Direct branches from parent to each child (no trunk)
-      const startY = downward
-        ? parentY + NODE_R
-        : parentY - NODE_R;
-
-      for (const child of children) {
-        conns.push({
-          x1: parentCenterX, y1: startY,
-          x2: child.x, y2: childY - NODE_R,
-          type: 'branch',
-          seed: hsh(child.id + (downward ? '' : 'anc')),
-          depth: child.depth,
-        });
-      }
-    }
-  }
-
-  // 6c: Ensure root always has a trunk (tree base)
-  const rootNode = nodeMap.get(rootId);
-  if (rootNode) {
-    const rootSp = spouseOf(rootId);
-    const rootCenterX = rootSp && nodeMap.has(rootSp)
-      ? (rootNode.x + nodeMap.get(rootSp)!.x) / 2
-      : rootNode.x;
-    const hasDownwardTrunk = conns.some(c =>
-      c.type === 'trunk' && Math.abs(c.x1 - rootCenterX) < 5 && c.depth === 0
-    );
-    if (!hasDownwardTrunk) {
-      const ry = rootNode.y;
-      conns.push({
-        x1: rootCenterX, y1: ry + NODE_R,
-        x2: rootCenterX, y2: ry + NODE_R + ROOT_TRUNK_LEN,
-        type: 'trunk',
-        seed: hsh(rootId + 'rootTrunk'),
-        depth: 0,
+        x1: parentCenterX, y1: startY,
+        x2: child.x, y2: childY - NODE_R,
+        type: 'branch',
+        seed: hsh(child.id + (downward ? '' : 'anc')),
+        depth: child.depth,
       });
     }
   }

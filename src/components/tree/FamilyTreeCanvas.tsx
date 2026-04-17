@@ -2,7 +2,7 @@ import React, { useMemo, useEffect, useState, useCallback } from 'react';
 import { View, StyleSheet, TouchableOpacity } from 'react-native';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import {
-  Canvas, Path, Group, Circle, RoundedRect, Oval,
+  Canvas, Path, Group, Circle, RoundedRect,
   LinearGradient, vec, Paragraph, ImageSVG,
   Skia,
 } from '@shopify/react-native-skia';
@@ -14,25 +14,26 @@ import {
 } from 'react-native-reanimated';
 import type { FamilyState } from '../../types';
 import {
-  computeUnifiedLayout, hsh, NODE_R,
-  COUPLE_SPACING,
+  computeUnifiedLayout, NODE_R,
 } from '../../utils/treeLayout';
-import type { LNode, Conn } from '../../utils/treeLayout';
 import { computeRelationshipLabels } from '../../utils/relationshipLabels';
 import { P } from './palette';
 import { mkPath } from './skiaHelpers';
 import { mkPara } from './skiaHelpers';
-import { WEDDING_RINGS_SVG, TREE_ROOTS_SVG } from './svgAssets';
-import { genTrunk, genBranch, genCanopy, leafPath, leafVeinPath, placeAnimals } from './geometry';
+import { WEDDING_RINGS_SVG, TREE_TRUNK_ROOTS_SVG } from './svgAssets';
+import { genBranch, genCanopy, leafPath, leafVeinPath, placeAnimals } from './geometry';
 import { OwlComponent, BirdComponent, SquirrelComponent } from './animals';
 
 // ======================== CANVAS CONSTANTS ========================
 
-/** Base width for trunk geometry */
-const TRUNK_BASE_WIDTH = 48;
+/** Width of the trunk+roots SVG anchored under the root person (height derived from 90×72 aspect) */
+const TRUNK_ROOTS_W = 180;
+const TRUNK_ROOTS_H = TRUNK_ROOTS_W * (72 / 90);
+/** How far the SVG overlaps the root person's circle so the trunk visually grows out of it */
+const TRUNK_ROOTS_OVERLAP = 8;
 
 /** Offset for shadow elements */
-const SHADOW_OFFSET = { trunk: { x: 3, y: 4 }, branch: { x: 2, y: 3 }, root: { x: 2, y: 3 }, node: { x: 1.5, y: 2.5 } };
+const SHADOW_OFFSET = { branch: { x: 2, y: 3 }, node: { x: 1.5, y: 2.5 } };
 
 /** Node label box dimensions */
 const LABEL_BOX = { width: 80, height: 54, radius: 5 };
@@ -84,7 +85,7 @@ function PersonInitials({ x, y, name }: { x: number; y: number; name: string }) 
 
 // ======================== MOURNING BAND (thin diagonal strip, lower-right) ========================
 const weddingRingsSvg = Skia.SVG.MakeFromString(WEDDING_RINGS_SVG);
-const treeRootsSvg = Skia.SVG.MakeFromString(TREE_ROOTS_SVG);
+const treeTrunkRootsSvg = Skia.SVG.MakeFromString(TREE_TRUNK_ROOTS_SVG);
 
 function MourningBand({ x, y }: { x: number; y: number }) {
   const r = NODE_R;
@@ -113,30 +114,6 @@ export function FamilyTreeCanvas({ state, rootId, onNodePress, onNodeLongPress }
   }, [state.people, state.parentChildRelationships, state.marriages, rootId]);
 
   const geo = useMemo(() => {
-    const trunkConns = layout.conns.filter(c => c.type === 'trunk');
-    const branchConns = layout.conns.filter(c => c.type === 'branch');
-    const trunks = trunkConns.map(c => {
-      const topY = Math.min(c.y1, c.y2);
-      const botY = Math.max(c.y1, c.y2);
-      const isRootTrunk = c.depth === 0;
-      const hasBranches = branchConns.some(b => Math.abs(b.x1 - c.x1) < 5);
-      const rootDir: 'up' | 'down' | null = isRootTrunk
-        ? (hasBranches ? 'up' : 'down')
-        : null;
-      const raw = genTrunk(c.x1, topY, botY, TRUNK_BASE_WIDTH, c.seed, rootDir);
-      return {
-        ...c, bw: TRUNK_BASE_WIDTH, midW: raw.midW,
-        path: mkPath(raw.path),
-        furrows: raw.furrows.map(f => ({ ...f, path: mkPath(f.d) })),
-        cracks: raw.cracks.map(cr => ({ ...cr, path: mkPath(cr.d) })),
-        highlights: raw.highlights.map(h => ({ ...h, path: mkPath(h.d) })),
-        knots: raw.knots, moss: raw.moss,
-        rootDir: raw.rootDir,
-        rootBaseY: raw.rootDir === 'up' ? topY : botY,
-        topLeaves: genCanopy(c.x1, topY - 8, 28, 18, 30, c.seed + 7000),
-      };
-    });
-
     const rootNode = layout.nodes.find(n => n.id === rootId);
     const rootY = rootNode?.y ?? 0;
 
@@ -167,8 +144,12 @@ export function FamilyTreeCanvas({ state, rootId, onNodePress, onNodeLongPress }
         relation: n.label ? mkPara(n.label, 7, P.sepia, LABEL_BOX.width) : null,
       };
     });
-    return { trunks, branches, couples, animals, labels: nodeLabels };
-  }, [layout]);
+    // Direction of trunk+roots: down if root has parents (ancestors above),
+    // up if root has only descendants below (no parents).
+    const rootHasParents = state.parentChildRelationships.some(r => r.childId === rootId);
+
+    return { rootNode, branches, couples, animals, labels: nodeLabels, rootHasParents };
+  }, [layout, rootId, state.parentChildRelationships]);
 
   // === ANIMATIONS ===
   const windPhase = useSharedValue(0);
@@ -292,58 +273,31 @@ export function FamilyTreeCanvas({ state, rootId, onNodePress, onNodeLongPress }
         <Canvas style={styles.cvs}>
           <Group transform={cam}>
 
-            {/* TRUNKS */}
-            {geo.trunks.map((t, i) => (
-              <Group key={`t${i}`}>
-                {/* Roots — rendered BEFORE trunk so trunk overlaps them */}
-                {t.rootDir && treeRootsSvg && (() => {
-                  const rootsW = 160;
-                  const rootsH = rootsW * (233 / 355);
-                  const flipY = t.rootDir === 'up' ? -1 : 1;
-                  const rx = t.x1 - rootsW / 2;
-                  // Both cases: SVG starts 12px above rootBaseY, extends downward.
-                  // For 'up', the scaleY=-1 flip mirrors it upward above the trunk.
-                  const ry = t.rootBaseY - 12;
-                  return (
-                    <Group transform={[
-                      { translateX: t.x1 },
-                      { translateY: t.rootBaseY },
-                      { scaleY: flipY },
-                      { translateX: -t.x1 },
-                      { translateY: -t.rootBaseY },
-                    ]}>
-                      <ImageSVG svg={treeRootsSvg} x={rx} y={ry} width={rootsW} height={rootsH} />
-                    </Group>
-                  );
-                })()}
-                <Group transform={[{ translateX: SHADOW_OFFSET.trunk.x }, { translateY: SHADOW_OFFSET.trunk.y }]}>
-                  <Path path={t.path} color={P.shadow.trunk} />
+            {/* TREE BASE — single SVG (trunk + roots) anchored to the selected root person.
+                Direction depends on family structure:
+                  - has parents → growing DOWN (ancestors above, tree base hangs below the root)
+                  - no parents → growing UP (only descendants below, tree base flips above the root) */}
+            {geo.rootNode && treeTrunkRootsSvg && (() => {
+              const anchorY = geo.rootHasParents
+                ? geo.rootNode.y + NODE_R - TRUNK_ROOTS_OVERLAP
+                : geo.rootNode.y - NODE_R + TRUNK_ROOTS_OVERLAP;
+              const flipY = geo.rootHasParents ? 1 : -1;
+              return (
+                <Group transform={[
+                  { translateY: anchorY },
+                  { scaleY: flipY },
+                  { translateY: -anchorY },
+                ]}>
+                  <ImageSVG
+                    svg={treeTrunkRootsSvg}
+                    x={geo.rootNode.x - TRUNK_ROOTS_W / 2}
+                    y={anchorY}
+                    width={TRUNK_ROOTS_W}
+                    height={TRUNK_ROOTS_H}
+                  />
                 </Group>
-                <Path path={t.path} style="fill">
-                  <LinearGradient start={vec(t.x1 - 12, t.y1)} end={vec(t.x1 + 12, t.y1)} colors={[P.bark.light, P.bark.mid, P.bark.dark, P.bark.mid, P.bark.light]} />
-                </Path>
-                <Path path={t.path} style="fill" opacity={0.3}>
-                  <LinearGradient start={vec(t.x1, t.y1)} end={vec(t.x1, t.y2)} colors={['rgba(200,180,150,0.5)', 'transparent', P.bark.shadow]} />
-                </Path>
-                {t.furrows.map((f, fi) => <Path key={fi} path={f.path} style="stroke" color={P.bark.deep} strokeWidth={f.w} opacity={f.op} strokeCap="round" />)}
-                {t.highlights.map((h, hi) => <Path key={hi} path={h.path} style="stroke" color="rgba(255,252,235,0.35)" strokeWidth={h.w} opacity={h.op} strokeCap="round" />)}
-                {t.knots.map((k, ki) => (
-                  <Group key={ki}>
-                    <Oval x={k.cx - k.rx} y={k.cy - k.ry} width={k.rx * 2} height={k.ry * 2} color={P.bark.shadow} opacity={k.op} />
-                    <Oval x={k.cx - k.rx * 0.55} y={k.cy - k.ry * 0.55} width={k.rx * 1.1} height={k.ry * 1.1} color={P.bark.deep} style="stroke" strokeWidth={0.3} opacity={k.op * 0.5} />
-                  </Group>
-                ))}
-                {t.moss.map((m, mi) => <Oval key={mi} x={m.cx - m.rx} y={m.cy - m.ry} width={m.rx * 2} height={m.ry * 2} color={m.col} opacity={m.op} />)}
-                <Group transform={leafSway[i % 3]} origin={vec(t.x1, t.y2 - 10)}>
-                  {t.topLeaves.map((l, li) => (
-                    <Group key={li} transform={[{ translateX: l.x }, { translateY: l.y }, { rotate: (l.rot * Math.PI) / 180 }]}>
-                      <Path path={leafPath(l.sz, l.type)} color={l.col} opacity={l.op} />
-                      {l.layer > 0 && <Path path={leafVeinPath(l.sz)} style="stroke" color={P.leaf.deep} strokeWidth={0.3} opacity={0.2} />}
-                    </Group>
-                  ))}
-                </Group>
-              </Group>
-            ))}
+              );
+            })()}
 
             {/* BRANCHES */}
             {geo.branches.map((b, i) => (
