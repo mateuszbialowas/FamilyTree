@@ -266,7 +266,7 @@ export function computeUnifiedLayout(
 
   function placeDesc(node: DescNode, cx: number) {
     if (node.spouseId) {
-      addNode(mkNode(node.id, cx - COUPLE_SPACING, node.gen));
+      addNode(mkNode(node.id, cx - COUPLE_SPACING, node.gen, node.spouseId));
       addNode(mkNode(node.spouseId, cx + COUPLE_SPACING, node.gen, node.id));
     } else {
       addNode(mkNode(node.id, cx, node.gen));
@@ -351,29 +351,50 @@ export function computeUnifiedLayout(
         const sibNodes: LNode[] = [];
 
         if (existingKids.length > 0 && newKids.length > 0) {
-          // Find leftmost X of existing kids (including their spouses)
-          const existingLeftX = Math.min(...existingKids.map(k => {
-            const ks = spouseOf(k.id);
-            return ks && nodeMap.has(ks) ? Math.min(k.x, nodeMap.get(ks)!.x) : k.x;
-          }));
+          // Place new siblings on the OUTER side of the existing placed child
+          // (away from that child's spouse, who is an in-law — not a child of g1/g2).
+          const anchor = existingKids[0];
+          const anchorSpouseId = spouseOf(anchor.id);
+          const anchorSpouse = anchorSpouseId && nodeMap.has(anchorSpouseId)
+            ? nodeMap.get(anchorSpouseId)! : null;
+          const placeOnRight = anchorSpouse ? anchor.x > anchorSpouse.x : false;
 
-          // Place new siblings right-to-left, starting just left of existing kids
-          let sx = existingLeftX - CHILD_GAP;
-          for (let i = newKids.length - 1; i >= 0; i--) {
-            const kid = newKids[i];
-            const ks = spouseOf(kid);
-            if (ks && !placed.has(ks) && pMap.has(ks)) {
-              const spn = mkNode(ks, sx, childGen, kid);
-              const sn = mkNode(kid, sx - COUPLE_SPACING * 2, childGen);
-              addNode(sn);
-              addNode(spn);
-              sibNodes.push(sn);
-              sx = sn.x - CHILD_GAP;
-            } else {
-              const sn = mkNode(kid, sx, childGen);
-              addNode(sn);
-              sibNodes.push(sn);
-              sx -= SOLO_WIDTH + CHILD_GAP;
+          if (placeOnRight) {
+            let sx = anchor.x + MIN_NODE_DIST;
+            for (const kid of newKids) {
+              const ks = spouseOf(kid);
+              if (ks && !placed.has(ks) && pMap.has(ks)) {
+                const sn = mkNode(kid, sx, childGen, ks);
+                const spn = mkNode(ks, sx + COUPLE_SPACING * 2, childGen, kid);
+                addNode(sn);
+                addNode(spn);
+                sibNodes.push(sn);
+                sx += COUPLE_WIDTH + CHILD_GAP;
+              } else {
+                const sn = mkNode(kid, sx, childGen);
+                addNode(sn);
+                sibNodes.push(sn);
+                sx += SOLO_WIDTH + CHILD_GAP;
+              }
+            }
+          } else {
+            let sx = anchor.x - CHILD_GAP;
+            for (let i = newKids.length - 1; i >= 0; i--) {
+              const kid = newKids[i];
+              const ks = spouseOf(kid);
+              if (ks && !placed.has(ks) && pMap.has(ks)) {
+                const spn = mkNode(ks, sx, childGen, kid);
+                const sn = mkNode(kid, sx - COUPLE_SPACING * 2, childGen, ks);
+                addNode(sn);
+                addNode(spn);
+                sibNodes.push(sn);
+                sx = sn.x - CHILD_GAP;
+              } else {
+                const sn = mkNode(kid, sx, childGen);
+                addNode(sn);
+                sibNodes.push(sn);
+                sx -= SOLO_WIDTH + CHILD_GAP;
+              }
             }
           }
         } else {
@@ -386,7 +407,7 @@ export function computeUnifiedLayout(
           for (const kid of newKids) {
             const ks = spouseOf(kid);
             if (ks && !placed.has(ks) && pMap.has(ks)) {
-              const sn = mkNode(kid, sx, childGen);
+              const sn = mkNode(kid, sx, childGen, ks);
               const spn = mkNode(ks, sx + COUPLE_SPACING * 2, childGen, kid);
               addNode(sn);
               addNode(spn);
@@ -449,7 +470,7 @@ export function computeUnifiedLayout(
         }
 
         if (g2) {
-          addNode(mkNode(g1, center - COUPLE_SPACING, parentGen));
+          addNode(mkNode(g1, center - COUPLE_SPACING, parentGen, g2));
           addNode(mkNode(g2, center + COUPLE_SPACING, parentGen, g1));
         } else {
           addNode(mkNode(g1, center, parentGen));

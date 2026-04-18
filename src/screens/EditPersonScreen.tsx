@@ -1,5 +1,5 @@
 import React from 'react';
-import { View, Text, ScrollView, Alert } from 'react-native';
+import { View, Text, ScrollView, Alert, KeyboardAvoidingView, Platform } from 'react-native';
 import { useRoute, useNavigation } from '@react-navigation/native';
 import type { RouteProp } from '@react-navigation/native';
 import { useFamily } from '../context/FamilyContext';
@@ -54,14 +54,23 @@ export function EditPersonScreen() {
   };
 
   return (
-    <ScrollView style={formStyles.container} contentContainerStyle={formStyles.content}>
-      <ScreenHeader title="Edytuj osobę" />
-      <PersonForm
-        initialValues={person}
-        submitLabel="Zapisz zmiany"
-        submitTestID="btn-save-edit"
-        onSubmit={handleSave}
-      />
-    </ScrollView>
+    <KeyboardAvoidingView
+      style={formStyles.container}
+      behavior={Platform.OS === 'ios' ? 'padding' : undefined}
+    >
+      <ScrollView
+        style={formStyles.container}
+        contentContainerStyle={formStyles.content}
+        keyboardShouldPersistTaps="handled"
+      >
+        <ScreenHeader title="Edytuj osobę" />
+        <PersonForm
+          initialValues={person}
+          submitLabel="Zapisz zmiany"
+          submitTestID="btn-save-edit"
+          onSubmit={handleSave}
+        />
+      </ScrollView>
+    </KeyboardAvoidingView>
   );
 }

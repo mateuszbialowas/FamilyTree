@@ -3,7 +3,7 @@ import { View, StyleSheet, TouchableOpacity } from 'react-native';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import {
   Canvas, Path, Group, Circle, RoundedRect,
-  LinearGradient, vec, Paragraph, ImageSVG,
+  LinearGradient, RadialGradient, vec, Paragraph, ImageSVG,
   Skia,
 } from '@shopify/react-native-skia';
 import { GestureDetector, Gesture } from 'react-native-gesture-handler';
@@ -63,6 +63,11 @@ const ANIM = {
   tailWag: 700,
   centerDuration: 350,
   longPressDuration: 500,
+  glowPulse: 1400,
+  rootRevealDuration: 280,
+  bounceUp: 90,
+  bounceDown: 140,
+  bounceScale: 1.08,
 };
 
 // ======================== PROPS ========================
@@ -183,14 +188,39 @@ export function FamilyTreeCanvas({ state, rootId, onNodePress, onNodeLongPress }
     tailWag.value = withRepeat(withTiming(0.12, { duration: ANIM.tailWag, easing: Easing.inOut(Easing.sin) }), -1, true);
   }, []);
 
+  // Pulsing halo around the selected root person
+  const rootGlow = useSharedValue(0);
+  useEffect(() => {
+    rootGlow.value = withRepeat(
+      withTiming(1, { duration: ANIM.glowPulse, easing: Easing.inOut(Easing.sin) }),
+      -1, true,
+    );
+  }, []);
+  const glowR = useDerivedValue(() => NODE_GLOW_R + rootGlow.value * 5);
+  const glowOpacity = useDerivedValue(() => 0.18 + rootGlow.value * 0.17);
+
+  // Fade-in when the selected root person changes (smooth swap, no snap)
+  const canvasOpacity = useSharedValue(1);
+  useEffect(() => {
+    canvasOpacity.value = 0;
+    canvasOpacity.value = withTiming(1, { duration: ANIM.rootRevealDuration, easing: Easing.out(Easing.quad) });
+  }, [rootId]);
+
   const leafSway = [
     useDerivedValue(() => [{ rotate: Math.sin(windPhase.value) * 0.03 }]),
     useDerivedValue(() => [{ rotate: Math.sin(windPhase.value + 1.2) * 0.04 }]),
     useDerivedValue(() => [{ rotate: Math.sin(windPhase.value + 2.4) * 0.035 }]),
   ];
+  // Trunk + roots SVG sways slower and ~3× more subtly than the leaves
+  const trunkSway = useDerivedValue(() => [{ rotate: Math.sin(windPhase.value * 0.5) * 0.012 }]);
   const owlEyeT = useDerivedValue(() => [{ scaleY: owlBlink.value }]);
   const birdBobT = useDerivedValue(() => [{ translateY: birdBob.value }]);
   const tailWagT = useDerivedValue(() => [{ rotate: tailWag.value }]);
+
+  // Tap bounce — when a node is tapped, briefly scale it up around its center
+  const [bouncingId, setBouncingId] = useState<string | null>(null);
+  const bounceScale = useSharedValue(1);
+  const bounceTransform = useDerivedValue(() => [{ scale: bounceScale.value }]);
 
   // === GESTURES ===
   const tx = useSharedValue(0), ty = useSharedValue(0), sc = useSharedValue(1);
@@ -206,7 +236,14 @@ export function FamilyTreeCanvas({ state, rootId, onNodePress, onNodeLongPress }
       Math.abs(canvasX - n.x) < NODE_R + 20 &&
       Math.abs(canvasY - n.y) < NODE_R + 20
     );
-    if (hit) onNodePress(hit.id);
+    if (hit) {
+      setBouncingId(hit.id);
+      bounceScale.value = withSequence(
+        withTiming(ANIM.bounceScale, { duration: ANIM.bounceUp, easing: Easing.out(Easing.quad) }),
+        withTiming(1, { duration: ANIM.bounceDown, easing: Easing.inOut(Easing.quad) }),
+      );
+      onNodePress(hit.id);
+    }
   };
 
   const handleLongPress = (tapX: number, tapY: number) => {
@@ -271,31 +308,54 @@ export function FamilyTreeCanvas({ state, rootId, onNodePress, onNodeLongPress }
         onLayout={e => setCanvasSize({ w: e.nativeEvent.layout.width, h: e.nativeEvent.layout.height })}
       >
         <Canvas style={styles.cvs}>
-          <Group transform={cam}>
+          <Group transform={cam} opacity={canvasOpacity}>
 
             {/* TREE BASE — single SVG (trunk + roots) anchored to the selected root person.
                 Direction depends on family structure:
                   - has parents → growing DOWN (ancestors above, tree base hangs below the root)
-                  - no parents → growing UP (only descendants below, tree base flips above the root) */}
+                  - no parents → growing UP (only descendants below, tree base flips above the root)
+                Sways gently with the wind around its anchor (where it meets the circle).
+                A soft "ground" shadow is drawn at the far end (only in the down-growing case). */}
             {geo.rootNode && treeTrunkRootsSvg && (() => {
               const anchorY = geo.rootHasParents
                 ? geo.rootNode.y + NODE_R - TRUNK_ROOTS_OVERLAP
                 : geo.rootNode.y - NODE_R + TRUNK_ROOTS_OVERLAP;
               const flipY = geo.rootHasParents ? 1 : -1;
+              const farY = anchorY + flipY * TRUNK_ROOTS_H;
               return (
-                <Group transform={[
-                  { translateY: anchorY },
-                  { scaleY: flipY },
-                  { translateY: -anchorY },
-                ]}>
-                  <ImageSVG
-                    svg={treeTrunkRootsSvg}
-                    x={geo.rootNode.x - TRUNK_ROOTS_W / 2}
-                    y={anchorY}
-                    width={TRUNK_ROOTS_W}
-                    height={TRUNK_ROOTS_H}
-                  />
-                </Group>
+                <>
+                  {/* Ground shadow — soft elliptical pool under the root tips. Only when growing down. */}
+                  {geo.rootHasParents && (
+                    <Group transform={[
+                      { translateX: geo.rootNode.x },
+                      { translateY: farY - 6 },
+                      { scaleY: 0.22 },
+                    ]}>
+                      <Circle cx={0} cy={0} r={70}>
+                        <RadialGradient
+                          c={vec(0, 0)}
+                          r={70}
+                          colors={['rgba(0,0,0,0.28)', 'rgba(0,0,0,0)']}
+                        />
+                      </Circle>
+                    </Group>
+                  )}
+                  <Group transform={trunkSway} origin={vec(geo.rootNode.x, anchorY)}>
+                    <Group transform={[
+                      { translateY: anchorY },
+                      { scaleY: flipY },
+                      { translateY: -anchorY },
+                    ]}>
+                      <ImageSVG
+                        svg={treeTrunkRootsSvg}
+                        x={geo.rootNode.x - TRUNK_ROOTS_W / 2}
+                        y={anchorY}
+                        width={TRUNK_ROOTS_W}
+                        height={TRUNK_ROOTS_H}
+                      />
+                    </Group>
+                  </Group>
+                </>
               );
             })()}
 
@@ -336,18 +396,26 @@ export function FamilyTreeCanvas({ state, rootId, onNodePress, onNodeLongPress }
               return null;
             })}
 
-            {/* NODES */}
+            {/* NODES — the most-recently-tapped node bounces (scale up & settle) around its circle center */}
             {layout.nodes.map(n => {
               const lb = geo.labels.find(l => l.id === n.id);
               const isRoot = n.id === rootId;
-              return (
-                <Group key={n.id}>
+              const isBouncing = n.id === bouncingId;
+              const nodeBody = (
+                <>
                   <Circle cx={n.x + SHADOW_OFFSET.node.x} cy={n.y + SHADOW_OFFSET.node.y} r={NODE_R} color={P.shadow.node} />
-                  {isRoot && <Circle cx={n.x} cy={n.y} r={NODE_GLOW_R} color={P.hl.glow} />}
+                  {isRoot && <Circle cx={n.x} cy={n.y} r={glowR} color={P.hl.ring} opacity={glowOpacity} />}
                   <Circle cx={n.x} cy={n.y} r={NODE_R} color={P.cream} />
                   <PersonInitials x={n.x} y={n.y} name={n.name} />
                   {n.isDead && <MourningBand x={n.x} y={n.y} />}
                   <Circle cx={n.x} cy={n.y} r={NODE_R} color={isRoot ? P.hl.ring : P.sepia} style="stroke" strokeWidth={isRoot ? STROKE.rootRing : STROKE.nodeRing} />
+                </>
+              );
+              return (
+                <Group key={n.id}>
+                  {isBouncing
+                    ? <Group transform={bounceTransform} origin={vec(n.x, n.y)}>{nodeBody}</Group>
+                    : nodeBody}
                   <RoundedRect x={n.x - LABEL_BOX.width / 2} y={n.y + NODE_R + 3} width={LABEL_BOX.width} height={LABEL_BOX.height} r={LABEL_BOX.radius} color={P.cream} />
                   <RoundedRect x={n.x - LABEL_BOX.width / 2} y={n.y + NODE_R + 3} width={LABEL_BOX.width} height={LABEL_BOX.height} r={LABEL_BOX.radius} color={P.parchEdge} style="stroke" strokeWidth={STROKE.labelBox} />
                   {lb && <>

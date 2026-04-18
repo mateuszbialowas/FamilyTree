@@ -1,5 +1,5 @@
 import React from 'react';
-import { ScrollView, Alert } from 'react-native';
+import { ScrollView, Alert, KeyboardAvoidingView, Platform } from 'react-native';
 import { useNavigation, useRoute } from '@react-navigation/native';
 import type { RouteProp } from '@react-navigation/native';
 import { useFamily } from '../context/FamilyContext';
@@ -106,19 +106,28 @@ export function AddPersonScreen() {
   };
 
   return (
-    <ScrollView style={formStyles.container} contentContainerStyle={formStyles.content}>
-      <ScreenHeader
-        title="Dodaj osobę"
-        subtitle={relatedPerson && relationType
-          ? `${REL_LABELS[relationType]} ${relatedPerson.firstName} ${relatedPerson.lastName}`
-          : undefined
-        }
-      />
-      <PersonForm
-        submitLabel="Zapisz"
-        submitTestID="btn-save-person"
-        onSubmit={handleSave}
-      />
-    </ScrollView>
+    <KeyboardAvoidingView
+      style={formStyles.container}
+      behavior={Platform.OS === 'ios' ? 'padding' : undefined}
+    >
+      <ScrollView
+        style={formStyles.container}
+        contentContainerStyle={formStyles.content}
+        keyboardShouldPersistTaps="handled"
+      >
+        <ScreenHeader
+          title="Dodaj osobę"
+          subtitle={relatedPerson && relationType
+            ? `${REL_LABELS[relationType]} ${relatedPerson.firstName} ${relatedPerson.lastName}`
+            : undefined
+          }
+        />
+        <PersonForm
+          submitLabel="Zapisz"
+          submitTestID="btn-save-person"
+          onSubmit={handleSave}
+        />
+      </ScrollView>
+    </KeyboardAvoidingView>
   );
 }

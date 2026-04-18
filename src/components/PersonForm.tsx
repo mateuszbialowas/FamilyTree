@@ -91,6 +91,7 @@ export function PersonForm({ initialValues, submitLabel, submitTestID, onSubmit 
           value={birthDate || new Date()}
           mode="date"
           display={Platform.OS === 'ios' ? 'spinner' : 'default'}
+          locale="pl-PL"
           onChange={(_, date) => {
             setShowBirthPicker(Platform.OS === 'ios');
             if (date) setBirthDate(date);
@@ -114,6 +115,7 @@ export function PersonForm({ initialValues, submitLabel, submitTestID, onSubmit 
           value={deathDate || new Date()}
           mode="date"
           display={Platform.OS === 'ios' ? 'spinner' : 'default'}
+          locale="pl-PL"
           onChange={(_, date) => {
             setShowDeathPicker(Platform.OS === 'ios');
             if (date) setDeathDate(date);
