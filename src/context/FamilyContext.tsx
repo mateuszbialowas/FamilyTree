@@ -1,97 +1,62 @@
-import React, { createContext, useContext, useReducer, useEffect, useRef, useCallback, useState } from 'react';
+import React, { createContext, useContext, useReducer, useEffect, useRef, useCallback, useState, useMemo } from 'react';
 import type { FamilyState, FamilyAction } from '../types';
 import { loadData, saveData } from '../utils/storage';
+import {
+  historyReducer,
+  createInitialHistory,
+  type HistoryEntry,
+} from './familyReducers';
 
-const initialState: FamilyState = {
-  people: [],
-  parentChildRelationships: [],
-  marriages: [],
-};
-
-function familyReducer(state: FamilyState, action: FamilyAction): FamilyState {
-  switch (action.type) {
-    case 'ADD_PERSON':
-      return { ...state, people: [...state.people, action.payload] };
-
-    case 'UPDATE_PERSON':
-      return {
-        ...state,
-        people: state.people.map((p) =>
-          p.id === action.payload.id ? action.payload : p
-        ),
-      };
-
-    case 'DELETE_PERSON': {
-      const id = action.payload;
-      return {
-        ...state,
-        people: state.people.filter((p) => p.id !== id),
-        parentChildRelationships: state.parentChildRelationships.filter(
-          (r) => r.parentId !== id && r.childId !== id
-        ),
-        marriages: state.marriages.filter(
-          (m) => m.spouse1Id !== id && m.spouse2Id !== id
-        ),
-      };
-    }
-
-    case 'ADD_PARENT_CHILD':
-      return {
-        ...state,
-        parentChildRelationships: [
-          ...state.parentChildRelationships,
-          action.payload,
-        ],
-      };
-
-    case 'ADD_MARRIAGE':
-      return { ...state, marriages: [...state.marriages, action.payload] };
-
-    case 'REMOVE_RELATIONSHIP':
-      if (action.payload.kind === 'parentChild') {
-        return {
-          ...state,
-          parentChildRelationships: state.parentChildRelationships.filter(
-            (r) => r.id !== action.payload.id
-          ),
-        };
-      }
-      return {
-        ...state,
-        marriages: state.marriages.filter((m) => m.id !== action.payload.id),
-      };
-
-    case 'IMPORT_DATA':
-      return action.payload;
-
-    case 'CLEAR_DATA':
-      return initialState;
-
-    default:
-      return state;
-  }
-}
+export type { HistoryEntry } from './familyReducers';
 
 type FamilyContextValue = {
   state: FamilyState;
   dispatch: React.Dispatch<FamilyAction>;
   isLoading: boolean;
+  undo: () => void;
+  redo: () => void;
+  canUndo: boolean;
+  canRedo: boolean;
+  pastEntries: readonly HistoryEntry[];
+  futureEntries: readonly HistoryEntry[];
+  presentEntry: HistoryEntry;
+  jumpTo: (target: { direction: 'past' | 'future'; index: number }) => void;
 };
 
 const FamilyContext = createContext<FamilyContextValue | null>(null);
 
 export function FamilyProvider({ children }: { children: React.ReactNode }) {
-  const [state, dispatch] = useReducer(familyReducer, initialState);
+  const [history, historyDispatch] = useReducer(historyReducer, undefined, () =>
+    createInitialHistory(),
+  );
   const [isLoading, setIsLoading] = useState(true);
   const isInitialized = useRef(false);
   const saveTimeout = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  const dispatch = useCallback<React.Dispatch<FamilyAction>>((action) => {
+    historyDispatch({ type: 'APPLY', action, now: Date.now() });
+  }, []);
+
+  const undo = useCallback(() => historyDispatch({ type: 'UNDO' }), []);
+  const redo = useCallback(() => historyDispatch({ type: 'REDO' }), []);
+  const jumpTo = useCallback(
+    (target: { direction: 'past' | 'future'; index: number }) => {
+      historyDispatch({ type: 'JUMP', direction: target.direction, index: target.index });
+    },
+    [],
+  );
 
   // Load data on mount
   useEffect(() => {
     (async () => {
       const saved = await loadData();
       if (saved) {
-        dispatch({ type: 'IMPORT_DATA', payload: saved });
+        historyDispatch({
+          type: 'RESET',
+          payload: saved,
+          label: 'Wczytano zapisane dane',
+          now: Date.now(),
+        });
       }
       isInitialized.current = true;
       setIsLoading(false);
@@ -106,16 +71,30 @@ export function FamilyProvider({ children }: { children: React.ReactNode }) {
       clearTimeout(saveTimeout.current);
     }
     saveTimeout.current = setTimeout(() => {
-      saveData(state);
+      saveData(history.present.state);
     }, 500);
 
     return () => {
       if (saveTimeout.current) clearTimeout(saveTimeout.current);
     };
-  }, [state]);
+  }, [history.present]);
+
+  const value = useMemo<FamilyContextValue>(() => ({
+    state: history.present.state,
+    dispatch,
+    isLoading,
+    undo,
+    redo,
+    canUndo: history.past.length > 0,
+    canRedo: history.future.length > 0,
+    pastEntries: history.past,
+    futureEntries: history.future,
+    presentEntry: history.present,
+    jumpTo,
+  }), [history, dispatch, isLoading, undo, redo, jumpTo]);
 
   return (
-    <FamilyContext.Provider value={{ state, dispatch, isLoading }}>
+    <FamilyContext.Provider value={value}>
       {children}
     </FamilyContext.Provider>
   );

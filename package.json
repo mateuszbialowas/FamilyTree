@@ -9,7 +9,9 @@
     "web": "expo start --web",
     "test:e2e": "maestro test .maestro/",
     "test:e2e:single": "maestro test",
-    "test:e2e:studio": "maestro studio"
+    "test:e2e:studio": "maestro studio",
+    "test": "vitest run",
+    "test:watch": "vitest"
   },
   "dependencies": {
     "@expo-google-fonts/lora": "^0.4.2",
@@ -39,7 +41,8 @@
   },
   "devDependencies": {
     "@types/react": "~19.1.0",
-    "typescript": "~5.9.2"
+    "typescript": "~5.9.2",
+    "vitest": "^4.1.4"
   },
   "private": true
 }

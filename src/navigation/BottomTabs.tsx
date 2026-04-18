@@ -50,7 +50,6 @@ export function BottomTabs() {
           name="Drzewo"
           component={TreeStack}
           options={{
-            tabBarTestID: 'tab-tree',
             tabBarIcon: ({ color, size }) => (
               <MaterialCommunityIcons name="family-tree" size={size} color={color} />
             ),
@@ -60,7 +59,6 @@ export function BottomTabs() {
           name="Lista"
           component={ListStack}
           options={{
-            tabBarTestID: 'tab-list',
             tabBarIcon: ({ color, size }) => (
               <MaterialCommunityIcons name="format-list-bulleted" size={size} color={color} />
             ),
@@ -70,7 +68,6 @@ export function BottomTabs() {
           name="Ustawienia"
           component={SettingsStack}
           options={{
-            tabBarTestID: 'tab-settings',
             tabBarIcon: ({ color, size }) => (
               <MaterialCommunityIcons name="cog" size={size} color={color} />
             ),

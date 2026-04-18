@@ -1,6 +1,6 @@
 import React, { useState, useCallback } from 'react';
 import {
-  View, Text, TouchableOpacity, Modal, FlatList, Alert, StyleSheet,
+  View, Text, TouchableOpacity, Modal, FlatList, Alert, StyleSheet, Pressable,
 } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
@@ -92,12 +92,21 @@ export function TreeScreen() {
       )}
 
       {/* Root picker modal */}
-      <Modal visible={pickerVisible} animationType="slide" transparent>
-        <View style={styles.modalOverlay}>
-          <View style={styles.modalContent}>
+      <Modal
+        visible={pickerVisible}
+        animationType="slide"
+        transparent
+        onRequestClose={() => setPickerVisible(false)}
+      >
+        <Pressable
+          style={styles.modalOverlay}
+          onPress={() => setPickerVisible(false)}
+          testID="picker-backdrop"
+        >
+          <Pressable style={styles.modalContent} onPress={() => { /* swallow tap */ }}>
             <View style={styles.modalHeader}>
               <Text style={styles.modalTitle}>Wybierz korzeń drzewa</Text>
-              <TouchableOpacity onPress={() => setPickerVisible(false)}>
+              <TouchableOpacity onPress={() => setPickerVisible(false)} testID="picker-close">
                 <MaterialCommunityIcons name="close" size={24} color={colors.text} />
               </TouchableOpacity>
             </View>
@@ -129,8 +138,8 @@ export function TreeScreen() {
                 </TouchableOpacity>
               )}
             />
-          </View>
-        </View>
+          </Pressable>
+        </Pressable>
       </Modal>
     </View>
   );

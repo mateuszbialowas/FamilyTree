@@ -301,6 +301,20 @@ export function FamilyTreeCanvas({ state, rootId, onNodePress, onNodeLongPress }
     sc.value = withTiming(1, { duration: ANIM.centerDuration, easing });
   }, [layout.nodes, rootId, canvasSize]);
 
+  // Initial centering: jump (no animation) to root when canvas is first laid out
+  // or when the selected root changes. Keeps user pan/zoom intact between renders.
+  const lastCenteredFor = React.useRef<string | null>(null);
+  useEffect(() => {
+    if (canvasSize.w === 0) return;
+    if (lastCenteredFor.current === rootId) return;
+    const node = layout.nodes.find(n => n.id === rootId);
+    if (!node) return;
+    tx.value = canvasSize.w / 2 - node.x;
+    ty.value = canvasSize.h / 2 - node.y;
+    sc.value = 1;
+    lastCenteredFor.current = rootId;
+  }, [canvasSize.w, canvasSize.h, rootId, layout.nodes]);
+
   return (
     <GestureDetector gesture={gesture}>
       <View

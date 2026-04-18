@@ -209,7 +209,7 @@ function pathToLabel(
   if (key === 'spouse,up,down,spouse') return m ? 'Szwagier' : 'Szwagierka';
 
   // ── Uncle/Aunt by marriage (spouse of wuj/ciotka) ──
-  if (key === 'up,up,down,spouse') return m ? 'Wujek' : 'Ciotka';
+  if (key === 'up,up,down,spouse') return m ? 'Wujek' : 'Ciocia';
 
   // ── Cousin's spouse ──
   if (key === 'up,up,down,down,spouse') return m ? 'Mąż kuzynki' : 'Żona kuzyna';
@@ -282,7 +282,9 @@ function pathToLabel(
   }
 
   // ── By marriage: blood path + trailing spouse ──
-  if (spouses === 1 && isUpsThenDownsThenSpouse(path)) {
+  // Requires at least one 'down' step — pure ups followed by spouse is
+  // an "ancestor's spouse" case, handled further below.
+  if (spouses === 1 && isUpsThenDownsThenSpouse(path) && downs > 0) {
     const bloodUps = ups;
     const bloodDowns = downs;
     const diff = Math.abs(bloodUps - bloodDowns);

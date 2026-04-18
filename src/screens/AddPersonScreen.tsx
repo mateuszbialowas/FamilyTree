@@ -1,5 +1,5 @@
 import React from 'react';
-import { ScrollView, Alert, KeyboardAvoidingView, Platform } from 'react-native';
+import { ScrollView, Alert, Platform, View, Text, StyleSheet } from 'react-native';
 import { useNavigation, useRoute } from '@react-navigation/native';
 import type { RouteProp } from '@react-navigation/native';
 import { useFamily } from '../context/FamilyContext';
@@ -8,7 +8,11 @@ import { generateId } from '../utils/uuid';
 import { formatDateISO } from '../utils/date';
 import { ScreenHeader } from '../components/ui/ScreenHeader';
 import { PersonForm } from '../components/PersonForm';
+import { KeyboardDoneAccessory } from '../components/ui/KeyboardDoneAccessory';
 import { formStyles } from '../theme/formStyles';
+import { colors } from '../theme/colors';
+import { fonts, fontSizes } from '../theme/typography';
+import { spacing, borderRadius } from '../theme/spacing';
 
 type AddPersonParams = {
   AddPerson: {
@@ -32,6 +36,9 @@ export function AddPersonScreen() {
   const relatedPersonId = route.params?.relatedPersonId;
   const relationType = route.params?.relationType;
   const relatedPerson = relatedPersonId ? state.people.find(p => p.id === relatedPersonId) : null;
+  const siblingParents = relationType === 'sibling' && relatedPersonId
+    ? getParents(relatedPersonId, state)
+    : [];
 
   const handleSave = (data: {
     firstName: string;
@@ -106,14 +113,13 @@ export function AddPersonScreen() {
   };
 
   return (
-    <KeyboardAvoidingView
-      style={formStyles.container}
-      behavior={Platform.OS === 'ios' ? 'padding' : undefined}
-    >
+    <View style={formStyles.container}>
       <ScrollView
         style={formStyles.container}
         contentContainerStyle={formStyles.content}
         keyboardShouldPersistTaps="handled"
+        keyboardDismissMode="interactive"
+        automaticallyAdjustKeyboardInsets={Platform.OS === 'ios'}
       >
         <ScreenHeader
           title="Dodaj osobę"
@@ -122,12 +128,64 @@ export function AddPersonScreen() {
             : undefined
           }
         />
+        {relationType === 'sibling' && relatedPerson && (
+          <View testID="sibling-preview" style={previewStyles.box}>
+            <Text style={previewStyles.title}>Automatyczne powiązania</Text>
+            {siblingParents.length > 0 ? (
+              <>
+                <Text style={previewStyles.body}>
+                  Nowa osoba zostanie przypisana jako dziecko tych samych rodziców co {relatedPerson.firstName}:
+                </Text>
+                {siblingParents.map(p => (
+                  <Text key={p.id} style={previewStyles.bullet}>
+                    • {p.firstName} {p.lastName}
+                  </Text>
+                ))}
+              </>
+            ) : (
+              <Text style={previewStyles.body}>
+                {relatedPerson.firstName} nie ma jeszcze przypisanych rodziców, więc żadne relacje nie zostaną dodane automatycznie.
+              </Text>
+            )}
+          </View>
+        )}
         <PersonForm
           submitLabel="Zapisz"
           submitTestID="btn-save-person"
           onSubmit={handleSave}
         />
       </ScrollView>
-    </KeyboardAvoidingView>
+      <KeyboardDoneAccessory />
+    </View>
   );
 }
+
+const previewStyles = StyleSheet.create({
+  box: {
+    marginHorizontal: spacing.lg,
+    marginBottom: spacing.md,
+    padding: spacing.md,
+    backgroundColor: colors.surface,
+    borderRadius: borderRadius.md,
+    borderWidth: 1,
+    borderColor: colors.border,
+  },
+  title: {
+    fontFamily: fonts.bodyBold,
+    fontSize: fontSizes.sm,
+    color: colors.text,
+    marginBottom: spacing.xs,
+  },
+  body: {
+    fontFamily: fonts.body,
+    fontSize: fontSizes.sm,
+    color: colors.textMuted,
+    marginBottom: spacing.xs,
+  },
+  bullet: {
+    fontFamily: fonts.body,
+    fontSize: fontSizes.sm,
+    color: colors.text,
+    marginLeft: spacing.xs,
+  },
+});

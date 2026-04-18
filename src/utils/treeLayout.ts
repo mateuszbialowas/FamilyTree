@@ -327,10 +327,12 @@ export function computeUnifiedLayout(
         const ups = (parentsOf.get(pn.id) ?? []).filter(id => !placed.has(id) && pMap.has(id));
         if (ups.length === 0) continue;
 
-        // Determine parent couple
+        // Determine parent couple. Include g1's spouse even if not a parent of pn
+        // (e.g. step-ancestor or spouse-of-ancestor), so they render side-by-side
+        // with marriage rings and don't fall into the "disconnected" bucket.
         const g1 = ups[0];
         const g1s = spouseOf(g1);
-        const g2 = g1s && ups.includes(g1s) ? g1s : null;
+        const g2 = g1s && pMap.has(g1s) && !placed.has(g1s) ? g1s : null;
 
         const gk = g2 ? [g1, g2].sort().join('+') : g1;
         if (doneGroups.has(gk)) continue;

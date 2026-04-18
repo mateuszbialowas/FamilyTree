@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { View, Alert, StyleSheet, ScrollView } from 'react-native';
 import { File, Paths } from 'expo-file-system';
 import * as Sharing from 'expo-sharing';
@@ -7,12 +7,15 @@ import { useFamily } from '../context/FamilyContext';
 import { ScreenHeader } from '../components/ui/ScreenHeader';
 import { Button } from '../components/ui/Button';
 import { Divider } from '../components/ui/Divider';
+import { HistoryModal } from '../components/HistoryModal';
 import { colors } from '../theme/colors';
 import { spacing } from '../theme/spacing';
-import type { FamilyState } from '../types';
+import { validateFamilyState } from '../utils/validateImport';
 
 export function SettingsScreen() {
-  const { state, dispatch } = useFamily();
+  const { state, dispatch, pastEntries, futureEntries } = useFamily();
+  const [historyVisible, setHistoryVisible] = useState(false);
+  const historyCount = pastEntries.length + futureEntries.length;
 
   const handleExport = async () => {
     try {
@@ -38,14 +41,22 @@ export function SettingsScreen() {
       const pickedFile = result.assets[0];
       const file = new File(pickedFile.uri);
       const json = await file.text();
-      const data = JSON.parse(json) as FamilyState;
-      if (!data.people || !data.parentChildRelationships || !data.marriages) {
-        Alert.alert('Błąd', 'Nieprawidłowy format pliku.');
+      let raw: unknown;
+      try {
+        raw = JSON.parse(json);
+      } catch {
+        Alert.alert('Błąd', 'Plik nie jest prawidłowym JSON-em.');
         return;
       }
+      const validation = validateFamilyState(raw);
+      if (!validation.ok) {
+        Alert.alert('Nieprawidłowy plik', validation.error);
+        return;
+      }
+      const { data } = validation;
       Alert.alert(
         'Import danych',
-        `Znaleziono ${data.people.length} osób. Czy chcesz zastąpić obecne dane?`,
+        `Znaleziono ${data.people.length} osób, ${data.parentChildRelationships.length} relacji, ${data.marriages.length} małżeństw. Zastąpić obecne dane?`,
         [
           { text: 'Anuluj', style: 'cancel' },
           {
@@ -79,6 +90,18 @@ export function SettingsScreen() {
       <ScreenHeader title="Ustawienia" />
 
       <View style={styles.section}>
+        <Button
+          testID="btn-history"
+          title={`Historia zmian (${historyCount})`}
+          onPress={() => setHistoryVisible(true)}
+          variant="outline"
+          disabled={historyCount === 0}
+        />
+      </View>
+
+      <Divider />
+
+      <View style={styles.section}>
         <Button testID="btn-import" title="Importuj dane (JSON)" onPress={handleImport} variant="outline" />
         <View style={styles.gap} />
         <Button testID="btn-export" title="Eksportuj dane (JSON)" onPress={handleExport} variant="outline" />
@@ -89,6 +112,11 @@ export function SettingsScreen() {
       <View style={styles.section}>
         <Button testID="btn-clear-data" title="Wyczyść wszystkie dane" onPress={handleClear} variant="ghost" />
       </View>
+
+      <HistoryModal
+        visible={historyVisible}
+        onClose={() => setHistoryVisible(false)}
+      />
     </ScrollView>
   );
 }

@@ -4,12 +4,14 @@ import {
   TextInput as RNTextInput,
   Text,
   StyleSheet,
+  Platform,
   type TextInputProps,
   type ViewStyle,
 } from 'react-native';
 import { colors } from '../../theme/colors';
 import { fonts, fontSizes } from '../../theme/typography';
 import { spacing, borderRadius } from '../../theme/spacing';
+import { KEYBOARD_DONE_ID } from './KeyboardDoneAccessory';
 
 type Props = TextInputProps & {
   label?: string;
@@ -22,14 +24,18 @@ export function TextInput({
   error,
   containerStyle,
   style,
+  inputAccessoryViewID,
   ...rest
 }: Props) {
+  const accessoryID = inputAccessoryViewID ??
+    (Platform.OS === 'ios' ? KEYBOARD_DONE_ID : undefined);
   return (
     <View style={[styles.container, containerStyle]}>
       {label && <Text style={styles.label}>{label}</Text>}
       <RNTextInput
         style={[styles.input, rest.multiline && styles.multiline, error && styles.inputError, style]}
         placeholderTextColor={colors.textMuted}
+        inputAccessoryViewID={accessoryID}
         {...rest}
       />
       {error && <Text style={styles.error}>{error}</Text>}

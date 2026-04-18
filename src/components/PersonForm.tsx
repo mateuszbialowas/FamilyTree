@@ -1,10 +1,10 @@
 import React, { useState } from 'react';
-import { View, Text, TouchableOpacity, Platform } from 'react-native';
-import DateTimePicker from '@react-native-community/datetimepicker';
+import { View, Text, TouchableOpacity } from 'react-native';
 import { TextInput } from './ui/TextInput';
 import { Button } from './ui/Button';
+import { DatePickerField } from './ui/DatePickerField';
 import { formStyles as styles } from '../theme/formStyles';
-import { formatDateISO, parseDate } from '../utils/date';
+import { parseDate } from '../utils/date';
 import type { Person } from '../types';
 
 type PersonFormData = {
@@ -34,8 +34,6 @@ export function PersonForm({ initialValues, submitLabel, submitTestID, onSubmit 
     initialValues?.deathDate ? parseDate(initialValues.deathDate) : null,
   );
   const [notes, setNotes] = useState(initialValues?.notes ?? '');
-  const [showBirthPicker, setShowBirthPicker] = useState(false);
-  const [showDeathPicker, setShowDeathPicker] = useState(false);
 
   const handleSubmit = () => {
     onSubmit({ firstName, lastName, gender, birthDate, deathDate, notes });
@@ -80,48 +78,21 @@ export function PersonForm({ initialValues, submitLabel, submitTestID, onSubmit 
         </TouchableOpacity>
       </View>
 
-      <Text style={styles.label}>Data urodzenia</Text>
-      <TouchableOpacity style={styles.dateBtn} onPress={() => setShowBirthPicker(true)}>
-        <Text style={birthDate ? styles.dateText : styles.datePlaceholder}>
-          {birthDate ? formatDateISO(birthDate) : 'Wybierz datę'}
-        </Text>
-      </TouchableOpacity>
-      {showBirthPicker && (
-        <DateTimePicker
-          value={birthDate || new Date()}
-          mode="date"
-          display={Platform.OS === 'ios' ? 'spinner' : 'default'}
-          locale="pl-PL"
-          onChange={(_, date) => {
-            setShowBirthPicker(Platform.OS === 'ios');
-            if (date) setBirthDate(date);
-          }}
-        />
-      )}
+      <DatePickerField
+        testID="picker-birth"
+        label="Data urodzenia"
+        value={birthDate}
+        onChange={setBirthDate}
+        clearLabel="Wyczyść datę urodzenia"
+      />
 
-      <Text style={styles.label}>Data śmierci (opcjonalne)</Text>
-      <TouchableOpacity style={styles.dateBtn} onPress={() => setShowDeathPicker(true)}>
-        <Text style={deathDate ? styles.dateText : styles.datePlaceholder}>
-          {deathDate ? formatDateISO(deathDate) : 'Wybierz datę'}
-        </Text>
-      </TouchableOpacity>
-      {deathDate && (
-        <TouchableOpacity onPress={() => setDeathDate(null)}>
-          <Text style={styles.clearDate}>Wyczyść datę śmierci</Text>
-        </TouchableOpacity>
-      )}
-      {showDeathPicker && (
-        <DateTimePicker
-          value={deathDate || new Date()}
-          mode="date"
-          display={Platform.OS === 'ios' ? 'spinner' : 'default'}
-          locale="pl-PL"
-          onChange={(_, date) => {
-            setShowDeathPicker(Platform.OS === 'ios');
-            if (date) setDeathDate(date);
-          }}
-        />
-      )}
+      <DatePickerField
+        testID="picker-death"
+        label="Data śmierci (opcjonalne)"
+        value={deathDate}
+        onChange={setDeathDate}
+        clearLabel="Wyczyść datę śmierci"
+      />
 
       <TextInput
         testID="input-notes"

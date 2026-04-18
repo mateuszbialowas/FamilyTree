@@ -1,11 +1,12 @@
 import React from 'react';
-import { View, Text, ScrollView, Alert, KeyboardAvoidingView, Platform } from 'react-native';
+import { View, Text, ScrollView, Alert, Platform } from 'react-native';
 import { useRoute, useNavigation } from '@react-navigation/native';
 import type { RouteProp } from '@react-navigation/native';
 import { useFamily } from '../context/FamilyContext';
 import { formatDateISO } from '../utils/date';
 import { ScreenHeader } from '../components/ui/ScreenHeader';
 import { PersonForm } from '../components/PersonForm';
+import { KeyboardDoneAccessory } from '../components/ui/KeyboardDoneAccessory';
 import { formStyles } from '../theme/formStyles';
 
 type RouteParams = { EditPerson: { personId: string } };
@@ -54,14 +55,13 @@ export function EditPersonScreen() {
   };
 
   return (
-    <KeyboardAvoidingView
-      style={formStyles.container}
-      behavior={Platform.OS === 'ios' ? 'padding' : undefined}
-    >
+    <View style={formStyles.container}>
       <ScrollView
         style={formStyles.container}
         contentContainerStyle={formStyles.content}
         keyboardShouldPersistTaps="handled"
+        keyboardDismissMode="interactive"
+        automaticallyAdjustKeyboardInsets={Platform.OS === 'ios'}
       >
         <ScreenHeader title="Edytuj osobę" />
         <PersonForm
@@ -71,6 +71,7 @@ export function EditPersonScreen() {
           onSubmit={handleSave}
         />
       </ScrollView>
-    </KeyboardAvoidingView>
+      <KeyboardDoneAccessory />
+    </View>
   );
 }
