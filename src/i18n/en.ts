@@ -1,0 +1,215 @@
+import type { Translations } from './index';
+
+/**
+ * English translations — scaffold. The type `Translations` (derived from `pl`)
+ * enforces matching shape; TypeScript will flag missing keys when EN is wired up.
+ *
+ * These are first-pass translations. Review before enabling in production.
+ */
+export const en: Translations = {
+  app: {
+    name: 'Family Tree',
+  },
+
+  common: {
+    cancel: 'Cancel',
+    save: 'Save',
+    delete: 'Delete',
+    clear: 'Clear',
+    done: 'Done',
+    search: 'Search',
+    error: 'Error',
+    back: 'Back',
+    unknown: 'Unknown',
+    alive: 'Alive',
+    selectDate: 'Pick a date',
+  },
+
+  splash: {
+    title: 'Family Tree',
+  },
+
+  nav: {
+    tabTree: 'Tree',
+    tabList: 'List',
+    tabSettings: 'Settings',
+    homeTree: 'Tree',
+    homeList: 'People',
+    homeSettings: 'Settings',
+    titlePersonDetail: 'Details',
+    titleAddPerson: 'New person',
+    titleEditPerson: 'Edit',
+    titleAddRelationship: 'New relationship',
+  },
+
+  tree: {
+    rootLabel: 'Tree root:',
+    rootPickerTitle: 'Choose tree root',
+    emptyTitle: 'No people in the tree',
+    emptySubtitle: 'Add the first person using the + button',
+    longPressTitle: 'Add a related person',
+    longPressAddParent: 'Add parent',
+    longPressAddChild: 'Add child',
+    longPressAddSpouse: 'Add spouse',
+    longPressAddSibling: 'Add sibling',
+    bornPrefix: 'b.',
+  },
+
+  peopleList: {
+    searchPlaceholder: 'Search by first or last name…',
+    emptyTitle: 'Your chronicle is empty',
+    emptySubtitle: 'Add the first person by tapping +',
+  },
+
+  personForm: {
+    firstNameLabel: 'First name *',
+    firstNamePlaceholder: 'Enter first name',
+    lastNameLabel: 'Last name *',
+    lastNamePlaceholder: 'Enter last name',
+    genderLabel: 'Gender',
+    genderMale: 'Male',
+    genderFemale: 'Female',
+    birthDateLabel: 'Date of birth',
+    deathDateLabel: 'Date of death (optional)',
+    clearBirthDate: 'Clear date of birth',
+    clearDeathDate: 'Clear date of death',
+    notesLabel: 'Notes',
+    notesPlaceholder: 'Additional information…',
+    requiredError: 'First and last name are required.',
+  },
+
+  personDetail: {
+    notFound: 'Person not found',
+    birthDateLabel: 'Date of birth',
+    deathDateLabel: 'Date of death',
+    notesLabel: 'Notes',
+    sectionParents: 'Parents',
+    sectionSpouses: 'Spouses',
+    sectionChildren: 'Children',
+    sectionSiblings: 'Siblings',
+    relParent: 'Parent',
+    relSpouse: 'Spouse',
+    relChild: 'Child',
+    relSibling: 'Sibling',
+    marriageLabel: 'Married',
+    divorceLabel: 'Divorced',
+    btnEdit: 'Edit',
+    btnAddRelationship: 'Add relationship',
+    btnDelete: 'Delete person',
+    deleteTitle: 'Delete person',
+    deleteBody: (firstName, lastName) =>
+      `Really delete ${firstName} ${lastName}? All related relationships will also be removed.`,
+    removeRelationshipTitle: 'Remove relationship',
+    removeRelationshipBody: 'Really remove this relationship?',
+  },
+
+  addPerson: {
+    title: 'Add person',
+    saveLabel: 'Save',
+    relationLabelFor: (firstName, lastName) => `for ${firstName} ${lastName}`,
+    relationParent: 'Parent of',
+    relationChild: 'Child of',
+    relationSpouse: 'Spouse of',
+    relationSibling: 'Sibling of',
+    siblingPreviewTitle: 'Auto-linking',
+    siblingPreviewBody: (firstName) =>
+      `The new person will be linked as a child of the same parents as ${firstName}:`,
+    siblingPreviewEmpty: (firstName) =>
+      `${firstName} has no parents yet, so no relationships will be added automatically.`,
+  },
+
+  editPerson: {
+    title: 'Edit person',
+    saveLabel: 'Save changes',
+  },
+
+  addRelationship: {
+    title: 'Add relationship',
+    forSubtitle: (firstName, lastName) => `for ${firstName} ${lastName}`,
+    typeLabel: 'Relationship type',
+    typeParentChild: (firstName) => `${firstName} is the parent`,
+    typeChildParent: (firstName) => `${firstName} is the child`,
+    typeMarriage: 'Marriage',
+    marriageDateLabel: 'Marriage date (optional)',
+    selectPersonLabel: 'Select a person',
+    searchPlaceholder: 'Search…',
+    save: 'Save relationship',
+    errorSelectPerson: 'Select a person.',
+    errorParentChildExists: 'This parent-child relationship already exists.',
+    errorMarriageExists: 'This marriage already exists.',
+  },
+
+  settings: {
+    title: 'Settings',
+    history: (count) => `Change history (${count})`,
+    importJson: 'Import data (JSON)',
+    exportJson: 'Export data (JSON)',
+    clearAll: 'Clear all data',
+    exportDialogTitle: 'Export family tree',
+    exportFail: 'Failed to export data.',
+    importInvalidJson: 'File is not valid JSON.',
+    importInvalidTitle: 'Invalid file',
+    importFail: 'Failed to import data.',
+    importConfirmTitle: 'Import data',
+    importConfirmBody: (people, relations, marriages) =>
+      `Found ${people} people, ${relations} relationships, ${marriages} marriages. Replace current data?`,
+    importConfirmCta: 'Import',
+    clearTitle: 'Clear data',
+    clearBody: 'Really remove all data? This cannot be undone.',
+  },
+
+  history: {
+    title: 'Change history',
+    emptyTitle: 'No history',
+    emptySubtitle: 'Add or edit people to see a list of changes.',
+    currentChip: 'Current',
+    initialLabel: 'Initial state',
+    loadedLabel: 'Loaded saved data',
+    actions: {
+      addedPerson: (name) => `Added person: ${name}`,
+      updatedPerson: (name) => `Updated: ${name}`,
+      deletedPerson: (name) => `Deleted person: ${name}`,
+      addedParentChild: (parent, child) => `Linked parent and child: ${parent} → ${child}`,
+      addedMarriage: (s1, s2) => `Added marriage: ${s1} ⚭ ${s2}`,
+      removedParentChild: (parent, child) => `Removed relationship: ${parent} → ${child}`,
+      removedParentChildGeneric: 'Removed parent-child relationship',
+      removedMarriage: (s1, s2) => `Removed marriage: ${s1} ⚭ ${s2}`,
+      removedMarriageGeneric: 'Removed marriage',
+      importedData: (count) => `Imported data (${count} people)`,
+      clearedAll: 'Cleared all data',
+      unknownPerson: 'unknown person',
+    },
+  },
+
+  validateImport: {
+    rootNotObject: 'File does not contain a JSON object.',
+    missingPeople: 'Missing `people` list.',
+    missingParentChild: 'Missing parent-child relationships list.',
+    missingMarriages: 'Missing marriages list.',
+    personNotObject: (i) => `person #${i}: not an object`,
+    personMissingId: (i) => `person #${i}: missing id`,
+    personMissingFirstName: (i) => `person #${i}: missing first name`,
+    personMissingLastName: (i) => `person #${i}: missing last name`,
+    personInvalidGender: (i) => `person #${i}: invalid gender`,
+    personInvalidBirth: (i) => `person #${i}: invalid birth date`,
+    personInvalidDeath: (i) => `person #${i}: invalid death date`,
+    personMissingNotes: (i) => `person #${i}: missing notes`,
+    personDuplicateId: (i, id) => `person #${i}: duplicate id ${id}`,
+    pcNotObject: (i) => `parent-child relationship #${i}: not an object`,
+    pcMissingId: (i) => `parent-child relationship #${i}: missing id`,
+    pcMissingParentId: (i) => `parent-child relationship #${i}: missing parentId`,
+    pcMissingChildId: (i) => `parent-child relationship #${i}: missing childId`,
+    pcUnknownParent: (i) => `parent-child relationship #${i}: parentId references unknown person`,
+    pcUnknownChild: (i) => `parent-child relationship #${i}: childId references unknown person`,
+    pcSelfReference: (i) => `parent-child relationship #${i}: parent and child are the same person`,
+    marNotObject: (i) => `marriage #${i}: not an object`,
+    marMissingId: (i) => `marriage #${i}: missing id`,
+    marMissingSpouse1: (i) => `marriage #${i}: missing spouse1Id`,
+    marMissingSpouse2: (i) => `marriage #${i}: missing spouse2Id`,
+    marUnknownSpouse1: (i) => `marriage #${i}: spouse1Id references unknown person`,
+    marUnknownSpouse2: (i) => `marriage #${i}: spouse2Id references unknown person`,
+    marSelfReference: (i) => `marriage #${i}: spouses are the same person`,
+    marInvalidMarriageDate: (i) => `marriage #${i}: invalid marriage date`,
+    marInvalidDivorceDate: (i) => `marriage #${i}: invalid divorce date`,
+  },
+};

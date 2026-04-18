@@ -2,6 +2,7 @@ import React from 'react';
 import {
   InputAccessoryView, View, Text, Pressable, Keyboard, StyleSheet, Platform,
 } from 'react-native';
+import { t } from '../../i18n';
 import { colors } from '../../theme/colors';
 import { fonts, fontSizes } from '../../theme/typography';
 import { spacing } from '../../theme/spacing';
@@ -28,7 +29,7 @@ export function KeyboardDoneAccessory() {
           style={({ pressed }) => [styles.btn, pressed && styles.btnPressed]}
           hitSlop={8}
         >
-          <Text style={styles.txt}>Gotowe</Text>
+          <Text style={styles.txt}>{t.common.done}</Text>
         </Pressable>
       </View>
     </InputAccessoryView>

@@ -6,6 +6,7 @@ import {
   createInitialHistory,
   type HistoryEntry,
 } from './familyReducers';
+import { t } from '../i18n';
 
 export type { HistoryEntry } from './familyReducers';
 
@@ -54,7 +55,7 @@ export function FamilyProvider({ children }: { children: React.ReactNode }) {
         historyDispatch({
           type: 'RESET',
           payload: saved,
-          label: 'Wczytano zapisane dane',
+          label: t.history.loadedLabel,
           now: Date.now(),
         });
       }

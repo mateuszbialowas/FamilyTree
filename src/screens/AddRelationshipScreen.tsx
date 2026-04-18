@@ -17,6 +17,7 @@ import { formatDateISO } from '../utils/date';
 import { ScreenHeader } from '../components/ui/ScreenHeader';
 import { Button } from '../components/ui/Button';
 import { TextInput } from '../components/ui/TextInput';
+import { t } from '../i18n';
 import { formStyles } from '../theme/formStyles';
 import { colors } from '../theme/colors';
 import { fonts, fontSizes } from '../theme/typography';
@@ -49,7 +50,7 @@ export function AddRelationshipScreen() {
 
   const handleSave = () => {
     if (!selectedPersonId) {
-      Alert.alert('Błąd', 'Wybierz osobę.');
+      Alert.alert(t.common.error, t.addRelationship.errorSelectPerson);
       return;
     }
 
@@ -58,7 +59,7 @@ export function AddRelationshipScreen() {
         (r) => r.parentId === person.id && r.childId === selectedPersonId
       );
       if (exists) {
-        Alert.alert('Błąd', 'Ta relacja rodzic-dziecko już istnieje.');
+        Alert.alert(t.common.error, t.addRelationship.errorParentChildExists);
         return;
       }
       dispatch({
@@ -70,7 +71,7 @@ export function AddRelationshipScreen() {
         (r) => r.parentId === selectedPersonId && r.childId === person.id
       );
       if (exists) {
-        Alert.alert('Błąd', 'Ta relacja rodzic-dziecko już istnieje.');
+        Alert.alert(t.common.error, t.addRelationship.errorParentChildExists);
         return;
       }
       dispatch({
@@ -84,7 +85,7 @@ export function AddRelationshipScreen() {
           (m.spouse1Id === selectedPersonId && m.spouse2Id === person.id)
       );
       if (exists) {
-        Alert.alert('Błąd', 'To małżeństwo już istnieje.');
+        Alert.alert(t.common.error, t.addRelationship.errorMarriageExists);
         return;
       }
       dispatch({
@@ -103,20 +104,20 @@ export function AddRelationshipScreen() {
   };
 
   const relTypes: { key: RelType; label: string }[] = [
-    { key: 'parent-child', label: `${person.firstName} jest rodzicem` },
-    { key: 'child-parent', label: `${person.firstName} jest dzieckiem` },
-    { key: 'marriage', label: 'Małżeństwo' },
+    { key: 'parent-child', label: t.addRelationship.typeParentChild(person.firstName) },
+    { key: 'child-parent', label: t.addRelationship.typeChildParent(person.firstName) },
+    { key: 'marriage', label: t.addRelationship.typeMarriage },
   ];
 
   return (
     <ScrollView style={formStyles.container} contentContainerStyle={formStyles.content}>
       <ScreenHeader
-        title="Dodaj relację"
-        subtitle={`dla ${person.firstName} ${person.lastName}`}
+        title={t.addRelationship.title}
+        subtitle={t.addRelationship.forSubtitle(person.firstName, person.lastName)}
       />
 
       <View style={formStyles.form}>
-        <Text style={formStyles.label}>Typ relacji</Text>
+        <Text style={formStyles.label}>{t.addRelationship.typeLabel}</Text>
         {relTypes.map((rt) => (
           <TouchableOpacity
             key={rt.key}
@@ -131,10 +132,10 @@ export function AddRelationshipScreen() {
 
         {relType === 'marriage' && (
           <>
-            <Text style={[formStyles.label, { marginTop: spacing.lg }]}>Data ślubu (opcjonalne)</Text>
+            <Text style={[formStyles.label, { marginTop: spacing.lg }]}>{t.addRelationship.marriageDateLabel}</Text>
             <TouchableOpacity style={formStyles.dateBtn} onPress={() => setShowMarriagePicker(true)}>
               <Text style={marriageDate ? formStyles.dateText : formStyles.datePlaceholder}>
-                {marriageDate ? formatDateISO(marriageDate) : 'Wybierz datę'}
+                {marriageDate ? formatDateISO(marriageDate) : t.common.selectDate}
               </Text>
             </TouchableOpacity>
             {showMarriagePicker && (
@@ -151,9 +152,9 @@ export function AddRelationshipScreen() {
           </>
         )}
 
-        <Text style={[formStyles.label, { marginTop: spacing.lg }]}>Wybierz osobę</Text>
+        <Text style={[formStyles.label, { marginTop: spacing.lg }]}>{t.addRelationship.selectPersonLabel}</Text>
         <TextInput
-          placeholder="Szukaj..."
+          placeholder={t.addRelationship.searchPlaceholder}
           value={search}
           onChangeText={setSearch}
           containerStyle={{ marginBottom: spacing.sm }}
@@ -174,7 +175,7 @@ export function AddRelationshipScreen() {
               {p.firstName} {p.lastName}
             </Text>
             {p.birthDate && (
-              <Text style={styles.personDate}>ur. {p.birthDate}</Text>
+              <Text style={styles.personDate}>{t.tree.bornPrefix} {p.birthDate}</Text>
             )}
           </TouchableOpacity>
         ))}
@@ -182,7 +183,7 @@ export function AddRelationshipScreen() {
         <View style={{ marginTop: spacing.xl }}>
           <Button
             testID="btn-save-relationship"
-            title="Zapisz relację"
+            title={t.addRelationship.save}
             onPress={handleSave}
             disabled={!selectedPersonId}
           />

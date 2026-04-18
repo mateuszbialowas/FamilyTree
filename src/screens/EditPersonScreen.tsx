@@ -7,6 +7,7 @@ import { formatDateISO } from '../utils/date';
 import { ScreenHeader } from '../components/ui/ScreenHeader';
 import { PersonForm } from '../components/PersonForm';
 import { KeyboardDoneAccessory } from '../components/ui/KeyboardDoneAccessory';
+import { t } from '../i18n';
 import { formStyles } from '../theme/formStyles';
 
 type RouteParams = { EditPerson: { personId: string } };
@@ -20,7 +21,7 @@ export function EditPersonScreen() {
   if (!person) {
     return (
       <View style={formStyles.container}>
-        <Text style={formStyles.notFound}>Nie znaleziono osoby</Text>
+        <Text style={formStyles.notFound}>{t.personDetail.notFound}</Text>
       </View>
     );
   }
@@ -34,7 +35,7 @@ export function EditPersonScreen() {
     notes: string;
   }) => {
     if (!data.firstName.trim() || !data.lastName.trim()) {
-      Alert.alert('Błąd', 'Imię i nazwisko są wymagane.');
+      Alert.alert(t.common.error, t.personForm.requiredError);
       return;
     }
 
@@ -63,10 +64,10 @@ export function EditPersonScreen() {
         keyboardDismissMode="interactive"
         automaticallyAdjustKeyboardInsets={Platform.OS === 'ios'}
       >
-        <ScreenHeader title="Edytuj osobę" />
+        <ScreenHeader title={t.editPerson.title} />
         <PersonForm
           initialValues={person}
-          submitLabel="Zapisz zmiany"
+          submitLabel={t.editPerson.saveLabel}
           submitTestID="btn-save-edit"
           onSubmit={handleSave}
         />

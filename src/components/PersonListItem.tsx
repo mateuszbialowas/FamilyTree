@@ -2,6 +2,7 @@ import React from 'react';
 import { TouchableOpacity, View, Text, StyleSheet } from 'react-native';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import type { Person } from '../types';
+import { t } from '../i18n';
 import { colors } from '../theme/colors';
 import { fonts, fontSizes } from '../theme/typography';
 import { spacing, borderRadius } from '../theme/spacing';
@@ -13,7 +14,7 @@ type Props = {
 
 function formatDates(person: Person): string {
   const birth = person.birthDate ?? '?';
-  const death = person.deathDate ?? 'żyje';
+  const death = person.deathDate ?? t.common.alive.toLowerCase();
   return `${birth} – ${death}`;
 }
 

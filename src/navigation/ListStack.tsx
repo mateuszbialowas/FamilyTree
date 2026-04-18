@@ -8,6 +8,7 @@ import { EditPersonScreen } from '../screens/EditPersonScreen';
 import { AddRelationshipScreen } from '../screens/AddRelationshipScreen';
 import { Logo } from '../components/Logo';
 import { SHARED_SCREEN_OPTIONS, SCREEN_TITLES, headerStyles } from './stackConfig';
+import { t } from '../i18n';
 
 const Stack = createNativeStackNavigator();
 
@@ -21,7 +22,7 @@ export function ListStack() {
           headerTitle: () => (
             <View style={headerStyles.headerTitle}>
               <Logo size={28} />
-              <Text style={headerStyles.headerText}>Lista osób</Text>
+              <Text style={headerStyles.headerText}>{t.nav.homeList}</Text>
             </View>
           ),
         }}

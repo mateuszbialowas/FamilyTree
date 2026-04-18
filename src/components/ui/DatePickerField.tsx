@@ -4,6 +4,7 @@ import {
 } from 'react-native';
 import DateTimePicker from '@react-native-community/datetimepicker';
 import { formatDateISO } from '../../utils/date';
+import { t } from '../../i18n';
 import { formStyles } from '../../theme/formStyles';
 import { colors } from '../../theme/colors';
 import { fonts, fontSizes } from '../../theme/typography';
@@ -23,7 +24,7 @@ export function DatePickerField({
   value,
   onChange,
   clearLabel,
-  placeholder = 'Wybierz datę',
+  placeholder = t.common.selectDate,
   testID,
 }: Props) {
   const [open, setOpen] = useState(false);
@@ -74,11 +75,11 @@ export function DatePickerField({
             <Pressable style={styles.sheet} onPress={() => { /* swallow */ }}>
               <View style={styles.toolbar}>
                 <TouchableOpacity onPress={cancel} testID="date-cancel">
-                  <Text style={styles.cancel}>Anuluj</Text>
+                  <Text style={styles.cancel}>{t.common.cancel}</Text>
                 </TouchableOpacity>
                 <Text style={styles.toolbarTitle}>{label}</Text>
                 <TouchableOpacity onPress={confirm} testID="date-confirm">
-                  <Text style={styles.done}>Gotowe</Text>
+                  <Text style={styles.done}>{t.common.done}</Text>
                 </TouchableOpacity>
               </View>
               <DateTimePicker

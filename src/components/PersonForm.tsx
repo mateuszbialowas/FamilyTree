@@ -3,6 +3,7 @@ import { View, Text, TouchableOpacity } from 'react-native';
 import { TextInput } from './ui/TextInput';
 import { Button } from './ui/Button';
 import { DatePickerField } from './ui/DatePickerField';
+import { t } from '../i18n';
 import { formStyles as styles } from '../theme/formStyles';
 import { parseDate } from '../utils/date';
 import type { Person } from '../types';
@@ -43,20 +44,20 @@ export function PersonForm({ initialValues, submitLabel, submitTestID, onSubmit 
     <View style={styles.form}>
       <TextInput
         testID="input-first-name"
-        label="Imię *"
-        placeholder="Wprowadź imię"
+        label={t.personForm.firstNameLabel}
+        placeholder={t.personForm.firstNamePlaceholder}
         value={firstName}
         onChangeText={setFirstName}
       />
       <TextInput
         testID="input-last-name"
-        label="Nazwisko *"
-        placeholder="Wprowadź nazwisko"
+        label={t.personForm.lastNameLabel}
+        placeholder={t.personForm.lastNamePlaceholder}
         value={lastName}
         onChangeText={setLastName}
       />
 
-      <Text style={styles.label}>Płeć</Text>
+      <Text style={styles.label}>{t.personForm.genderLabel}</Text>
       <View style={styles.genderRow}>
         <TouchableOpacity
           testID="gender-male"
@@ -64,7 +65,7 @@ export function PersonForm({ initialValues, submitLabel, submitTestID, onSubmit 
           onPress={() => setGender('male')}
         >
           <Text style={[styles.genderText, gender === 'male' && styles.genderTextActive]}>
-            Mężczyzna
+            {t.personForm.genderMale}
           </Text>
         </TouchableOpacity>
         <TouchableOpacity
@@ -73,31 +74,31 @@ export function PersonForm({ initialValues, submitLabel, submitTestID, onSubmit 
           onPress={() => setGender('female')}
         >
           <Text style={[styles.genderText, gender === 'female' && styles.genderTextActive]}>
-            Kobieta
+            {t.personForm.genderFemale}
           </Text>
         </TouchableOpacity>
       </View>
 
       <DatePickerField
         testID="picker-birth"
-        label="Data urodzenia"
+        label={t.personForm.birthDateLabel}
         value={birthDate}
         onChange={setBirthDate}
-        clearLabel="Wyczyść datę urodzenia"
+        clearLabel={t.personForm.clearBirthDate}
       />
 
       <DatePickerField
         testID="picker-death"
-        label="Data śmierci (opcjonalne)"
+        label={t.personForm.deathDateLabel}
         value={deathDate}
         onChange={setDeathDate}
-        clearLabel="Wyczyść datę śmierci"
+        clearLabel={t.personForm.clearDeathDate}
       />
 
       <TextInput
         testID="input-notes"
-        label="Notatki"
-        placeholder="Dodatkowe informacje..."
+        label={t.personForm.notesLabel}
+        placeholder={t.personForm.notesPlaceholder}
         value={notes}
         onChangeText={setNotes}
         multiline

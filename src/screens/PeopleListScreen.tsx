@@ -6,6 +6,7 @@ import { useFamily } from '../context/FamilyContext';
 import { TextInput } from '../components/ui/TextInput';
 import { EmptyState } from '../components/ui/EmptyState';
 import { PersonListItem } from '../components/PersonListItem';
+import { t } from '../i18n';
 import { colors } from '../theme/colors';
 import { spacing } from '../theme/spacing';
 
@@ -32,7 +33,7 @@ export function PeopleListScreen() {
       <View style={styles.searchWrap}>
         <TextInput
           testID="search-input"
-          placeholder="Szukaj po imieniu lub nazwisku..."
+          placeholder={t.peopleList.searchPlaceholder}
           value={search}
           onChangeText={setSearch}
           containerStyle={styles.searchInput}
@@ -53,8 +54,8 @@ export function PeopleListScreen() {
         ListEmptyComponent={
           <EmptyState
             icon="book-open-variant"
-            title="Twoja kronika jest pusta"
-            subtitle="Dodaj pierwszą osobę, naciskając przycisk +"
+            title={t.peopleList.emptyTitle}
+            subtitle={t.peopleList.emptySubtitle}
           />
         }
       />

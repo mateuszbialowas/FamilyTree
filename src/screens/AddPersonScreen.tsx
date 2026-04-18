@@ -9,6 +9,7 @@ import { formatDateISO } from '../utils/date';
 import { ScreenHeader } from '../components/ui/ScreenHeader';
 import { PersonForm } from '../components/PersonForm';
 import { KeyboardDoneAccessory } from '../components/ui/KeyboardDoneAccessory';
+import { t } from '../i18n';
 import { formStyles } from '../theme/formStyles';
 import { colors } from '../theme/colors';
 import { fonts, fontSizes } from '../theme/typography';
@@ -21,11 +22,13 @@ type AddPersonParams = {
   };
 };
 
-const REL_LABELS: Record<string, string> = {
-  parent: 'Rodzic dla',
-  child: 'Dziecko dla',
-  spouse: 'Małżonek dla',
-  sibling: 'Rodzeństwo dla',
+const relLabel = (type: 'parent' | 'child' | 'spouse' | 'sibling'): string => {
+  switch (type) {
+    case 'parent': return t.addPerson.relationParent;
+    case 'child': return t.addPerson.relationChild;
+    case 'spouse': return t.addPerson.relationSpouse;
+    case 'sibling': return t.addPerson.relationSibling;
+  }
 };
 
 export function AddPersonScreen() {
@@ -49,7 +52,7 @@ export function AddPersonScreen() {
     notes: string;
   }) => {
     if (!data.firstName.trim() || !data.lastName.trim()) {
-      Alert.alert('Błąd', 'Imię i nazwisko są wymagane.');
+      Alert.alert(t.common.error, t.personForm.requiredError);
       return;
     }
 
@@ -122,19 +125,19 @@ export function AddPersonScreen() {
         automaticallyAdjustKeyboardInsets={Platform.OS === 'ios'}
       >
         <ScreenHeader
-          title="Dodaj osobę"
+          title={t.addPerson.title}
           subtitle={relatedPerson && relationType
-            ? `${REL_LABELS[relationType]} ${relatedPerson.firstName} ${relatedPerson.lastName}`
+            ? `${relLabel(relationType)} ${relatedPerson.firstName} ${relatedPerson.lastName}`
             : undefined
           }
         />
         {relationType === 'sibling' && relatedPerson && (
           <View testID="sibling-preview" style={previewStyles.box}>
-            <Text style={previewStyles.title}>Automatyczne powiązania</Text>
+            <Text style={previewStyles.title}>{t.addPerson.siblingPreviewTitle}</Text>
             {siblingParents.length > 0 ? (
               <>
                 <Text style={previewStyles.body}>
-                  Nowa osoba zostanie przypisana jako dziecko tych samych rodziców co {relatedPerson.firstName}:
+                  {t.addPerson.siblingPreviewBody(relatedPerson.firstName)}
                 </Text>
                 {siblingParents.map(p => (
                   <Text key={p.id} style={previewStyles.bullet}>
@@ -144,13 +147,13 @@ export function AddPersonScreen() {
               </>
             ) : (
               <Text style={previewStyles.body}>
-                {relatedPerson.firstName} nie ma jeszcze przypisanych rodziców, więc żadne relacje nie zostaną dodane automatycznie.
+                {t.addPerson.siblingPreviewEmpty(relatedPerson.firstName)}
               </Text>
             )}
           </View>
         )}
         <PersonForm
-          submitLabel="Zapisz"
+          submitLabel={t.addPerson.saveLabel}
           submitTestID="btn-save-person"
           onSubmit={handleSave}
         />

@@ -8,6 +8,7 @@ import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { useFamily } from '../context/FamilyContext';
 import { FamilyTreeCanvas } from '../components/tree/FamilyTreeCanvas';
 import { EmptyState } from '../components/ui/EmptyState';
+import { t } from '../i18n';
 import { colors } from '../theme/colors';
 import { fonts, fontSizes } from '../theme/typography';
 import { spacing, borderRadius } from '../theme/spacing';
@@ -35,25 +36,25 @@ export function TreeScreen() {
 
     Alert.alert(
       name,
-      'Dodaj powiązaną osobę',
+      t.tree.longPressTitle,
       [
         {
-          text: 'Dodaj rodzica',
+          text: t.tree.longPressAddParent,
           onPress: () => navigation.navigate('AddPerson', { relatedPersonId: personId, relationType: 'parent' }),
         },
         {
-          text: 'Dodaj dziecko',
+          text: t.tree.longPressAddChild,
           onPress: () => navigation.navigate('AddPerson', { relatedPersonId: personId, relationType: 'child' }),
         },
         {
-          text: 'Dodaj małżonka',
+          text: t.tree.longPressAddSpouse,
           onPress: () => navigation.navigate('AddPerson', { relatedPersonId: personId, relationType: 'spouse' }),
         },
         {
-          text: 'Dodaj rodzeństwo',
+          text: t.tree.longPressAddSibling,
           onPress: () => navigation.navigate('AddPerson', { relatedPersonId: personId, relationType: 'sibling' }),
         },
-        { text: 'Anuluj', style: 'cancel' },
+        { text: t.common.cancel, style: 'cancel' },
       ],
     );
   }, [navigation, state.people]);
@@ -63,8 +64,8 @@ export function TreeScreen() {
       <View style={styles.container}>
         <EmptyState
           icon="family-tree"
-          title="Brak osób w drzewie"
-          subtitle="Dodaj pierwszą osobę używając przycisku +"
+          title={t.tree.emptyTitle}
+          subtitle={t.tree.emptySubtitle}
         />
       </View>
     );
@@ -74,7 +75,7 @@ export function TreeScreen() {
     <View style={styles.container}>
       {/* Root person selector */}
       <TouchableOpacity style={styles.selectorBar} onPress={() => setPickerVisible(true)}>
-        <Text style={styles.selectorLabel}>Korzeń drzewa:</Text>
+        <Text style={styles.selectorLabel}>{t.tree.rootLabel}</Text>
         <Text style={styles.selectorName} numberOfLines={1}>
           {rootPerson ? `${rootPerson.firstName} ${rootPerson.lastName}` : '—'}
         </Text>
@@ -105,7 +106,7 @@ export function TreeScreen() {
         >
           <Pressable style={styles.modalContent} onPress={() => { /* swallow tap */ }}>
             <View style={styles.modalHeader}>
-              <Text style={styles.modalTitle}>Wybierz korzeń drzewa</Text>
+              <Text style={styles.modalTitle}>{t.tree.rootPickerTitle}</Text>
               <TouchableOpacity onPress={() => setPickerVisible(false)} testID="picker-close">
                 <MaterialCommunityIcons name="close" size={24} color={colors.text} />
               </TouchableOpacity>
@@ -133,7 +134,7 @@ export function TreeScreen() {
                     {item.firstName} {item.lastName}
                   </Text>
                   {item.birthDate && (
-                    <Text style={styles.pickerItemDate}>ur. {item.birthDate}</Text>
+                    <Text style={styles.pickerItemDate}>{t.tree.bornPrefix} {item.birthDate}</Text>
                   )}
                 </TouchableOpacity>
               )}

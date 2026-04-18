@@ -7,6 +7,7 @@ import { useFamily } from '../context/FamilyContext';
 import type { HistoryEntry } from '../context/FamilyContext';
 import { EmptyState } from './ui/EmptyState';
 import { formatRelativeTime } from '../utils/formatRelativeTime';
+import { t } from '../i18n';
 import { colors } from '../theme/colors';
 import { fonts, fontSizes } from '../theme/typography';
 import { spacing, borderRadius } from '../theme/spacing';
@@ -74,7 +75,7 @@ export function HistoryModal({ visible, onClose }: Props) {
         </View>
         {isPresent && (
           <View style={styles.chip}>
-            <Text style={styles.chipText}>Bieżący</Text>
+            <Text style={styles.chipText}>{t.history.currentChip}</Text>
           </View>
         )}
       </TouchableOpacity>
@@ -95,7 +96,7 @@ export function HistoryModal({ visible, onClose }: Props) {
       >
         <Pressable style={styles.sheet} onPress={() => { /* swallow */ }}>
           <View style={styles.header}>
-            <Text style={styles.title}>Historia zmian</Text>
+            <Text style={styles.title}>{t.history.title}</Text>
             <TouchableOpacity onPress={onClose} testID="history-close">
               <MaterialCommunityIcons name="close" size={24} color={colors.text} />
             </TouchableOpacity>
@@ -103,8 +104,8 @@ export function HistoryModal({ visible, onClose }: Props) {
           {isEmpty ? (
             <EmptyState
               icon="history"
-              title="Brak historii"
-              subtitle="Zacznij dodawać lub edytować osoby, żeby zobaczyć listę zmian."
+              title={t.history.emptyTitle}
+              subtitle={t.history.emptySubtitle}
             />
           ) : (
             <FlatList

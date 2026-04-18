@@ -7,6 +7,7 @@ import { TreeStack } from './TreeStack';
 import { ListStack } from './ListStack';
 import { SettingsStack } from './SettingsStack';
 import { FAB } from '../components/FAB';
+import { t } from '../i18n';
 import { colors } from '../theme/colors';
 import { fonts } from '../theme/typography';
 
@@ -50,6 +51,7 @@ export function BottomTabs() {
           name="Drzewo"
           component={TreeStack}
           options={{
+            tabBarLabel: t.nav.tabTree,
             tabBarIcon: ({ color, size }) => (
               <MaterialCommunityIcons name="family-tree" size={size} color={color} />
             ),
@@ -59,6 +61,7 @@ export function BottomTabs() {
           name="Lista"
           component={ListStack}
           options={{
+            tabBarLabel: t.nav.tabList,
             tabBarIcon: ({ color, size }) => (
               <MaterialCommunityIcons name="format-list-bulleted" size={size} color={color} />
             ),
@@ -68,6 +71,7 @@ export function BottomTabs() {
           name="Ustawienia"
           component={SettingsStack}
           options={{
+            tabBarLabel: t.nav.tabSettings,
             tabBarIcon: ({ color, size }) => (
               <MaterialCommunityIcons name="cog" size={size} color={color} />
             ),

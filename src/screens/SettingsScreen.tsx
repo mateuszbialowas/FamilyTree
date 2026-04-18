@@ -8,6 +8,7 @@ import { ScreenHeader } from '../components/ui/ScreenHeader';
 import { Button } from '../components/ui/Button';
 import { Divider } from '../components/ui/Divider';
 import { HistoryModal } from '../components/HistoryModal';
+import { t } from '../i18n';
 import { colors } from '../theme/colors';
 import { spacing } from '../theme/spacing';
 import { validateFamilyState } from '../utils/validateImport';
@@ -25,10 +26,10 @@ export function SettingsScreen() {
       file.write(json);
       await Sharing.shareAsync(file.uri, {
         mimeType: 'application/json',
-        dialogTitle: 'Eksportuj drzewo genealogiczne',
+        dialogTitle: t.settings.exportDialogTitle,
       });
     } catch {
-      Alert.alert('Błąd', 'Nie udało się wyeksportować danych.');
+      Alert.alert(t.common.error, t.settings.exportFail);
     }
   };
 
@@ -45,39 +46,43 @@ export function SettingsScreen() {
       try {
         raw = JSON.parse(json);
       } catch {
-        Alert.alert('Błąd', 'Plik nie jest prawidłowym JSON-em.');
+        Alert.alert(t.common.error, t.settings.importInvalidJson);
         return;
       }
       const validation = validateFamilyState(raw);
       if (!validation.ok) {
-        Alert.alert('Nieprawidłowy plik', validation.error);
+        Alert.alert(t.settings.importInvalidTitle, validation.error);
         return;
       }
       const { data } = validation;
       Alert.alert(
-        'Import danych',
-        `Znaleziono ${data.people.length} osób, ${data.parentChildRelationships.length} relacji, ${data.marriages.length} małżeństw. Zastąpić obecne dane?`,
+        t.settings.importConfirmTitle,
+        t.settings.importConfirmBody(
+          data.people.length,
+          data.parentChildRelationships.length,
+          data.marriages.length,
+        ),
         [
-          { text: 'Anuluj', style: 'cancel' },
+          { text: t.common.cancel, style: 'cancel' },
           {
-            text: 'Importuj',
+            text: t.settings.importConfirmCta,
             onPress: () => dispatch({ type: 'IMPORT_DATA', payload: data }),
           },
         ]
       );
     } catch {
-      Alert.alert('Błąd', 'Nie udało się zaimportować danych.');
+      Alert.alert(t.common.error, t.settings.importFail);
     }
   };
 
   const handleClear = () => {
     Alert.alert(
-      'Wyczyść dane',
-      'Czy na pewno chcesz usunąć wszystkie dane? Tej operacji nie można cofnąć.',
+      t.settings.clearTitle,
+      t.settings.clearBody,
       [
-        { text: 'Anuluj', style: 'cancel' },
+        { text: t.common.cancel, style: 'cancel' },
         {
-          text: 'Wyczyść',
+          text: t.common.clear,
           style: 'destructive',
           onPress: () => dispatch({ type: 'CLEAR_DATA' }),
         },
@@ -87,12 +92,12 @@ export function SettingsScreen() {
 
   return (
     <ScrollView style={styles.container} contentContainerStyle={styles.content}>
-      <ScreenHeader title="Ustawienia" />
+      <ScreenHeader title={t.settings.title} />
 
       <View style={styles.section}>
         <Button
           testID="btn-history"
-          title={`Historia zmian (${historyCount})`}
+          title={t.settings.history(historyCount)}
           onPress={() => setHistoryVisible(true)}
           variant="outline"
           disabled={historyCount === 0}
@@ -102,15 +107,15 @@ export function SettingsScreen() {
       <Divider />
 
       <View style={styles.section}>
-        <Button testID="btn-import" title="Importuj dane (JSON)" onPress={handleImport} variant="outline" />
+        <Button testID="btn-import" title={t.settings.importJson} onPress={handleImport} variant="outline" />
         <View style={styles.gap} />
-        <Button testID="btn-export" title="Eksportuj dane (JSON)" onPress={handleExport} variant="outline" />
+        <Button testID="btn-export" title={t.settings.exportJson} onPress={handleExport} variant="outline" />
       </View>
 
       <Divider />
 
       <View style={styles.section}>
-        <Button testID="btn-clear-data" title="Wyczyść wszystkie dane" onPress={handleClear} variant="ghost" />
+        <Button testID="btn-clear-data" title={t.settings.clearAll} onPress={handleClear} variant="ghost" />
       </View>
 
       <HistoryModal

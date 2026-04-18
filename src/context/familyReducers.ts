@@ -1,5 +1,6 @@
 import type { FamilyState, FamilyAction } from '../types';
 import { describeAction } from '../utils/describeAction';
+import { t } from '../i18n';
 
 export const initialFamilyState: FamilyState = {
   people: [],
@@ -31,7 +32,7 @@ export type HistoryAction =
 export function createInitialHistory(now: number = Date.now()): HistoryState {
   return {
     past: [],
-    present: { state: initialFamilyState, label: 'Stan początkowy', timestamp: now },
+    present: { state: initialFamilyState, label: t.history.initialLabel, timestamp: now },
     future: [],
   };
 }

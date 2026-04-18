@@ -12,6 +12,7 @@ import Animated, {
 import { AnimatedPath } from './AnimatedPath';
 import { colors } from '../theme/colors';
 import { fonts, fontSizes } from '../theme/typography';
+import { t } from '../i18n';
 
 const BROWN = 'rgb(139,69,19)';
 const GOLD = 'rgb(184,134,11)';
@@ -122,7 +123,7 @@ export function AnimatedSplash({ onFinish }: Props) {
         </Svg>
       </View>
 
-      <Animated.Text style={[styles.title, titleStyle]}>FamilyTree</Animated.Text>
+      <Animated.Text style={[styles.title, titleStyle]}>{t.splash.title}</Animated.Text>
     </Animated.View>
   );
 }
