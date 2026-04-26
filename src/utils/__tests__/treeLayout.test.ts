@@ -181,6 +181,54 @@ describe('computeUnifiedLayout', () => {
     expect(coupleConn).toBeDefined();
   });
 
+  it('renders second marriage without shared kids as extra-couple (Camilla case)', () => {
+    // Charles ma dwoje dzieci z Dianą i drugie małżeństwo z Camillą (bezdzietne).
+    // Diana powinna zostać w głównym układzie jako podstawowa para, Camilla
+    // powinna być umieszczona jako "extra" z dashed line (typ 'extra-couple').
+    const state: FamilyState = {
+      people: [
+        person('p-william', 'William', 'Wales', 'male'),
+        person('p-charles', 'Charles', 'Windsor', 'male'),
+        person('p-diana', 'Diana', 'Spencer', 'female'),
+        person('p-camilla', 'Camilla', 'Parker Bowles', 'female'),
+      ],
+      parentChildRelationships: [
+        { id: 'r1', parentId: 'p-charles', childId: 'p-william' },
+        { id: 'r2', parentId: 'p-diana', childId: 'p-william' },
+      ],
+      marriages: [
+        { id: 'm1', spouse1Id: 'p-charles', spouse2Id: 'p-diana', marriageDate: null, divorceDate: null },
+        { id: 'm2', spouse1Id: 'p-charles', spouse2Id: 'p-camilla', marriageDate: null, divorceDate: null },
+      ],
+    };
+
+    const { nodes, conns } = computeUnifiedLayout('p-william', state);
+
+    const charles = nodes.find(n => n.id === 'p-charles');
+    const diana = nodes.find(n => n.id === 'p-diana');
+    const camilla = nodes.find(n => n.id === 'p-camilla');
+
+    expect(charles).toBeDefined();
+    expect(diana).toBeDefined();
+    expect(camilla).toBeDefined();
+
+    // Charles i Diana są parą (matka Williama) — taki sam Y, standardowy odstęp
+    expect(charles!.y).toBe(diana!.y);
+    expect(Math.abs(charles!.x - diana!.x)).toBe(2 * COUPLE_SPACING);
+    expect(charles!.partnerId).toBe('p-diana');
+
+    // Camilla jest umieszczona z offsetem (poza główną linią par)
+    expect(camilla!.y).not.toBe(charles!.y);
+
+    // Istnieje dokładnie jedno połączenie typu 'extra-couple' dla pary Charles-Camilla
+    const extraConns = conns.filter(c => c.type === 'extra-couple');
+    expect(extraConns).toHaveLength(1);
+
+    // Główne małżeństwo (Charles-Diana) renderowane jako 'couple'
+    const coupleConns = conns.filter(c => c.type === 'couple');
+    expect(coupleConns.length).toBeGreaterThanOrEqual(1);
+  });
+
   it('places disconnected people after connected tree', () => {
     const state: FamilyState = {
       people: [

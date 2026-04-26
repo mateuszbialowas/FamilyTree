@@ -1,0 +1,431 @@
+{
+  "people": [
+    {
+      "id": "p-george-i",
+      "firstName": "George I",
+      "lastName": "Hanover",
+      "gender": "male",
+      "birthDate": "1660-05-28",
+      "deathDate": "1727-06-11",
+      "notes": "King of Great Britain and Ireland 1714–1727. First Hanoverian monarch."
+    },
+    {
+      "id": "p-sophia-dorothea",
+      "firstName": "Sophia Dorothea",
+      "lastName": "of Celle",
+      "gender": "female",
+      "birthDate": "1666-09-15",
+      "deathDate": "1726-11-13",
+      "notes": "Electoral Princess of Hanover. Marriage to George I annulled in 1694."
+    },
+    {
+      "id": "p-george-ii",
+      "firstName": "George II",
+      "lastName": "Hanover",
+      "gender": "male",
+      "birthDate": "1683-10-30",
+      "deathDate": "1760-10-25",
+      "notes": "King of Great Britain and Ireland 1727–1760."
+    },
+    {
+      "id": "p-caroline-ansbach",
+      "firstName": "Caroline",
+      "lastName": "of Ansbach",
+      "gender": "female",
+      "birthDate": "1683-03-01",
+      "deathDate": "1737-11-20",
+      "notes": "Queen consort of Great Britain."
+    },
+    {
+      "id": "p-frederick-wales",
+      "firstName": "Frederick",
+      "lastName": "Prince of Wales",
+      "gender": "male",
+      "birthDate": "1707-02-01",
+      "deathDate": "1751-03-31",
+      "notes": "Eldest son of George II; died before inheriting the throne."
+    },
+    {
+      "id": "p-augusta-saxe-gotha",
+      "firstName": "Augusta",
+      "lastName": "of Saxe-Gotha",
+      "gender": "female",
+      "birthDate": "1719-11-30",
+      "deathDate": "1772-02-08",
+      "notes": "Princess of Wales."
+    },
+    {
+      "id": "p-george-iii",
+      "firstName": "George III",
+      "lastName": "Hanover",
+      "gender": "male",
+      "birthDate": "1738-06-04",
+      "deathDate": "1820-01-29",
+      "notes": "King of Great Britain and Ireland 1760–1820; reign saw loss of American colonies."
+    },
+    {
+      "id": "p-charlotte-mecklenburg",
+      "firstName": "Charlotte",
+      "lastName": "of Mecklenburg-Strelitz",
+      "gender": "female",
+      "birthDate": "1744-05-19",
+      "deathDate": "1818-11-17",
+      "notes": "Queen consort, mother of 15 children."
+    },
+    {
+      "id": "p-george-iv",
+      "firstName": "George IV",
+      "lastName": "Hanover",
+      "gender": "male",
+      "birthDate": "1762-08-12",
+      "deathDate": "1830-06-26",
+      "notes": "King 1820–1830. Regent during father's illness from 1811."
+    },
+    {
+      "id": "p-william-iv",
+      "firstName": "William IV",
+      "lastName": "Hanover",
+      "gender": "male",
+      "birthDate": "1765-08-21",
+      "deathDate": "1837-06-20",
+      "notes": "King 1830–1837. Uncle to Queen Victoria."
+    },
+    {
+      "id": "p-edward-kent",
+      "firstName": "Edward",
+      "lastName": "Duke of Kent",
+      "gender": "male",
+      "birthDate": "1767-11-02",
+      "deathDate": "1820-01-23",
+      "notes": "Fourth son of George III; father of Queen Victoria."
+    },
+    {
+      "id": "p-victoria-sc-saalfeld",
+      "firstName": "Victoria",
+      "lastName": "of Saxe-Coburg-Saalfeld",
+      "gender": "female",
+      "birthDate": "1786-08-17",
+      "deathDate": "1861-03-16",
+      "notes": "Duchess of Kent; mother of Queen Victoria."
+    },
+    {
+      "id": "p-victoria",
+      "firstName": "Victoria",
+      "lastName": "Queen of the United Kingdom",
+      "gender": "female",
+      "birthDate": "1819-05-24",
+      "deathDate": "1901-01-22",
+      "notes": "Queen 1837–1901. Her reign gave name to the Victorian era."
+    },
+    {
+      "id": "p-albert",
+      "firstName": "Albert",
+      "lastName": "of Saxe-Coburg and Gotha",
+      "gender": "male",
+      "birthDate": "1819-08-26",
+      "deathDate": "1861-12-14",
+      "notes": "Prince consort; Victoria's husband and first cousin."
+    },
+    {
+      "id": "p-edward-vii",
+      "firstName": "Edward VII",
+      "lastName": "Saxe-Coburg and Gotha",
+      "gender": "male",
+      "birthDate": "1841-11-09",
+      "deathDate": "1910-05-06",
+      "notes": "King 1901–1910. Eldest son of Victoria and Albert."
+    },
+    {
+      "id": "p-alexandra-denmark",
+      "firstName": "Alexandra",
+      "lastName": "of Denmark",
+      "gender": "female",
+      "birthDate": "1844-12-01",
+      "deathDate": "1925-11-20",
+      "notes": "Queen consort of Edward VII."
+    },
+    {
+      "id": "p-george-v",
+      "firstName": "George V",
+      "lastName": "Windsor",
+      "gender": "male",
+      "birthDate": "1865-06-03",
+      "deathDate": "1936-01-20",
+      "notes": "King 1910–1936. Renamed the dynasty 'Windsor' in 1917."
+    },
+    {
+      "id": "p-mary-teck",
+      "firstName": "Mary",
+      "lastName": "of Teck",
+      "gender": "female",
+      "birthDate": "1867-05-26",
+      "deathDate": "1953-03-24",
+      "notes": "Queen consort of George V."
+    },
+    {
+      "id": "p-edward-viii",
+      "firstName": "Edward VIII",
+      "lastName": "Windsor",
+      "gender": "male",
+      "birthDate": "1894-06-23",
+      "deathDate": "1972-05-28",
+      "notes": "King Jan–Dec 1936; abdicated to marry Wallis Simpson."
+    },
+    {
+      "id": "p-wallis-simpson",
+      "firstName": "Wallis",
+      "lastName": "Simpson",
+      "gender": "female",
+      "birthDate": "1896-06-19",
+      "deathDate": "1986-04-24",
+      "notes": "Duchess of Windsor."
+    },
+    {
+      "id": "p-george-vi",
+      "firstName": "George VI",
+      "lastName": "Windsor",
+      "gender": "male",
+      "birthDate": "1895-12-14",
+      "deathDate": "1952-02-06",
+      "notes": "King 1936–1952; reigned through WWII."
+    },
+    {
+      "id": "p-elizabeth-bowes-lyon",
+      "firstName": "Elizabeth",
+      "lastName": "Bowes-Lyon",
+      "gender": "female",
+      "birthDate": "1900-08-04",
+      "deathDate": "2002-03-30",
+      "notes": "Queen consort, later Queen Mother."
+    },
+    {
+      "id": "p-elizabeth-ii",
+      "firstName": "Elizabeth II",
+      "lastName": "Windsor",
+      "gender": "female",
+      "birthDate": "1926-04-21",
+      "deathDate": "2022-09-08",
+      "notes": "Queen 1952–2022; longest reigning British monarch (70 years)."
+    },
+    {
+      "id": "p-philip",
+      "firstName": "Philip",
+      "lastName": "Mountbatten",
+      "gender": "male",
+      "birthDate": "1921-06-10",
+      "deathDate": "2021-04-09",
+      "notes": "Duke of Edinburgh; consort of Elizabeth II for 73 years."
+    },
+    {
+      "id": "p-margaret",
+      "firstName": "Margaret",
+      "lastName": "Windsor",
+      "gender": "female",
+      "birthDate": "1930-08-21",
+      "deathDate": "2002-02-09",
+      "notes": "Younger sister of Elizabeth II; Countess of Snowdon."
+    },
+    {
+      "id": "p-charles-iii",
+      "firstName": "Charles III",
+      "lastName": "Windsor",
+      "gender": "male",
+      "birthDate": "1948-11-14",
+      "deathDate": null,
+      "notes": "King from 2022."
+    },
+    {
+      "id": "p-diana",
+      "firstName": "Diana",
+      "lastName": "Spencer",
+      "gender": "female",
+      "birthDate": "1961-07-01",
+      "deathDate": "1997-08-31",
+      "notes": "Princess of Wales. Marriage to Charles ended in divorce (1996)."
+    },
+    {
+      "id": "p-camilla",
+      "firstName": "Camilla",
+      "lastName": "Parker Bowles",
+      "gender": "female",
+      "birthDate": "1947-07-17",
+      "deathDate": null,
+      "notes": "Queen consort of Charles III from 2022."
+    },
+    {
+      "id": "p-anne",
+      "firstName": "Anne",
+      "lastName": "Princess Royal",
+      "gender": "female",
+      "birthDate": "1950-08-15",
+      "deathDate": null,
+      "notes": "Second child of Elizabeth II."
+    },
+    {
+      "id": "p-andrew",
+      "firstName": "Andrew",
+      "lastName": "Duke of York",
+      "gender": "male",
+      "birthDate": "1960-02-19",
+      "deathDate": null,
+      "notes": "Third child of Elizabeth II."
+    },
+    {
+      "id": "p-edward-wessex",
+      "firstName": "Edward",
+      "lastName": "Duke of Edinburgh",
+      "gender": "male",
+      "birthDate": "1964-03-10",
+      "deathDate": null,
+      "notes": "Fourth child of Elizabeth II."
+    },
+    {
+      "id": "p-william-wales",
+      "firstName": "William",
+      "lastName": "Prince of Wales",
+      "gender": "male",
+      "birthDate": "1982-06-21",
+      "deathDate": null,
+      "notes": "Heir apparent to the British throne."
+    },
+    {
+      "id": "p-catherine",
+      "firstName": "Catherine",
+      "lastName": "Middleton",
+      "gender": "female",
+      "birthDate": "1982-01-09",
+      "deathDate": null,
+      "notes": "Princess of Wales."
+    },
+    {
+      "id": "p-harry",
+      "firstName": "Harry",
+      "lastName": "Duke of Sussex",
+      "gender": "male",
+      "birthDate": "1984-09-15",
+      "deathDate": null,
+      "notes": "Second son of Charles III and Diana."
+    },
+    {
+      "id": "p-meghan",
+      "firstName": "Meghan",
+      "lastName": "Markle",
+      "gender": "female",
+      "birthDate": "1981-08-04",
+      "deathDate": null,
+      "notes": "Duchess of Sussex."
+    },
+    {
+      "id": "p-prince-george",
+      "firstName": "George",
+      "lastName": "of Wales",
+      "gender": "male",
+      "birthDate": "2013-07-22",
+      "deathDate": null,
+      "notes": "Second in the line of succession to the British throne."
+    },
+    {
+      "id": "p-princess-charlotte",
+      "firstName": "Charlotte",
+      "lastName": "of Wales",
+      "gender": "female",
+      "birthDate": "2015-05-02",
+      "deathDate": null,
+      "notes": "Third in the line of succession."
+    },
+    {
+      "id": "p-prince-louis",
+      "firstName": "Louis",
+      "lastName": "of Wales",
+      "gender": "male",
+      "birthDate": "2018-04-23",
+      "deathDate": null,
+      "notes": "Fourth in the line of succession."
+    },
+    {
+      "id": "p-archie",
+      "firstName": "Archie",
+      "lastName": "Mountbatten-Windsor",
+      "gender": "male",
+      "birthDate": "2019-05-06",
+      "deathDate": null,
+      "notes": "Son of Harry and Meghan."
+    },
+    {
+      "id": "p-lilibet",
+      "firstName": "Lilibet",
+      "lastName": "Mountbatten-Windsor",
+      "gender": "female",
+      "birthDate": "2021-06-04",
+      "deathDate": null,
+      "notes": "Daughter of Harry and Meghan."
+    }
+  ],
+  "parentChildRelationships": [
+    { "id": "r-01", "parentId": "p-george-i",          "childId": "p-george-ii" },
+    { "id": "r-02", "parentId": "p-sophia-dorothea",   "childId": "p-george-ii" },
+    { "id": "r-03", "parentId": "p-george-ii",         "childId": "p-frederick-wales" },
+    { "id": "r-04", "parentId": "p-caroline-ansbach",  "childId": "p-frederick-wales" },
+    { "id": "r-05", "parentId": "p-frederick-wales",   "childId": "p-george-iii" },
+    { "id": "r-06", "parentId": "p-augusta-saxe-gotha","childId": "p-george-iii" },
+    { "id": "r-07", "parentId": "p-george-iii",        "childId": "p-george-iv" },
+    { "id": "r-08", "parentId": "p-charlotte-mecklenburg", "childId": "p-george-iv" },
+    { "id": "r-09", "parentId": "p-george-iii",        "childId": "p-william-iv" },
+    { "id": "r-10", "parentId": "p-charlotte-mecklenburg", "childId": "p-william-iv" },
+    { "id": "r-11", "parentId": "p-george-iii",        "childId": "p-edward-kent" },
+    { "id": "r-12", "parentId": "p-charlotte-mecklenburg", "childId": "p-edward-kent" },
+    { "id": "r-13", "parentId": "p-edward-kent",       "childId": "p-victoria" },
+    { "id": "r-14", "parentId": "p-victoria-sc-saalfeld","childId": "p-victoria" },
+    { "id": "r-15", "parentId": "p-victoria",          "childId": "p-edward-vii" },
+    { "id": "r-16", "parentId": "p-albert",            "childId": "p-edward-vii" },
+    { "id": "r-17", "parentId": "p-edward-vii",        "childId": "p-george-v" },
+    { "id": "r-18", "parentId": "p-alexandra-denmark", "childId": "p-george-v" },
+    { "id": "r-19", "parentId": "p-george-v",          "childId": "p-edward-viii" },
+    { "id": "r-20", "parentId": "p-mary-teck",         "childId": "p-edward-viii" },
+    { "id": "r-21", "parentId": "p-george-v",          "childId": "p-george-vi" },
+    { "id": "r-22", "parentId": "p-mary-teck",         "childId": "p-george-vi" },
+    { "id": "r-23", "parentId": "p-george-vi",         "childId": "p-elizabeth-ii" },
+    { "id": "r-24", "parentId": "p-elizabeth-bowes-lyon","childId": "p-elizabeth-ii" },
+    { "id": "r-25", "parentId": "p-george-vi",         "childId": "p-margaret" },
+    { "id": "r-26", "parentId": "p-elizabeth-bowes-lyon","childId": "p-margaret" },
+    { "id": "r-27", "parentId": "p-elizabeth-ii",      "childId": "p-charles-iii" },
+    { "id": "r-28", "parentId": "p-philip",            "childId": "p-charles-iii" },
+    { "id": "r-29", "parentId": "p-elizabeth-ii",      "childId": "p-anne" },
+    { "id": "r-30", "parentId": "p-philip",            "childId": "p-anne" },
+    { "id": "r-31", "parentId": "p-elizabeth-ii",      "childId": "p-andrew" },
+    { "id": "r-32", "parentId": "p-philip",            "childId": "p-andrew" },
+    { "id": "r-33", "parentId": "p-elizabeth-ii",      "childId": "p-edward-wessex" },
+    { "id": "r-34", "parentId": "p-philip",            "childId": "p-edward-wessex" },
+    { "id": "r-35", "parentId": "p-charles-iii",       "childId": "p-william-wales" },
+    { "id": "r-36", "parentId": "p-diana",             "childId": "p-william-wales" },
+    { "id": "r-37", "parentId": "p-charles-iii",       "childId": "p-harry" },
+    { "id": "r-38", "parentId": "p-diana",             "childId": "p-harry" },
+    { "id": "r-39", "parentId": "p-william-wales",     "childId": "p-prince-george" },
+    { "id": "r-40", "parentId": "p-catherine",         "childId": "p-prince-george" },
+    { "id": "r-41", "parentId": "p-william-wales",     "childId": "p-princess-charlotte" },
+    { "id": "r-42", "parentId": "p-catherine",         "childId": "p-princess-charlotte" },
+    { "id": "r-43", "parentId": "p-william-wales",     "childId": "p-prince-louis" },
+    { "id": "r-44", "parentId": "p-catherine",         "childId": "p-prince-louis" },
+    { "id": "r-45", "parentId": "p-harry",             "childId": "p-archie" },
+    { "id": "r-46", "parentId": "p-meghan",            "childId": "p-archie" },
+    { "id": "r-47", "parentId": "p-harry",             "childId": "p-lilibet" },
+    { "id": "r-48", "parentId": "p-meghan",            "childId": "p-lilibet" }
+  ],
+  "marriages": [
+    { "id": "m-01", "spouse1Id": "p-george-i",       "spouse2Id": "p-sophia-dorothea",    "marriageDate": "1682-11-21", "divorceDate": "1694-12-28" },
+    { "id": "m-02", "spouse1Id": "p-george-ii",      "spouse2Id": "p-caroline-ansbach",   "marriageDate": "1705-09-02", "divorceDate": null },
+    { "id": "m-03", "spouse1Id": "p-frederick-wales","spouse2Id": "p-augusta-saxe-gotha", "marriageDate": "1736-05-08", "divorceDate": null },
+    { "id": "m-04", "spouse1Id": "p-george-iii",     "spouse2Id": "p-charlotte-mecklenburg", "marriageDate": "1761-09-08", "divorceDate": null },
+    { "id": "m-05", "spouse1Id": "p-edward-kent",    "spouse2Id": "p-victoria-sc-saalfeld","marriageDate": "1818-05-29", "divorceDate": null },
+    { "id": "m-06", "spouse1Id": "p-victoria",       "spouse2Id": "p-albert",             "marriageDate": "1840-02-10", "divorceDate": null },
+    { "id": "m-07", "spouse1Id": "p-edward-vii",     "spouse2Id": "p-alexandra-denmark",  "marriageDate": "1863-03-10", "divorceDate": null },
+    { "id": "m-08", "spouse1Id": "p-george-v",       "spouse2Id": "p-mary-teck",          "marriageDate": "1893-07-06", "divorceDate": null },
+    { "id": "m-09", "spouse1Id": "p-edward-viii",    "spouse2Id": "p-wallis-simpson",     "marriageDate": "1937-06-03", "divorceDate": null },
+    { "id": "m-10", "spouse1Id": "p-george-vi",      "spouse2Id": "p-elizabeth-bowes-lyon","marriageDate": "1923-04-26", "divorceDate": null },
+    { "id": "m-11", "spouse1Id": "p-elizabeth-ii",   "spouse2Id": "p-philip",             "marriageDate": "1947-11-20", "divorceDate": null },
+    { "id": "m-12", "spouse1Id": "p-charles-iii",    "spouse2Id": "p-diana",              "marriageDate": "1981-07-29", "divorceDate": "1996-08-28" },
+    { "id": "m-13", "spouse1Id": "p-charles-iii",    "spouse2Id": "p-camilla",            "marriageDate": "2005-04-09", "divorceDate": null },
+    { "id": "m-14", "spouse1Id": "p-william-wales",  "spouse2Id": "p-catherine",          "marriageDate": "2011-04-29", "divorceDate": null },
+    { "id": "m-15", "spouse1Id": "p-harry",          "spouse2Id": "p-meghan",             "marriageDate": "2018-05-19", "divorceDate": null }
+  ]
+}

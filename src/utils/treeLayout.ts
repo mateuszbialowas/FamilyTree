@@ -19,7 +19,13 @@ export interface Conn {
   y1: number;
   x2: number;
   y2: number;
-  type: 'couple' | 'branch';
+  /**
+   * `couple` — primary marriage (shared children or first listed). Rendered with rings.
+   * `branch` — parent→child tree branch.
+   * `extra-couple` — secondary marriage without shared children (e.g. remarriage).
+   *                  Rendered as dashed line without rings.
+   */
+  type: 'couple' | 'branch' | 'extra-couple';
   seed: number;
   depth: number;
 }
@@ -69,6 +75,67 @@ export function hsh(s: string) {
   return Math.abs(h) || 42;
 }
 
+/**
+ * Classify each person's marriages into "primary" (used for main layout) and
+ * "extras" (rendered as dangling leaf nodes with a dashed line).
+ *
+ * Primary selection per person: the marriage with shared children (or the
+ * first marriage when none have shared children). Extras = all other marriages.
+ *
+ * The `primarySpouseMap` is indexed by person ID and returns that person's
+ * single layout spouse. `extraSpousesMap` is indexed by person ID and returns
+ * the list of spouse IDs that should be drawn as "extras" attached to them.
+ *
+ * Note: the relationship is asymmetric on purpose. Example — Charles has kids
+ * with Diana, so `primary[Charles] = Diana`. Camilla only married Charles, so
+ * `primary[Camilla] = Charles`. But Camilla is in `extra[Charles]`, because
+ * from Charles's perspective she's the secondary marriage.
+ */
+export function classifyMarriages(
+  state: FamilyState,
+  childrenOf: Map<string, string[]>,
+): {
+  primarySpouseMap: Map<string, string>;
+  extraSpousesMap: Map<string, string[]>;
+} {
+  const primarySpouseMap = new Map<string, string>();
+  const extraSpousesMap = new Map<string, string[]>();
+
+  const marriageHasSharedChildren = (m: { spouse1Id: string; spouse2Id: string }) => {
+    const kids1 = new Set(childrenOf.get(m.spouse1Id) ?? []);
+    const kids2 = childrenOf.get(m.spouse2Id) ?? [];
+    return kids2.some(k => kids1.has(k));
+  };
+
+  const marriagesByPerson = new Map<string, typeof state.marriages>();
+  for (const m of state.marriages) {
+    if (!marriagesByPerson.has(m.spouse1Id)) marriagesByPerson.set(m.spouse1Id, []);
+    marriagesByPerson.get(m.spouse1Id)!.push(m);
+    if (!marriagesByPerson.has(m.spouse2Id)) marriagesByPerson.set(m.spouse2Id, []);
+    marriagesByPerson.get(m.spouse2Id)!.push(m);
+  }
+
+  for (const [personId, marriages] of marriagesByPerson) {
+    // Stable sort: marriages with shared children first, then preserve original order.
+    const sorted = marriages
+      .map((m, i) => ({ m, i, shared: marriageHasSharedChildren(m) ? 1 : 0 }))
+      .sort((a, b) => b.shared - a.shared || a.i - b.i)
+      .map(x => x.m);
+
+    const primary = sorted[0];
+    const otherSide = (m: { spouse1Id: string; spouse2Id: string }) =>
+      m.spouse1Id === personId ? m.spouse2Id : m.spouse1Id;
+
+    primarySpouseMap.set(personId, otherSide(primary));
+
+    const extras: string[] = [];
+    for (let i = 1; i < sorted.length; i++) extras.push(otherSide(sorted[i]));
+    if (extras.length > 0) extraSpousesMap.set(personId, extras);
+  }
+
+  return { primarySpouseMap, extraSpousesMap };
+}
+
 // ======================== UNIFIED LAYOUT ========================
 
 /**
@@ -101,10 +168,16 @@ export function computeUnifiedLayout(
     parentsOf.get(r.childId)!.push(r.parentId);
   }
 
-  const spouseOf = (id: string): string | null => {
-    const m = state.marriages.find(mg => mg.spouse1Id === id || mg.spouse2Id === id);
-    return m ? (m.spouse1Id === id ? m.spouse2Id : m.spouse1Id) : null;
-  };
+  // ============================================================
+  // Marriage classification: primary (main layout) vs extra (dangling)
+  // ============================================================
+  // A marriage is "primary" if the couple has shared children. If a person has
+  // multiple marriages, the one with shared children is picked as their layout
+  // spouse. Other marriages become "extras" rendered as dashed leaf nodes.
+  // This handles cases like Charles III → Diana (primary, kids) + Camilla (extra).
+  const { primarySpouseMap, extraSpousesMap } = classifyMarriages(state, childrenOf);
+
+  const spouseOf = (id: string): string | null => primarySpouseMap.get(id) ?? null;
 
   const coupleChildrenOf = (...pids: string[]): string[] => {
     const s = new Set<string>();
@@ -656,6 +729,44 @@ export function computeUnifiedLayout(
         depth: child.depth,
       });
     }
+  }
+
+  // ============================================================
+  // PHASE 6c: Place "extra" spouses (secondary marriages) as dangling leaves
+  // ============================================================
+  // An extra spouse is attached to their partner by a short dashed line
+  // and drawn on the opposite side of the primary spouse (or left if no primary
+  // was placed). Extras stack vertically when a person has multiple.
+  const EXTRA_Y_OFFSET = 70;  // vertical stacking step between multiple extras
+  const EXTRA_X_GAP = SOLO_WIDTH + CHILD_GAP;
+
+  for (const [personId, extraIds] of extraSpousesMap) {
+    const personNode = nodeMap.get(personId);
+    if (!personNode) continue;
+
+    const primaryId = primarySpouseMap.get(personId);
+    const primaryNode = primaryId ? nodeMap.get(primaryId) : null;
+    // Side opposite to the primary spouse; default to left (-1) when no primary on canvas.
+    const sign = primaryNode
+      ? (primaryNode.x > personNode.x ? -1 : 1)
+      : -1;
+
+    extraIds.forEach((extraId, idx) => {
+      if (!pMap.has(extraId) || placed.has(extraId)) return;
+      const extraX = personNode.x + sign * EXTRA_X_GAP;
+      const extraY = personNode.y + EXTRA_Y_OFFSET * (idx + 1);
+      const extraNode = mkNode(extraId, extraX, genOf.get(personId) ?? 0);
+      extraNode.y = extraY; // override genY with offset
+      addNode(extraNode);
+
+      conns.push({
+        x1: personNode.x, y1: personNode.y,
+        x2: extraNode.x, y2: extraNode.y,
+        type: 'extra-couple',
+        seed: hsh(personId + extraId + 'extra'),
+        depth: personNode.depth,
+      });
+    });
   }
 
   // ============================================================

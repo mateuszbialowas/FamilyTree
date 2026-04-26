@@ -4,7 +4,7 @@ import { MaterialCommunityIcons } from '@expo/vector-icons';
 import {
   Canvas, Path, Group, Circle, RoundedRect,
   LinearGradient, RadialGradient, vec, Paragraph, ImageSVG,
-  Skia,
+  Skia, DashPathEffect,
 } from '@shopify/react-native-skia';
 import { GestureDetector, Gesture } from 'react-native-gesture-handler';
 import {
@@ -136,6 +136,7 @@ export function FamilyTreeCanvas({ state, rootId, onNodePress, onNodeLongPress }
     });
 
     const couples = layout.conns.filter(c => c.type === 'couple');
+    const extraCouples = layout.conns.filter(c => c.type === 'extra-couple');
     const animals = placeAnimals(layout.conns);
     const nodeLabels = layout.nodes.map(n => {
       const parts = n.name.split(' ');
@@ -153,7 +154,7 @@ export function FamilyTreeCanvas({ state, rootId, onNodePress, onNodeLongPress }
     // up if root has only descendants below (no parents).
     const rootHasParents = state.parentChildRelationships.some(r => r.childId === rootId);
 
-    return { rootNode, branches, couples, animals, labels: nodeLabels, rootHasParents };
+    return { rootNode, branches, couples, extraCouples, animals, labels: nodeLabels, rootHasParents };
   }, [layout, rootId, state.parentChildRelationships]);
 
   // === ANIMATIONS ===
@@ -401,6 +402,25 @@ export function FamilyTreeCanvas({ state, rootId, onNodePress, onNodeLongPress }
                 </Group>
               </Group>
             ))}
+
+            {/* EXTRA-COUPLES — secondary marriages (no shared kids), rendered as dashed lines.
+                Drawn before NODES so the circles cover the line endpoints. */}
+            {geo.extraCouples.map((c, i) => {
+              const d = `M ${c.x1} ${c.y1} L ${c.x2} ${c.y2}`;
+              return (
+                <Path
+                  key={`ec${i}`}
+                  path={Skia.Path.MakeFromSVGString(d) ?? Skia.Path.Make()}
+                  style="stroke"
+                  color={P.sepia}
+                  strokeWidth={1.5}
+                  strokeCap="round"
+                  opacity={0.6}
+                >
+                  <DashPathEffect intervals={[6, 4]} />
+                </Path>
+              );
+            })}
 
             {/* ANIMALS */}
             {geo.animals.map((a, i) => {
