@@ -78,6 +78,10 @@ npx expo run:android
 
 # Expo dev server (press i/a to pick platform)
 npm start
+
+# Expo build and submit
+eas build --platform ios --profile production
+eas submit --platform ios --latest
 ```
 
 ### Sample data
