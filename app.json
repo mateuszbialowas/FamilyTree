@@ -2,7 +2,7 @@
   "expo": {
     "name": "Drzewo genealogiczne",
     "slug": "family-tree",
-    "version": "1.0.0",
+    "version": "1.0.1",
     "scheme": "family-tree",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
@@ -16,7 +16,7 @@
     "ios": {
       "supportsTablet": true,
       "bundleIdentifier": "com.mateuszbialowas.FamilyTree",
-      "buildNumber": "1.0.0",
+      "buildNumber": "1.0.1",
       "infoPlist": {
         "ITSAppUsesNonExemptEncryption": false
       }
