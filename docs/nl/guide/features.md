@@ -9,8 +9,8 @@ De stamboomweergave rendert een organische, handgetekende stamboom met `@shopify
 - Selecteer een hoofdpersoon om de boom opnieuw te centreren
 
 <div style="display: flex; gap: 16px; justify-content: center; flex-wrap: wrap; margin: 24px 0;">
-  <img src="/screenshots/tree.png" alt="Stamboom — afstammelingen" style="max-height: 420px; border-radius: 12px; box-shadow: 0 2px 12px rgba(0,0,0,0.12);" />
-  <img src="/screenshots/tree-ancestors.png" alt="Stamboom — voorouders" style="max-height: 420px; border-radius: 12px; box-shadow: 0 2px 12px rgba(0,0,0,0.12);" />
+  <img src="/screenshots/nl/tree.png" alt="Stamboom — afstammelingen" style="max-height: 420px; border-radius: 12px; box-shadow: 0 2px 12px rgba(0,0,0,0.12);" />
+  <img src="/screenshots/nl/tree-zoomed-out.png" alt="Stamboom — voorouders" style="max-height: 420px; border-radius: 12px; box-shadow: 0 2px 12px rgba(0,0,0,0.12);" />
 </div>
 
 ## Personenbeheer
@@ -20,9 +20,8 @@ De stamboomweergave rendert een organische, handgetekende stamboom met `@shopify
 - Overleden leden worden met een rouwband op de boom getoond
 
 <div style="display: flex; gap: 16px; justify-content: center; flex-wrap: wrap; margin: 24px 0;">
-  <img src="/screenshots/list.png" alt="Personenlijst" style="max-height: 420px; border-radius: 12px; box-shadow: 0 2px 12px rgba(0,0,0,0.12);" />
-  <img src="/screenshots/detail.png" alt="Persoonsdetails" style="max-height: 420px; border-radius: 12px; box-shadow: 0 2px 12px rgba(0,0,0,0.12);" />
-  <img src="/screenshots/detail2.png" alt="Persoonsdetails met relaties" style="max-height: 420px; border-radius: 12px; box-shadow: 0 2px 12px rgba(0,0,0,0.12);" />
+  <img src="/screenshots/nl/list.png" alt="Personenlijst" style="max-height: 420px; border-radius: 12px; box-shadow: 0 2px 12px rgba(0,0,0,0.12);" />
+  <img src="/screenshots/nl/person-detail.png" alt="Persoonsdetails" style="max-height: 420px; border-radius: 12px; box-shadow: 0 2px 12px rgba(0,0,0,0.12);" />
 </div>
 
 ## Relaties
@@ -34,10 +33,6 @@ Definieer relaties tussen personen:
 - **Broers/zussen** — afgeleid van gedeelde ouders
 
 De app berekent uitgebreide relatielabels (oom, neef, nicht enz.) automatisch.
-
-<div style="display: flex; gap: 16px; justify-content: center; margin: 24px 0;">
-  <img src="/screenshots/add-relationship.png" alt="Scherm relatie toevoegen" style="max-height: 420px; border-radius: 12px; box-shadow: 0 2px 12px rgba(0,0,0,0.12);" />
-</div>
 
 ## Drie hoofdtabbladen
 
@@ -54,7 +49,7 @@ De app berekent uitgebreide relatielabels (oom, neef, nicht enz.) automatisch.
 - Deel exports met familieleden via het systeemdeelmenu
 
 <div style="display: flex; gap: 16px; justify-content: center; margin: 24px 0;">
-  <img src="/screenshots/settings.png" alt="Instellingenscherm" style="max-height: 420px; border-radius: 12px; box-shadow: 0 2px 12px rgba(0,0,0,0.12);" />
+  <img src="/screenshots/nl/settings.png" alt="Instellingenscherm" style="max-height: 420px; border-radius: 12px; box-shadow: 0 2px 12px rgba(0,0,0,0.12);" />
 </div>
 
 ## Privacy

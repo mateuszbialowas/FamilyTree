@@ -89,4 +89,13 @@ echo
 echo "Done. Output: $OUT_ROOT"
 echo "Succeeded (${#SUCCEEDED[@]}): ${SUCCEEDED[*]:-none}"
 echo "Failed    (${#FAILED[@]}): ${FAILED[*]:-none}"
+
+# Frame each successful locale's screenshots inside the iPhone mockup.
+if [ ${#SUCCEEDED[@]} -gt 0 ]; then
+  echo
+  echo "Framing screenshots..."
+  node "$ROOT/scripts/frame-screenshots.mjs" "${SUCCEEDED[@]}" || \
+    echo "WARN: framing step failed (raw screenshots are still in $OUT_ROOT)" >&2
+fi
+
 [ ${#FAILED[@]} -eq 0 ] || exit 1

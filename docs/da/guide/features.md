@@ -9,8 +9,8 @@ Trævisningen renderer et organisk, håndtegnet stamtræ med `@shopify/react-nat
 - Vælg en rodperson for at centrere træet igen
 
 <div style="display: flex; gap: 16px; justify-content: center; flex-wrap: wrap; margin: 24px 0;">
-  <img src="/screenshots/tree.png" alt="Trævisning — efterkommere" style="max-height: 420px; border-radius: 12px; box-shadow: 0 2px 12px rgba(0,0,0,0.12);" />
-  <img src="/screenshots/tree-ancestors.png" alt="Trævisning — forfædre" style="max-height: 420px; border-radius: 12px; box-shadow: 0 2px 12px rgba(0,0,0,0.12);" />
+  <img src="/screenshots/da/tree.png" alt="Trævisning — efterkommere" style="max-height: 420px; border-radius: 12px; box-shadow: 0 2px 12px rgba(0,0,0,0.12);" />
+  <img src="/screenshots/da/tree-zoomed-out.png" alt="Trævisning — forfædre" style="max-height: 420px; border-radius: 12px; box-shadow: 0 2px 12px rgba(0,0,0,0.12);" />
 </div>
 
 ## Personhåndtering
@@ -20,9 +20,8 @@ Trævisningen renderer et organisk, håndtegnet stamtræ med `@shopify/react-nat
 - Afdøde medlemmer vises med sørgebånd på træet
 
 <div style="display: flex; gap: 16px; justify-content: center; flex-wrap: wrap; margin: 24px 0;">
-  <img src="/screenshots/list.png" alt="Personliste" style="max-height: 420px; border-radius: 12px; box-shadow: 0 2px 12px rgba(0,0,0,0.12);" />
-  <img src="/screenshots/detail.png" alt="Persondetaljer" style="max-height: 420px; border-radius: 12px; box-shadow: 0 2px 12px rgba(0,0,0,0.12);" />
-  <img src="/screenshots/detail2.png" alt="Persondetaljer med relationer" style="max-height: 420px; border-radius: 12px; box-shadow: 0 2px 12px rgba(0,0,0,0.12);" />
+  <img src="/screenshots/da/list.png" alt="Personliste" style="max-height: 420px; border-radius: 12px; box-shadow: 0 2px 12px rgba(0,0,0,0.12);" />
+  <img src="/screenshots/da/person-detail.png" alt="Persondetaljer" style="max-height: 420px; border-radius: 12px; box-shadow: 0 2px 12px rgba(0,0,0,0.12);" />
 </div>
 
 ## Relationer
@@ -34,10 +33,6 @@ Definér relationer mellem personer:
 - **Søskende** — udledt fra fælles forældre
 
 Appen beregner udvidede relationsetiketter (onkel, fætter, nevø osv.) automatisk.
-
-<div style="display: flex; gap: 16px; justify-content: center; margin: 24px 0;">
-  <img src="/screenshots/add-relationship.png" alt="Tilføj relation" style="max-height: 420px; border-radius: 12px; box-shadow: 0 2px 12px rgba(0,0,0,0.12);" />
-</div>
 
 ## Tre hovedfaner
 
@@ -54,7 +49,7 @@ Appen beregner udvidede relationsetiketter (onkel, fætter, nevø osv.) automati
 - Del eksporter med familiemedlemmer via systemets delemenu
 
 <div style="display: flex; gap: 16px; justify-content: center; margin: 24px 0;">
-  <img src="/screenshots/settings.png" alt="Indstillinger" style="max-height: 420px; border-radius: 12px; box-shadow: 0 2px 12px rgba(0,0,0,0.12);" />
+  <img src="/screenshots/da/settings.png" alt="Indstillinger" style="max-height: 420px; border-radius: 12px; box-shadow: 0 2px 12px rgba(0,0,0,0.12);" />
 </div>
 
 ## Privatliv

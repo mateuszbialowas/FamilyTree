@@ -9,8 +9,8 @@ Slektstrevisningen rendrer et organisk, håndtegnet slektstre med `@shopify/reac
 - Velg en rotperson for å sentrere treet på nytt
 
 <div style="display: flex; gap: 16px; justify-content: center; flex-wrap: wrap; margin: 24px 0;">
-  <img src="/screenshots/tree.png" alt="Slektstre — etterkommere" style="max-height: 420px; border-radius: 12px; box-shadow: 0 2px 12px rgba(0,0,0,0.12);" />
-  <img src="/screenshots/tree-ancestors.png" alt="Slektstre — forfedre" style="max-height: 420px; border-radius: 12px; box-shadow: 0 2px 12px rgba(0,0,0,0.12);" />
+  <img src="/screenshots/no/tree.png" alt="Slektstre — etterkommere" style="max-height: 420px; border-radius: 12px; box-shadow: 0 2px 12px rgba(0,0,0,0.12);" />
+  <img src="/screenshots/no/tree-zoomed-out.png" alt="Slektstre — forfedre" style="max-height: 420px; border-radius: 12px; box-shadow: 0 2px 12px rgba(0,0,0,0.12);" />
 </div>
 
 ## Personhåndtering
@@ -20,9 +20,8 @@ Slektstrevisningen rendrer et organisk, håndtegnet slektstre med `@shopify/reac
 - Avdøde medlemmer vises med sørgebånd på treet
 
 <div style="display: flex; gap: 16px; justify-content: center; flex-wrap: wrap; margin: 24px 0;">
-  <img src="/screenshots/list.png" alt="Personliste" style="max-height: 420px; border-radius: 12px; box-shadow: 0 2px 12px rgba(0,0,0,0.12);" />
-  <img src="/screenshots/detail.png" alt="Persondetaljer" style="max-height: 420px; border-radius: 12px; box-shadow: 0 2px 12px rgba(0,0,0,0.12);" />
-  <img src="/screenshots/detail2.png" alt="Persondetaljer med relasjoner" style="max-height: 420px; border-radius: 12px; box-shadow: 0 2px 12px rgba(0,0,0,0.12);" />
+  <img src="/screenshots/no/list.png" alt="Personliste" style="max-height: 420px; border-radius: 12px; box-shadow: 0 2px 12px rgba(0,0,0,0.12);" />
+  <img src="/screenshots/no/person-detail.png" alt="Persondetaljer" style="max-height: 420px; border-radius: 12px; box-shadow: 0 2px 12px rgba(0,0,0,0.12);" />
 </div>
 
 ## Relasjoner
@@ -34,10 +33,6 @@ Definer relasjoner mellom personer:
 - **Søsken** — utledet fra felles foreldre
 
 Appen beregner utvidede relasjonsetiketter (onkel, søskenbarn, nevø osv.) automatisk.
-
-<div style="display: flex; gap: 16px; justify-content: center; margin: 24px 0;">
-  <img src="/screenshots/add-relationship.png" alt="Legg til relasjon" style="max-height: 420px; border-radius: 12px; box-shadow: 0 2px 12px rgba(0,0,0,0.12);" />
-</div>
 
 ## Tre hovedfaner
 
@@ -54,7 +49,7 @@ Appen beregner utvidede relasjonsetiketter (onkel, søskenbarn, nevø osv.) auto
 - Del eksporter med familiemedlemmer via systemets delemeny
 
 <div style="display: flex; gap: 16px; justify-content: center; margin: 24px 0;">
-  <img src="/screenshots/settings.png" alt="Innstillinger" style="max-height: 420px; border-radius: 12px; box-shadow: 0 2px 12px rgba(0,0,0,0.12);" />
+  <img src="/screenshots/no/settings.png" alt="Innstillinger" style="max-height: 420px; border-radius: 12px; box-shadow: 0 2px 12px rgba(0,0,0,0.12);" />
 </div>
 
 ## Personvern

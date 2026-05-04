@@ -9,8 +9,8 @@
 - בחרו אדם שורש כדי למרכז מחדש את העץ
 
 <div style="display: flex; gap: 16px; justify-content: center; flex-wrap: wrap; margin: 24px 0;">
-  <img src="/screenshots/tree.png" alt="תצוגת עץ — צאצאים" style="max-height: 420px; border-radius: 12px; box-shadow: 0 2px 12px rgba(0,0,0,0.12);" />
-  <img src="/screenshots/tree-ancestors.png" alt="תצוגת עץ — אבות" style="max-height: 420px; border-radius: 12px; box-shadow: 0 2px 12px rgba(0,0,0,0.12);" />
+  <img src="/screenshots/he/tree.png" alt="תצוגת עץ — צאצאים" style="max-height: 420px; border-radius: 12px; box-shadow: 0 2px 12px rgba(0,0,0,0.12);" />
+  <img src="/screenshots/he/tree-zoomed-out.png" alt="תצוגת עץ — אבות" style="max-height: 420px; border-radius: 12px; box-shadow: 0 2px 12px rgba(0,0,0,0.12);" />
 </div>
 
 ## ניהול אנשים
@@ -20,9 +20,8 @@
 - בני משפחה שנפטרו מוצגים עם סרט אבל בעץ
 
 <div style="display: flex; gap: 16px; justify-content: center; flex-wrap: wrap; margin: 24px 0;">
-  <img src="/screenshots/list.png" alt="רשימת אנשים" style="max-height: 420px; border-radius: 12px; box-shadow: 0 2px 12px rgba(0,0,0,0.12);" />
-  <img src="/screenshots/detail.png" alt="פרטי אדם" style="max-height: 420px; border-radius: 12px; box-shadow: 0 2px 12px rgba(0,0,0,0.12);" />
-  <img src="/screenshots/detail2.png" alt="פרטי אדם עם קשרים" style="max-height: 420px; border-radius: 12px; box-shadow: 0 2px 12px rgba(0,0,0,0.12);" />
+  <img src="/screenshots/he/list.png" alt="רשימת אנשים" style="max-height: 420px; border-radius: 12px; box-shadow: 0 2px 12px rgba(0,0,0,0.12);" />
+  <img src="/screenshots/he/person-detail.png" alt="פרטי אדם" style="max-height: 420px; border-radius: 12px; box-shadow: 0 2px 12px rgba(0,0,0,0.12);" />
 </div>
 
 ## קשרים
@@ -34,10 +33,6 @@
 - **אחים** — מסיק מהורים משותפים
 
 האפליקציה מחשבת תוויות קשר מורחבות (דוד, בן דוד, אחיין וכו') באופן אוטומטי.
-
-<div style="display: flex; gap: 16px; justify-content: center; margin: 24px 0;">
-  <img src="/screenshots/add-relationship.png" alt="מסך הוספת קשר" style="max-height: 420px; border-radius: 12px; box-shadow: 0 2px 12px rgba(0,0,0,0.12);" />
-</div>
 
 ## שלוש לשוניות עיקריות
 
@@ -54,7 +49,7 @@
 - שתפו ייצואים עם בני משפחה דרך תפריט השיתוף של המערכת
 
 <div style="display: flex; gap: 16px; justify-content: center; margin: 24px 0;">
-  <img src="/screenshots/settings.png" alt="מסך הגדרות" style="max-height: 420px; border-radius: 12px; box-shadow: 0 2px 12px rgba(0,0,0,0.12);" />
+  <img src="/screenshots/he/settings.png" alt="מסך הגדרות" style="max-height: 420px; border-radius: 12px; box-shadow: 0 2px 12px rgba(0,0,0,0.12);" />
 </div>
 
 ## פרטיות

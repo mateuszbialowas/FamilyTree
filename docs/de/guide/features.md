@@ -9,8 +9,8 @@ Die Stammbaumansicht rendert einen organischen, handgezeichneten Familienstammba
 - Wählen Sie eine Stammperson aus, um den Baum neu zu zentrieren
 
 <div style="display: flex; gap: 16px; justify-content: center; flex-wrap: wrap; margin: 24px 0;">
-  <img src="/screenshots/tree.png" alt="Stammbaumansicht — Nachkommen" style="max-height: 420px; border-radius: 12px; box-shadow: 0 2px 12px rgba(0,0,0,0.12);" />
-  <img src="/screenshots/tree-ancestors.png" alt="Stammbaumansicht — Vorfahren" style="max-height: 420px; border-radius: 12px; box-shadow: 0 2px 12px rgba(0,0,0,0.12);" />
+  <img src="/screenshots/de/tree.png" alt="Stammbaumansicht — Nachkommen" style="max-height: 420px; border-radius: 12px; box-shadow: 0 2px 12px rgba(0,0,0,0.12);" />
+  <img src="/screenshots/de/tree-zoomed-out.png" alt="Stammbaumansicht — Vorfahren" style="max-height: 420px; border-radius: 12px; box-shadow: 0 2px 12px rgba(0,0,0,0.12);" />
 </div>
 
 ## Personenverwaltung
@@ -20,9 +20,8 @@ Die Stammbaumansicht rendert einen organischen, handgezeichneten Familienstammba
 - Verstorbene Mitglieder werden mit einem Trauerband im Baum angezeigt
 
 <div style="display: flex; gap: 16px; justify-content: center; flex-wrap: wrap; margin: 24px 0;">
-  <img src="/screenshots/list.png" alt="Personenliste" style="max-height: 420px; border-radius: 12px; box-shadow: 0 2px 12px rgba(0,0,0,0.12);" />
-  <img src="/screenshots/detail.png" alt="Personendetails" style="max-height: 420px; border-radius: 12px; box-shadow: 0 2px 12px rgba(0,0,0,0.12);" />
-  <img src="/screenshots/detail2.png" alt="Personendetails mit Beziehungen" style="max-height: 420px; border-radius: 12px; box-shadow: 0 2px 12px rgba(0,0,0,0.12);" />
+  <img src="/screenshots/de/list.png" alt="Personenliste" style="max-height: 420px; border-radius: 12px; box-shadow: 0 2px 12px rgba(0,0,0,0.12);" />
+  <img src="/screenshots/de/person-detail.png" alt="Personendetails" style="max-height: 420px; border-radius: 12px; box-shadow: 0 2px 12px rgba(0,0,0,0.12);" />
 </div>
 
 ## Beziehungen
@@ -34,10 +33,6 @@ Definieren Sie Beziehungen zwischen Personen:
 - **Geschwister** — abgeleitet von gemeinsamen Eltern
 
 Die App berechnet erweiterte Beziehungsbezeichnungen (Onkel, Cousin, Neffe usw.) automatisch.
-
-<div style="display: flex; gap: 16px; justify-content: center; margin: 24px 0;">
-  <img src="/screenshots/add-relationship.png" alt="Beziehung hinzufügen" style="max-height: 420px; border-radius: 12px; box-shadow: 0 2px 12px rgba(0,0,0,0.12);" />
-</div>
 
 ## Drei Hauptregisterkarten
 
@@ -54,7 +49,7 @@ Die App berechnet erweiterte Beziehungsbezeichnungen (Onkel, Cousin, Neffe usw.)
 - Teilen Sie Exporte mit Familienmitgliedern über das System-Teilen-Menü
 
 <div style="display: flex; gap: 16px; justify-content: center; margin: 24px 0;">
-  <img src="/screenshots/settings.png" alt="Einstellungen" style="max-height: 420px; border-radius: 12px; box-shadow: 0 2px 12px rgba(0,0,0,0.12);" />
+  <img src="/screenshots/de/settings.png" alt="Einstellungen" style="max-height: 420px; border-radius: 12px; box-shadow: 0 2px 12px rgba(0,0,0,0.12);" />
 </div>
 
 ## Datenschutz
