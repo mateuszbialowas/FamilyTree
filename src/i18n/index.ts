@@ -27,6 +27,9 @@ export const SUPPORTED_LOCALES: { code: Locale; label: string }[] = [
   { code: 'da', label: 'Dansk' },
 ];
 
+/** Bare locale codes derived from `SUPPORTED_LOCALES` — used for runtime validation. */
+export const SUPPORTED_LOCALE_CODES: readonly Locale[] = SUPPORTED_LOCALES.map((l) => l.code);
+
 i18n
   .use(initReactI18next)
   .init({

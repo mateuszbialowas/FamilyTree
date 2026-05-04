@@ -19,7 +19,7 @@ import { spacing } from '../theme/spacing';
 type RouteParams = { PersonDetail: { personId: string; rootId?: string } };
 
 export function PersonDetailScreen() {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const route = useRoute<RouteProp<RouteParams, 'PersonDetail'>>();
   const navigation = useNavigation<NativeStackNavigationProp<any>>();
   const { state, dispatch } = useFamily();
@@ -38,7 +38,7 @@ export function PersonDetailScreen() {
     if (!rootId || rootId === person.id) return null;
     const labels = computeRelationshipLabels(rootId, state, 'formal');
     return labels.get(person.id) ?? null;
-  }, [rootId, person.id, state]);
+  }, [rootId, person.id, state, i18n.language]);
 
   const parents = getParents(person.id, state);
   const children = getChildren(person.id, state);

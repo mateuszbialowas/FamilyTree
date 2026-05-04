@@ -1,4 +1,5 @@
 import React, { useMemo, useEffect, useState, useCallback } from 'react';
+import { useTranslation } from 'react-i18next';
 import { View, StyleSheet, TouchableOpacity } from 'react-native';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import {
@@ -114,10 +115,11 @@ function MourningBand({ x, y }: { x: number; y: number }) {
 
 // ======================== MAIN COMPONENT ========================
 export function FamilyTreeCanvas({ state, rootId, onNodePress, onNodeLongPress }: Props) {
+  const { i18n } = useTranslation();
   const layout = useMemo(() => {
     const labels = computeRelationshipLabels(rootId, state);
     return computeUnifiedLayout(rootId, state, labels);
-  }, [state.people, state.parentChildRelationships, state.marriages, rootId]);
+  }, [state.people, state.parentChildRelationships, state.marriages, rootId, i18n.language]);
 
   const geo = useMemo(() => {
     const rootNode = layout.nodes.find(n => n.id === rootId);

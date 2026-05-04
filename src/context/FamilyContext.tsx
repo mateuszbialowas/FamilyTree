@@ -8,11 +8,9 @@ import {
   type HistoryEntry,
 } from './familyReducers';
 import i18n from 'i18next';
-import { setLocale, type Locale } from '../i18n';
+import { setLocale, SUPPORTED_LOCALE_CODES, type Locale } from '../i18n';
 import { getSampleFamily } from '../utils/sampleFamilies';
 import { setInitialTreeZoom } from '../utils/screenshotMode';
-
-const SUPPORTED_LOCALES: readonly Locale[] = ['pl', 'en', 'de', 'he', 'nl', 'no', 'sv', 'da'];
 
 export type { HistoryEntry } from './familyReducers';
 
@@ -61,7 +59,7 @@ export function FamilyProvider({ children }: { children: React.ReactNode }) {
       const localeMatch = url.match(/load-sample\/([a-z]{2})/i);
       if (!localeMatch) return;
       const locale = localeMatch[1] as Locale;
-      if (!SUPPORTED_LOCALES.includes(locale)) return;
+      if (!SUPPORTED_LOCALE_CODES.includes(locale)) return;
       const zoomMatch = url.match(/[?&]zoom=([0-9.]+)/);
       if (zoomMatch) {
         const z = parseFloat(zoomMatch[1]);
