@@ -9,7 +9,7 @@ import { formatDateISO } from '../utils/date';
 import { ScreenHeader } from '../components/ui/ScreenHeader';
 import { PersonForm } from '../components/PersonForm';
 import { KeyboardDoneAccessory } from '../components/ui/KeyboardDoneAccessory';
-import { t } from '../i18n';
+import { useTranslation } from 'react-i18next';
 import { formStyles } from '../theme/formStyles';
 import { colors } from '../theme/colors';
 import { fonts, fontSizes } from '../theme/typography';
@@ -22,19 +22,20 @@ type AddPersonParams = {
   };
 };
 
-const relLabel = (type: 'parent' | 'child' | 'spouse' | 'sibling'): string => {
-  switch (type) {
-    case 'parent': return t.addPerson.relationParent;
-    case 'child': return t.addPerson.relationChild;
-    case 'spouse': return t.addPerson.relationSpouse;
-    case 'sibling': return t.addPerson.relationSibling;
-  }
-};
-
 export function AddPersonScreen() {
+  const { t } = useTranslation();
   const navigation = useNavigation();
   const route = useRoute<RouteProp<AddPersonParams, 'AddPerson'>>();
   const { state, dispatch } = useFamily();
+
+  const relLabel = (type: 'parent' | 'child' | 'spouse' | 'sibling'): string => {
+    switch (type) {
+      case 'parent': return t('addPerson.relationParent');
+      case 'child': return t('addPerson.relationChild');
+      case 'spouse': return t('addPerson.relationSpouse');
+      case 'sibling': return t('addPerson.relationSibling');
+    }
+  };
 
   const relatedPersonId = route.params?.relatedPersonId;
   const relationType = route.params?.relationType;
@@ -52,7 +53,7 @@ export function AddPersonScreen() {
     notes: string;
   }) => {
     if (!data.firstName.trim() || !data.lastName.trim()) {
-      Alert.alert(t.common.error, t.personForm.requiredError);
+      Alert.alert(t('common.error'), t('personForm.requiredError'));
       return;
     }
 
@@ -125,7 +126,7 @@ export function AddPersonScreen() {
         automaticallyAdjustKeyboardInsets={Platform.OS === 'ios'}
       >
         <ScreenHeader
-          title={t.addPerson.title}
+          title={t('addPerson.title')}
           subtitle={relatedPerson && relationType
             ? `${relLabel(relationType)} ${relatedPerson.firstName} ${relatedPerson.lastName}`
             : undefined
@@ -133,11 +134,11 @@ export function AddPersonScreen() {
         />
         {relationType === 'sibling' && relatedPerson && (
           <View testID="sibling-preview" style={previewStyles.box}>
-            <Text style={previewStyles.title}>{t.addPerson.siblingPreviewTitle}</Text>
+            <Text style={previewStyles.title}>{t('addPerson.siblingPreviewTitle')}</Text>
             {siblingParents.length > 0 ? (
               <>
                 <Text style={previewStyles.body}>
-                  {t.addPerson.siblingPreviewBody(relatedPerson.firstName)}
+                  {t('addPerson.siblingPreviewBody', { firstName: relatedPerson.firstName })}
                 </Text>
                 {siblingParents.map(p => (
                   <Text key={p.id} style={previewStyles.bullet}>
@@ -147,13 +148,13 @@ export function AddPersonScreen() {
               </>
             ) : (
               <Text style={previewStyles.body}>
-                {t.addPerson.siblingPreviewEmpty(relatedPerson.firstName)}
+                {t('addPerson.siblingPreviewEmpty', { firstName: relatedPerson.firstName })}
               </Text>
             )}
           </View>
         )}
         <PersonForm
-          submitLabel={t.addPerson.saveLabel}
+          submitLabel={t('addPerson.saveLabel')}
           submitTestID="btn-save-person"
           onSubmit={handleSave}
         />

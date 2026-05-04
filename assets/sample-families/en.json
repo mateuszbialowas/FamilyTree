@@ -1,0 +1,52 @@
+{
+  "people": [
+    { "id": "p-grandfather",   "firstName": "William",   "lastName": "Smith", "gender": "male",   "birthDate": "1925-04-12", "deathDate": "2003-08-19", "notes": "Schoolmaster in Manchester. Avid local historian." },
+    { "id": "p-grandmother",   "firstName": "Margaret",  "lastName": "Smith", "gender": "female", "birthDate": "1928-09-22", "deathDate": "2015-03-14", "notes": "Née Wilson. Retired NHS nurse." },
+    { "id": "p-son1",          "firstName": "Robert",    "lastName": "Smith", "gender": "male",   "birthDate": "1952-07-05", "deathDate": null, "notes": "Civil engineer. Lives in London." },
+    { "id": "p-son1-spouse",   "firstName": "Patricia",  "lastName": "Smith", "gender": "female", "birthDate": "1955-02-18", "deathDate": null, "notes": "Née Davies. English teacher." },
+    { "id": "p-son2",          "firstName": "James",     "lastName": "Smith", "gender": "male",   "birthDate": "1955-11-30", "deathDate": null, "notes": "Paediatrician. Father of two." },
+    { "id": "p-son2-spouse",   "firstName": "Helen",     "lastName": "Smith", "gender": "female", "birthDate": "1958-05-09", "deathDate": null, "notes": "Née Green. Architect." },
+    { "id": "p-daughter",      "firstName": "Elizabeth", "lastName": "Brown", "gender": "female", "birthDate": "1960-10-23", "deathDate": null, "notes": "Née Smith. Translator." },
+    { "id": "p-daughter-spouse","firstName": "Michael",  "lastName": "Brown", "gender": "male",   "birthDate": "1958-03-15", "deathDate": null, "notes": "Solicitor. Lives in Edinburgh." },
+    { "id": "p-gc1",           "firstName": "Daniel",    "lastName": "Smith", "gender": "male",   "birthDate": "1980-06-14", "deathDate": null, "notes": "Software developer. Son of Robert and Patricia." },
+    { "id": "p-gc1-spouse",    "firstName": "Sarah",     "lastName": "Smith", "gender": "female", "birthDate": "1982-12-03", "deathDate": null, "notes": "Née Taylor. Interior designer." },
+    { "id": "p-gc2",           "firstName": "Charlotte", "lastName": "Smith", "gender": "female", "birthDate": "1983-08-27", "deathDate": null, "notes": "Daughter of Robert and Patricia. Doctor." },
+    { "id": "p-gc3",           "firstName": "Thomas",    "lastName": "Smith", "gender": "male",   "birthDate": "1985-01-19", "deathDate": null, "notes": "Son of James and Helen. IT engineer." },
+    { "id": "p-gc4",           "firstName": "Emily",     "lastName": "Smith", "gender": "female", "birthDate": "1988-04-11", "deathDate": null, "notes": "Daughter of James and Helen. Journalist." },
+    { "id": "p-gc5",           "firstName": "Oliver",    "lastName": "Brown", "gender": "male",   "birthDate": "1986-07-22", "deathDate": null, "notes": "Son of Elizabeth and Michael. Architect." },
+    { "id": "p-gc6",           "firstName": "Sophie",    "lastName": "Brown", "gender": "female", "birthDate": "1990-11-08", "deathDate": null, "notes": "Daughter of Elizabeth and Michael. Medical student." },
+    { "id": "p-ggc1",          "firstName": "Henry",     "lastName": "Smith", "gender": "male",   "birthDate": "2010-03-21", "deathDate": null, "notes": "Son of Daniel and Sarah. Primary school pupil." },
+    { "id": "p-ggc2",          "firstName": "Lily",      "lastName": "Smith", "gender": "female", "birthDate": "2013-09-17", "deathDate": null, "notes": "Daughter of Daniel and Sarah." }
+  ],
+  "parentChildRelationships": [
+    { "id": "r-01", "parentId": "p-grandfather",  "childId": "p-son1" },
+    { "id": "r-02", "parentId": "p-grandmother",  "childId": "p-son1" },
+    { "id": "r-03", "parentId": "p-grandfather",  "childId": "p-son2" },
+    { "id": "r-04", "parentId": "p-grandmother",  "childId": "p-son2" },
+    { "id": "r-05", "parentId": "p-grandfather",  "childId": "p-daughter" },
+    { "id": "r-06", "parentId": "p-grandmother",  "childId": "p-daughter" },
+    { "id": "r-07", "parentId": "p-son1",         "childId": "p-gc1" },
+    { "id": "r-08", "parentId": "p-son1-spouse",  "childId": "p-gc1" },
+    { "id": "r-09", "parentId": "p-son1",         "childId": "p-gc2" },
+    { "id": "r-10", "parentId": "p-son1-spouse",  "childId": "p-gc2" },
+    { "id": "r-11", "parentId": "p-son2",         "childId": "p-gc3" },
+    { "id": "r-12", "parentId": "p-son2-spouse",  "childId": "p-gc3" },
+    { "id": "r-13", "parentId": "p-son2",         "childId": "p-gc4" },
+    { "id": "r-14", "parentId": "p-son2-spouse",  "childId": "p-gc4" },
+    { "id": "r-15", "parentId": "p-daughter",     "childId": "p-gc5" },
+    { "id": "r-16", "parentId": "p-daughter-spouse","childId": "p-gc5" },
+    { "id": "r-17", "parentId": "p-daughter",     "childId": "p-gc6" },
+    { "id": "r-18", "parentId": "p-daughter-spouse","childId": "p-gc6" },
+    { "id": "r-19", "parentId": "p-gc1",          "childId": "p-ggc1" },
+    { "id": "r-20", "parentId": "p-gc1-spouse",   "childId": "p-ggc1" },
+    { "id": "r-21", "parentId": "p-gc1",          "childId": "p-ggc2" },
+    { "id": "r-22", "parentId": "p-gc1-spouse",   "childId": "p-ggc2" }
+  ],
+  "marriages": [
+    { "id": "m-01", "spouse1Id": "p-grandfather", "spouse2Id": "p-grandmother",   "marriageDate": "1950-06-17", "divorceDate": null },
+    { "id": "m-02", "spouse1Id": "p-son1",        "spouse2Id": "p-son1-spouse",   "marriageDate": "1978-09-02", "divorceDate": null },
+    { "id": "m-03", "spouse1Id": "p-son2",        "spouse2Id": "p-son2-spouse",   "marriageDate": "1982-05-15", "divorceDate": null },
+    { "id": "m-04", "spouse1Id": "p-daughter",    "spouse2Id": "p-daughter-spouse","marriageDate": "1984-08-11", "divorceDate": null },
+    { "id": "m-05", "spouse1Id": "p-gc1",         "spouse2Id": "p-gc1-spouse",    "marriageDate": "2008-07-19", "divorceDate": null }
+  ]
+}

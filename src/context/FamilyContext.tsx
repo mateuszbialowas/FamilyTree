@@ -1,4 +1,5 @@
 import React, { createContext, useContext, useReducer, useEffect, useRef, useCallback, useState, useMemo } from 'react';
+import * as Linking from 'expo-linking';
 import type { FamilyState, FamilyAction } from '../types';
 import { loadData, saveData } from '../utils/storage';
 import {
@@ -6,7 +7,12 @@ import {
   createInitialHistory,
   type HistoryEntry,
 } from './familyReducers';
-import { t } from '../i18n';
+import i18n from 'i18next';
+import { setLocale, type Locale } from '../i18n';
+import { getSampleFamily } from '../utils/sampleFamilies';
+import { setInitialTreeZoom } from '../utils/screenshotMode';
+
+const SUPPORTED_LOCALES: readonly Locale[] = ['pl', 'en', 'de', 'he', 'nl', 'no', 'sv', 'da'];
 
 export type { HistoryEntry } from './familyReducers';
 
@@ -32,6 +38,7 @@ export function FamilyProvider({ children }: { children: React.ReactNode }) {
   );
   const [isLoading, setIsLoading] = useState(true);
   const isInitialized = useRef(false);
+  const pendingDeepLink = useRef<string | null>(null);
   const saveTimeout = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   const dispatch = useCallback<React.Dispatch<FamilyAction>>((action) => {
@@ -47,7 +54,28 @@ export function FamilyProvider({ children }: { children: React.ReactNode }) {
     [],
   );
 
-  // Load data on mount
+  // Apply a load-sample deep link. Switches locale + dispatches IMPORT_DATA.
+  // No-op for unrecognized URLs.
+  const applyDeepLink = useCallback(
+    (url: string) => {
+      const localeMatch = url.match(/load-sample\/([a-z]{2})/i);
+      if (!localeMatch) return;
+      const locale = localeMatch[1] as Locale;
+      if (!SUPPORTED_LOCALES.includes(locale)) return;
+      const zoomMatch = url.match(/[?&]zoom=([0-9.]+)/);
+      if (zoomMatch) {
+        const z = parseFloat(zoomMatch[1]);
+        if (Number.isFinite(z) && z > 0) setInitialTreeZoom(z);
+      }
+      setLocale(locale);
+      dispatch({ type: 'IMPORT_DATA', payload: getSampleFamily(locale) });
+    },
+    [dispatch],
+  );
+
+  // Load saved data on mount, then process any deep link that arrived
+  // while the load was in flight. Loading first prevents loadData from
+  // overwriting the deep-link import when both fire on cold launch.
   useEffect(() => {
     (async () => {
       const saved = await loadData();
@@ -55,14 +83,36 @@ export function FamilyProvider({ children }: { children: React.ReactNode }) {
         historyDispatch({
           type: 'RESET',
           payload: saved,
-          label: t.history.loadedLabel,
+          label: i18n.t('history.loadedLabel'),
           now: Date.now(),
         });
       }
       isInitialized.current = true;
       setIsLoading(false);
+      if (pendingDeepLink.current) {
+        applyDeepLink(pendingDeepLink.current);
+        pendingDeepLink.current = null;
+      }
     })();
-  }, []);
+  }, [applyDeepLink]);
+
+  // Deep-link handler: family-tree://load-sample/<locale>[?zoom=<n>]
+  // Used by the Maestro screenshot flow; the same import is also
+  // available to users via Settings → Load sample family. URLs that
+  // arrive before loadData() finishes are queued and applied after.
+  useEffect(() => {
+    const handleUrl = (url: string | null) => {
+      if (!url) return;
+      if (!isInitialized.current) {
+        pendingDeepLink.current = url;
+        return;
+      }
+      applyDeepLink(url);
+    };
+    Linking.getInitialURL().then(handleUrl);
+    const sub = Linking.addEventListener('url', ({ url }) => handleUrl(url));
+    return () => sub.remove();
+  }, [applyDeepLink]);
 
   // Debounced save on state change
   useEffect(() => {

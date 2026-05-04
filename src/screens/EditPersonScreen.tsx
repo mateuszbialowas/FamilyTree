@@ -7,12 +7,13 @@ import { formatDateISO } from '../utils/date';
 import { ScreenHeader } from '../components/ui/ScreenHeader';
 import { PersonForm } from '../components/PersonForm';
 import { KeyboardDoneAccessory } from '../components/ui/KeyboardDoneAccessory';
-import { t } from '../i18n';
+import { useTranslation } from 'react-i18next';
 import { formStyles } from '../theme/formStyles';
 
 type RouteParams = { EditPerson: { personId: string } };
 
 export function EditPersonScreen() {
+  const { t } = useTranslation();
   const route = useRoute<RouteProp<RouteParams, 'EditPerson'>>();
   const navigation = useNavigation();
   const { state, dispatch } = useFamily();
@@ -21,7 +22,7 @@ export function EditPersonScreen() {
   if (!person) {
     return (
       <View style={formStyles.container}>
-        <Text style={formStyles.notFound}>{t.personDetail.notFound}</Text>
+        <Text style={formStyles.notFound}>{t('personDetail.notFound')}</Text>
       </View>
     );
   }
@@ -35,7 +36,7 @@ export function EditPersonScreen() {
     notes: string;
   }) => {
     if (!data.firstName.trim() || !data.lastName.trim()) {
-      Alert.alert(t.common.error, t.personForm.requiredError);
+      Alert.alert(t('common.error'), t('personForm.requiredError'));
       return;
     }
 
@@ -64,10 +65,10 @@ export function EditPersonScreen() {
         keyboardDismissMode="interactive"
         automaticallyAdjustKeyboardInsets={Platform.OS === 'ios'}
       >
-        <ScreenHeader title={t.editPerson.title} />
+        <ScreenHeader title={t('editPerson.title')} />
         <PersonForm
           initialValues={person}
-          submitLabel={t.editPerson.saveLabel}
+          submitLabel={t('editPerson.saveLabel')}
           submitTestID="btn-save-edit"
           onSubmit={handleSave}
         />

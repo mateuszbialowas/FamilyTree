@@ -7,7 +7,7 @@ import { useFamily } from '../context/FamilyContext';
 import type { HistoryEntry } from '../context/FamilyContext';
 import { EmptyState } from './ui/EmptyState';
 import { formatRelativeTime } from '../utils/formatRelativeTime';
-import { t } from '../i18n';
+import { useTranslation } from 'react-i18next';
 import { colors } from '../theme/colors';
 import { fonts, fontSizes } from '../theme/typography';
 import { spacing, borderRadius } from '../theme/spacing';
@@ -23,6 +23,7 @@ type Row =
   | { kind: 'future'; index: number; entry: HistoryEntry };
 
 export function HistoryModal({ visible, onClose }: Props) {
+  const { t } = useTranslation();
   const { pastEntries, futureEntries, presentEntry, jumpTo } = useFamily();
 
   const rows: Row[] = useMemo(() => {
@@ -75,7 +76,7 @@ export function HistoryModal({ visible, onClose }: Props) {
         </View>
         {isPresent && (
           <View style={styles.chip}>
-            <Text style={styles.chipText}>{t.history.currentChip}</Text>
+            <Text style={styles.chipText}>{t('history.currentChip')}</Text>
           </View>
         )}
       </TouchableOpacity>
@@ -96,7 +97,7 @@ export function HistoryModal({ visible, onClose }: Props) {
       >
         <Pressable style={styles.sheet} onPress={() => { /* swallow */ }}>
           <View style={styles.header}>
-            <Text style={styles.title}>{t.history.title}</Text>
+            <Text style={styles.title}>{t('history.title')}</Text>
             <TouchableOpacity onPress={onClose} testID="history-close">
               <MaterialCommunityIcons name="close" size={24} color={colors.text} />
             </TouchableOpacity>
@@ -104,8 +105,8 @@ export function HistoryModal({ visible, onClose }: Props) {
           {isEmpty ? (
             <EmptyState
               icon="history"
-              title={t.history.emptyTitle}
-              subtitle={t.history.emptySubtitle}
+              title={t('history.emptyTitle')}
+              subtitle={t('history.emptySubtitle')}
             />
           ) : (
             <FlatList

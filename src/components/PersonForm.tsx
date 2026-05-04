@@ -3,7 +3,7 @@ import { View, Text, TouchableOpacity } from 'react-native';
 import { TextInput } from './ui/TextInput';
 import { Button } from './ui/Button';
 import { DatePickerField } from './ui/DatePickerField';
-import { t } from '../i18n';
+import { useTranslation } from 'react-i18next';
 import { formStyles as styles } from '../theme/formStyles';
 import { parseDate } from '../utils/date';
 import type { Person } from '../types';
@@ -25,6 +25,7 @@ type Props = {
 };
 
 export function PersonForm({ initialValues, submitLabel, submitTestID, onSubmit }: Props) {
+  const { t } = useTranslation();
   const [firstName, setFirstName] = useState(initialValues?.firstName ?? '');
   const [lastName, setLastName] = useState(initialValues?.lastName ?? '');
   const [gender, setGender] = useState<'male' | 'female'>(initialValues?.gender ?? 'male');
@@ -44,20 +45,20 @@ export function PersonForm({ initialValues, submitLabel, submitTestID, onSubmit 
     <View style={styles.form}>
       <TextInput
         testID="input-first-name"
-        label={t.personForm.firstNameLabel}
-        placeholder={t.personForm.firstNamePlaceholder}
+        label={t('personForm.firstNameLabel')}
+        placeholder={t('personForm.firstNamePlaceholder')}
         value={firstName}
         onChangeText={setFirstName}
       />
       <TextInput
         testID="input-last-name"
-        label={t.personForm.lastNameLabel}
-        placeholder={t.personForm.lastNamePlaceholder}
+        label={t('personForm.lastNameLabel')}
+        placeholder={t('personForm.lastNamePlaceholder')}
         value={lastName}
         onChangeText={setLastName}
       />
 
-      <Text style={styles.label}>{t.personForm.genderLabel}</Text>
+      <Text style={styles.label}>{t('personForm.genderLabel')}</Text>
       <View style={styles.genderRow}>
         <TouchableOpacity
           testID="gender-male"
@@ -65,7 +66,7 @@ export function PersonForm({ initialValues, submitLabel, submitTestID, onSubmit 
           onPress={() => setGender('male')}
         >
           <Text style={[styles.genderText, gender === 'male' && styles.genderTextActive]}>
-            {t.personForm.genderMale}
+            {t('personForm.genderMale')}
           </Text>
         </TouchableOpacity>
         <TouchableOpacity
@@ -74,31 +75,31 @@ export function PersonForm({ initialValues, submitLabel, submitTestID, onSubmit 
           onPress={() => setGender('female')}
         >
           <Text style={[styles.genderText, gender === 'female' && styles.genderTextActive]}>
-            {t.personForm.genderFemale}
+            {t('personForm.genderFemale')}
           </Text>
         </TouchableOpacity>
       </View>
 
       <DatePickerField
         testID="picker-birth"
-        label={t.personForm.birthDateLabel}
+        label={t('personForm.birthDateLabel')}
         value={birthDate}
         onChange={setBirthDate}
-        clearLabel={t.personForm.clearBirthDate}
+        clearLabel={t('personForm.clearBirthDate')}
       />
 
       <DatePickerField
         testID="picker-death"
-        label={t.personForm.deathDateLabel}
+        label={t('personForm.deathDateLabel')}
         value={deathDate}
         onChange={setDeathDate}
-        clearLabel={t.personForm.clearDeathDate}
+        clearLabel={t('personForm.clearDeathDate')}
       />
 
       <TextInput
         testID="input-notes"
-        label={t.personForm.notesLabel}
-        placeholder={t.personForm.notesPlaceholder}
+        label={t('personForm.notesLabel')}
+        placeholder={t('personForm.notesPlaceholder')}
         value={notes}
         onChangeText={setNotes}
         multiline

@@ -17,6 +17,7 @@ import {
   computeUnifiedLayout, NODE_R,
 } from '../../utils/treeLayout';
 import { computeRelationshipLabels } from '../../utils/relationshipLabels';
+import { consumeInitialTreeZoom } from '../../utils/screenshotMode';
 import { P } from './palette';
 import { mkPath } from './skiaHelpers';
 import { mkPara } from './skiaHelpers';
@@ -304,15 +305,17 @@ export function FamilyTreeCanvas({ state, rootId, onNodePress, onNodeLongPress }
 
   // Initial centering: jump (no animation) to root when canvas is first laid out
   // or when the selected root changes. Keeps user pan/zoom intact between renders.
+  // Honors a one-shot initial-zoom override set via the screenshot deep link.
   const lastCenteredFor = React.useRef<string | null>(null);
   useEffect(() => {
     if (canvasSize.w === 0) return;
     if (lastCenteredFor.current === rootId) return;
     const node = layout.nodes.find(n => n.id === rootId);
     if (!node) return;
-    tx.value = canvasSize.w / 2 - node.x;
-    ty.value = canvasSize.h / 2 - node.y;
-    sc.value = 1;
+    const z = consumeInitialTreeZoom() ?? 1;
+    tx.value = canvasSize.w / 2 - node.x * z;
+    ty.value = canvasSize.h / 2 - node.y * z;
+    sc.value = z;
     lastCenteredFor.current = rootId;
   }, [canvasSize.w, canvasSize.h, rootId, layout.nodes]);
 

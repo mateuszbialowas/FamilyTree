@@ -2,7 +2,7 @@ import React from 'react';
 import { TouchableOpacity, View, Text, StyleSheet } from 'react-native';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import type { Person } from '../types';
-import { t } from '../i18n';
+import { useTranslation } from 'react-i18next';
 import { colors } from '../theme/colors';
 import { fonts, fontSizes } from '../theme/typography';
 import { spacing, borderRadius } from '../theme/spacing';
@@ -12,13 +12,13 @@ type Props = {
   onPress: () => void;
 };
 
-function formatDates(person: Person): string {
-  const birth = person.birthDate ?? '?';
-  const death = person.deathDate ?? t.common.alive.toLowerCase();
-  return `${birth} – ${death}`;
-}
-
 export function PersonListItem({ person, onPress }: Props) {
+  const { t } = useTranslation();
+  const formatDates = (): string => {
+    const birth = person.birthDate ?? '?';
+    const death = person.deathDate ?? t('common.alive').toLowerCase();
+    return `${birth} – ${death}`;
+  };
   return (
     <TouchableOpacity testID={`person-item-${person.id}`} style={styles.container} onPress={onPress} activeOpacity={0.7} accessible={false}>
       <View style={styles.iconWrap}>
@@ -30,7 +30,7 @@ export function PersonListItem({ person, onPress }: Props) {
         <Text style={styles.name}>
           {person.firstName} {person.lastName}
         </Text>
-        <Text style={styles.dates}>{formatDates(person)}</Text>
+        <Text style={styles.dates}>{formatDates()}</Text>
       </View>
       <MaterialCommunityIcons
         name="chevron-right"

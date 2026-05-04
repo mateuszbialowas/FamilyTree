@@ -1,0 +1,52 @@
+{
+  "people": [
+    { "id": "p-grandfather",   "firstName": "Erik",     "lastName": "Andersson", "gender": "male",   "birthDate": "1925-04-12", "deathDate": "2003-08-19", "notes": "Rektor i Stockholm. Hembygdshistoriker." },
+    { "id": "p-grandmother",   "firstName": "Birgitta", "lastName": "Andersson", "gender": "female", "birthDate": "1928-09-22", "deathDate": "2015-03-14", "notes": "Född Lindberg. Pensionerad sjuksköterska." },
+    { "id": "p-son1",          "firstName": "Anders",   "lastName": "Andersson", "gender": "male",   "birthDate": "1952-07-05", "deathDate": null, "notes": "Civilingenjör. Bor i Göteborg." },
+    { "id": "p-son1-spouse",   "firstName": "Eva",      "lastName": "Andersson", "gender": "female", "birthDate": "1955-02-18", "deathDate": null, "notes": "Född Karlsson. Svensklärare." },
+    { "id": "p-son2",          "firstName": "Lars",     "lastName": "Andersson", "gender": "male",   "birthDate": "1955-11-30", "deathDate": null, "notes": "Barnläkare. Far till två barn." },
+    { "id": "p-son2-spouse",   "firstName": "Helena",   "lastName": "Andersson", "gender": "female", "birthDate": "1958-05-09", "deathDate": null, "notes": "Född Persson. Arkitekt." },
+    { "id": "p-daughter",      "firstName": "Karin",    "lastName": "Johansson", "gender": "female", "birthDate": "1960-10-23", "deathDate": null, "notes": "Född Andersson. Översättare." },
+    { "id": "p-daughter-spouse","firstName": "Per",     "lastName": "Johansson", "gender": "male",   "birthDate": "1958-03-15", "deathDate": null, "notes": "Advokat. Bor i Malmö." },
+    { "id": "p-gc1",           "firstName": "Johan",    "lastName": "Andersson", "gender": "male",   "birthDate": "1980-06-14", "deathDate": null, "notes": "Mjukvaruutvecklare. Son till Anders och Eva." },
+    { "id": "p-gc1-spouse",    "firstName": "Sofia",    "lastName": "Andersson", "gender": "female", "birthDate": "1982-12-03", "deathDate": null, "notes": "Född Nilsson. Inredningsarkitekt." },
+    { "id": "p-gc2",           "firstName": "Linnea",   "lastName": "Andersson", "gender": "female", "birthDate": "1983-08-27", "deathDate": null, "notes": "Dotter till Anders och Eva. Läkare." },
+    { "id": "p-gc3",           "firstName": "Oskar",    "lastName": "Andersson", "gender": "male",   "birthDate": "1985-01-19", "deathDate": null, "notes": "Son till Lars och Helena. IT-ingenjör." },
+    { "id": "p-gc4",           "firstName": "Sara",     "lastName": "Andersson", "gender": "female", "birthDate": "1988-04-11", "deathDate": null, "notes": "Dotter till Lars och Helena. Journalist." },
+    { "id": "p-gc5",           "firstName": "Viktor",   "lastName": "Johansson", "gender": "male",   "birthDate": "1986-07-22", "deathDate": null, "notes": "Son till Karin och Per. Arkitekt." },
+    { "id": "p-gc6",           "firstName": "Elin",     "lastName": "Johansson", "gender": "female", "birthDate": "1990-11-08", "deathDate": null, "notes": "Dotter till Karin och Per. Läkarstudent." },
+    { "id": "p-ggc1",          "firstName": "Hugo",     "lastName": "Andersson", "gender": "male",   "birthDate": "2010-03-21", "deathDate": null, "notes": "Son till Johan och Sofia. Lågstadieelev." },
+    { "id": "p-ggc2",          "firstName": "Alva",     "lastName": "Andersson", "gender": "female", "birthDate": "2013-09-17", "deathDate": null, "notes": "Dotter till Johan och Sofia." }
+  ],
+  "parentChildRelationships": [
+    { "id": "r-01", "parentId": "p-grandfather",  "childId": "p-son1" },
+    { "id": "r-02", "parentId": "p-grandmother",  "childId": "p-son1" },
+    { "id": "r-03", "parentId": "p-grandfather",  "childId": "p-son2" },
+    { "id": "r-04", "parentId": "p-grandmother",  "childId": "p-son2" },
+    { "id": "r-05", "parentId": "p-grandfather",  "childId": "p-daughter" },
+    { "id": "r-06", "parentId": "p-grandmother",  "childId": "p-daughter" },
+    { "id": "r-07", "parentId": "p-son1",         "childId": "p-gc1" },
+    { "id": "r-08", "parentId": "p-son1-spouse",  "childId": "p-gc1" },
+    { "id": "r-09", "parentId": "p-son1",         "childId": "p-gc2" },
+    { "id": "r-10", "parentId": "p-son1-spouse",  "childId": "p-gc2" },
+    { "id": "r-11", "parentId": "p-son2",         "childId": "p-gc3" },
+    { "id": "r-12", "parentId": "p-son2-spouse",  "childId": "p-gc3" },
+    { "id": "r-13", "parentId": "p-son2",         "childId": "p-gc4" },
+    { "id": "r-14", "parentId": "p-son2-spouse",  "childId": "p-gc4" },
+    { "id": "r-15", "parentId": "p-daughter",     "childId": "p-gc5" },
+    { "id": "r-16", "parentId": "p-daughter-spouse","childId": "p-gc5" },
+    { "id": "r-17", "parentId": "p-daughter",     "childId": "p-gc6" },
+    { "id": "r-18", "parentId": "p-daughter-spouse","childId": "p-gc6" },
+    { "id": "r-19", "parentId": "p-gc1",          "childId": "p-ggc1" },
+    { "id": "r-20", "parentId": "p-gc1-spouse",   "childId": "p-ggc1" },
+    { "id": "r-21", "parentId": "p-gc1",          "childId": "p-ggc2" },
+    { "id": "r-22", "parentId": "p-gc1-spouse",   "childId": "p-ggc2" }
+  ],
+  "marriages": [
+    { "id": "m-01", "spouse1Id": "p-grandfather", "spouse2Id": "p-grandmother",   "marriageDate": "1950-06-17", "divorceDate": null },
+    { "id": "m-02", "spouse1Id": "p-son1",        "spouse2Id": "p-son1-spouse",   "marriageDate": "1978-09-02", "divorceDate": null },
+    { "id": "m-03", "spouse1Id": "p-son2",        "spouse2Id": "p-son2-spouse",   "marriageDate": "1982-05-15", "divorceDate": null },
+    { "id": "m-04", "spouse1Id": "p-daughter",    "spouse2Id": "p-daughter-spouse","marriageDate": "1984-08-11", "divorceDate": null },
+    { "id": "m-05", "spouse1Id": "p-gc1",         "spouse2Id": "p-gc1-spouse",    "marriageDate": "2008-07-19", "divorceDate": null }
+  ]
+}

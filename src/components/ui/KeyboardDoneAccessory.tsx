@@ -2,7 +2,7 @@ import React from 'react';
 import {
   InputAccessoryView, View, Text, Pressable, Keyboard, StyleSheet, Platform,
 } from 'react-native';
-import { t } from '../../i18n';
+import { useTranslation } from 'react-i18next';
 import { colors } from '../../theme/colors';
 import { fonts, fontSizes } from '../../theme/typography';
 import { spacing } from '../../theme/spacing';
@@ -19,6 +19,7 @@ import { spacing } from '../../theme/spacing';
 export const KEYBOARD_DONE_ID = 'keyboard-done-accessory';
 
 export function KeyboardDoneAccessory() {
+  const { t } = useTranslation();
   if (Platform.OS !== 'ios') return null;
   return (
     <InputAccessoryView nativeID={KEYBOARD_DONE_ID}>
@@ -29,7 +30,7 @@ export function KeyboardDoneAccessory() {
           style={({ pressed }) => [styles.btn, pressed && styles.btnPressed]}
           hitSlop={8}
         >
-          <Text style={styles.txt}>{t.common.done}</Text>
+          <Text style={styles.txt}>{t('common.done')}</Text>
         </Pressable>
       </View>
     </InputAccessoryView>

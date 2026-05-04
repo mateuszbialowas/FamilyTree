@@ -17,7 +17,7 @@ import { formatDateISO } from '../utils/date';
 import { ScreenHeader } from '../components/ui/ScreenHeader';
 import { Button } from '../components/ui/Button';
 import { TextInput } from '../components/ui/TextInput';
-import { t } from '../i18n';
+import { useTranslation } from 'react-i18next';
 import { formStyles } from '../theme/formStyles';
 import { colors } from '../theme/colors';
 import { fonts, fontSizes } from '../theme/typography';
@@ -27,6 +27,7 @@ type RouteParams = { AddRelationship: { personId: string } };
 type RelType = 'parent-child' | 'child-parent' | 'marriage';
 
 export function AddRelationshipScreen() {
+  const { t } = useTranslation();
   const route = useRoute<RouteProp<RouteParams, 'AddRelationship'>>();
   const navigation = useNavigation();
   const { state, dispatch } = useFamily();
@@ -50,7 +51,7 @@ export function AddRelationshipScreen() {
 
   const handleSave = () => {
     if (!selectedPersonId) {
-      Alert.alert(t.common.error, t.addRelationship.errorSelectPerson);
+      Alert.alert(t('common.error'), t('addRelationship.errorSelectPerson'));
       return;
     }
 
@@ -59,7 +60,7 @@ export function AddRelationshipScreen() {
         (r) => r.parentId === person.id && r.childId === selectedPersonId
       );
       if (exists) {
-        Alert.alert(t.common.error, t.addRelationship.errorParentChildExists);
+        Alert.alert(t('common.error'), t('addRelationship.errorParentChildExists'));
         return;
       }
       dispatch({
@@ -71,7 +72,7 @@ export function AddRelationshipScreen() {
         (r) => r.parentId === selectedPersonId && r.childId === person.id
       );
       if (exists) {
-        Alert.alert(t.common.error, t.addRelationship.errorParentChildExists);
+        Alert.alert(t('common.error'), t('addRelationship.errorParentChildExists'));
         return;
       }
       dispatch({
@@ -85,7 +86,7 @@ export function AddRelationshipScreen() {
           (m.spouse1Id === selectedPersonId && m.spouse2Id === person.id)
       );
       if (exists) {
-        Alert.alert(t.common.error, t.addRelationship.errorMarriageExists);
+        Alert.alert(t('common.error'), t('addRelationship.errorMarriageExists'));
         return;
       }
       dispatch({
@@ -104,20 +105,20 @@ export function AddRelationshipScreen() {
   };
 
   const relTypes: { key: RelType; label: string }[] = [
-    { key: 'parent-child', label: t.addRelationship.typeParentChild(person.firstName) },
-    { key: 'child-parent', label: t.addRelationship.typeChildParent(person.firstName) },
-    { key: 'marriage', label: t.addRelationship.typeMarriage },
+    { key: 'parent-child', label: t('addRelationship.typeParentChild', { firstName: person.firstName }) },
+    { key: 'child-parent', label: t('addRelationship.typeChildParent', { firstName: person.firstName }) },
+    { key: 'marriage', label: t('addRelationship.typeMarriage') },
   ];
 
   return (
     <ScrollView style={formStyles.container} contentContainerStyle={formStyles.content}>
       <ScreenHeader
-        title={t.addRelationship.title}
-        subtitle={t.addRelationship.forSubtitle(person.firstName, person.lastName)}
+        title={t('addRelationship.title')}
+        subtitle={t('addRelationship.forSubtitle', { firstName: person.firstName, lastName: person.lastName })}
       />
 
       <View style={formStyles.form}>
-        <Text style={formStyles.label}>{t.addRelationship.typeLabel}</Text>
+        <Text style={formStyles.label}>{t('addRelationship.typeLabel')}</Text>
         {relTypes.map((rt) => (
           <TouchableOpacity
             key={rt.key}
@@ -132,10 +133,10 @@ export function AddRelationshipScreen() {
 
         {relType === 'marriage' && (
           <>
-            <Text style={[formStyles.label, { marginTop: spacing.lg }]}>{t.addRelationship.marriageDateLabel}</Text>
+            <Text style={[formStyles.label, { marginTop: spacing.lg }]}>{t('addRelationship.marriageDateLabel')}</Text>
             <TouchableOpacity style={formStyles.dateBtn} onPress={() => setShowMarriagePicker(true)}>
               <Text style={marriageDate ? formStyles.dateText : formStyles.datePlaceholder}>
-                {marriageDate ? formatDateISO(marriageDate) : t.common.selectDate}
+                {marriageDate ? formatDateISO(marriageDate) : t('common.selectDate')}
               </Text>
             </TouchableOpacity>
             {showMarriagePicker && (
@@ -152,9 +153,9 @@ export function AddRelationshipScreen() {
           </>
         )}
 
-        <Text style={[formStyles.label, { marginTop: spacing.lg }]}>{t.addRelationship.selectPersonLabel}</Text>
+        <Text style={[formStyles.label, { marginTop: spacing.lg }]}>{t('addRelationship.selectPersonLabel')}</Text>
         <TextInput
-          placeholder={t.addRelationship.searchPlaceholder}
+          placeholder={t('addRelationship.searchPlaceholder')}
           value={search}
           onChangeText={setSearch}
           containerStyle={{ marginBottom: spacing.sm }}
@@ -175,7 +176,7 @@ export function AddRelationshipScreen() {
               {p.firstName} {p.lastName}
             </Text>
             {p.birthDate && (
-              <Text style={styles.personDate}>{t.tree.bornPrefix} {p.birthDate}</Text>
+              <Text style={styles.personDate}>{t('tree.bornPrefix')} {p.birthDate}</Text>
             )}
           </TouchableOpacity>
         ))}
@@ -183,7 +184,7 @@ export function AddRelationshipScreen() {
         <View style={{ marginTop: spacing.xl }}>
           <Button
             testID="btn-save-relationship"
-            title={t.addRelationship.save}
+            title={t('addRelationship.save')}
             onPress={handleSave}
             disabled={!selectedPersonId}
           />

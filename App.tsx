@@ -9,7 +9,8 @@ import { FamilyProvider } from './src/context/FamilyContext';
 import { RootNavigator } from './src/navigation/RootNavigator';
 import { AnimatedSplash } from './src/components/AnimatedSplash';
 import { colors } from './src/theme/colors';
-import { loadStoredLocale, useLocale } from './src/i18n';
+import { loadStoredLocale } from './src/i18n';
+import { setSplashVisible } from './src/utils/uiState';
 
 SplashScreen.preventAutoHideAsync();
 
@@ -24,7 +25,6 @@ export default function App() {
 
   const [showSplash, setShowSplash] = useState(true);
   const [localeReady, setLocaleReady] = useState(false);
-  const locale = useLocale();
 
   useEffect(() => {
     loadStoredLocale().finally(() => setLocaleReady(true));
@@ -37,7 +37,10 @@ export default function App() {
   }, [fontsLoaded, localeReady]);
 
   const handleAnimationFinish = useCallback(() => {
-    setTimeout(() => setShowSplash(false), 50);
+    setTimeout(() => {
+      setShowSplash(false);
+      setSplashVisible(false);
+    }, 50);
   }, []);
 
   if (!fontsLoaded || !localeReady) {
@@ -49,7 +52,7 @@ export default function App() {
   }
 
   return (
-    <GestureHandlerRootView key={locale} style={styles.root}>
+    <GestureHandlerRootView style={styles.root}>
       <FamilyProvider>
         <RootNavigator />
         <StatusBar style="dark" />

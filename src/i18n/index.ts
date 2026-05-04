@@ -1,5 +1,7 @@
-import { useEffect, useState } from 'react';
+import i18n from 'i18next';
+import { initReactI18next } from 'react-i18next';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+
 import { pl } from './pl';
 import { en } from './en';
 import { de } from './de';
@@ -10,9 +12,9 @@ import { sv } from './sv';
 import { da } from './da';
 
 export type Locale = 'pl' | 'en' | 'de' | 'he' | 'nl' | 'no' | 'sv' | 'da';
-export type Translations = typeof pl;
 
-const dictionaries: Record<Locale, Translations> = { pl, en, de, he, nl, no, sv, da };
+const STORAGE_KEY = 'familyTree.locale.v1';
+const DEFAULT_LOCALE: Locale = 'pl';
 
 export const SUPPORTED_LOCALES: { code: Locale; label: string }[] = [
   { code: 'pl', label: 'Polski' },
@@ -25,52 +27,50 @@ export const SUPPORTED_LOCALES: { code: Locale; label: string }[] = [
   { code: 'da', label: 'Dansk' },
 ];
 
-const STORAGE_KEY = 'familyTree.locale.v1';
+i18n
+  .use(initReactI18next)
+  .init({
+    compatibilityJSON: 'v4',
+    resources: {
+      pl: { translation: pl },
+      en: { translation: en },
+      de: { translation: de },
+      he: { translation: he },
+      nl: { translation: nl },
+      no: { translation: no },
+      sv: { translation: sv },
+      da: { translation: da },
+    },
+    lng: DEFAULT_LOCALE,
+    fallbackLng: DEFAULT_LOCALE,
+    interpolation: { escapeValue: false },
+    react: { useSuspense: false },
+  });
 
-let currentLocale: Locale = 'pl';
-let currentDict: Translations = dictionaries.pl;
-const listeners = new Set<() => void>();
-
-export function getLocale(): Locale {
-  return currentLocale;
-}
-
-export function setLocale(locale: Locale): void {
-  if (locale === currentLocale) return;
-  currentLocale = locale;
-  currentDict = dictionaries[locale];
-  AsyncStorage.setItem(STORAGE_KEY, locale).catch(() => {});
-  listeners.forEach((l) => l());
-}
-
-export async function loadStoredLocale(): Promise<Locale> {
-  try {
-    const stored = (await AsyncStorage.getItem(STORAGE_KEY)) as Locale | null;
-    if (stored && stored in dictionaries) {
-      currentLocale = stored;
-      currentDict = dictionaries[stored];
-    }
-  } catch {}
-  return currentLocale;
-}
+// Persist locale on every change.
+i18n.on('languageChanged', (lng) => {
+  AsyncStorage.setItem(STORAGE_KEY, lng).catch(() => {});
+});
 
 /**
- * Reactive translations. Reads always go through the proxy to the current
- * dictionary, so calling `setLocale()` immediately changes what `t.x.y` returns.
- * Components subscribed via `useLocale()` re-render on change.
+ * Read the saved locale from AsyncStorage and apply it. Awaited from App.tsx
+ * before rendering so the very first paint matches the user's saved choice.
  */
-export const t: Translations = new Proxy({} as Translations, {
-  get: (_target, key) => currentDict[key as keyof Translations],
-}) as Translations;
-
-export function useLocale(): Locale {
-  const [locale, setLocaleState] = useState<Locale>(currentLocale);
-  useEffect(() => {
-    const listener = () => setLocaleState(currentLocale);
-    listeners.add(listener);
-    return () => {
-      listeners.delete(listener);
-    };
-  }, []);
-  return locale;
+export async function loadStoredLocale(): Promise<void> {
+  try {
+    const stored = await AsyncStorage.getItem(STORAGE_KEY);
+    if (stored && stored !== i18n.language) {
+      await i18n.changeLanguage(stored);
+    }
+  } catch {}
 }
+
+export async function setLocale(locale: Locale): Promise<void> {
+  await i18n.changeLanguage(locale);
+}
+
+export function getLocale(): Locale {
+  return (i18n.language as Locale) ?? DEFAULT_LOCALE;
+}
+
+export default i18n;

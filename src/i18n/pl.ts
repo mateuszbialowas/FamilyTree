@@ -1,19 +1,13 @@
 /**
- * Polskie tłumaczenia — źródło prawdy dla kształtu obiektu tłumaczeń.
- * Każdy inny język musi zaimplementować ten sam kształt (zob. `Translations` w `index.ts`).
+ * Polskie tłumaczenia (zasób i18next).
  *
- * Konwencja: namespace per ekran lub obszar funkcjonalny. Template-stringi
- * wyrażone jako funkcje, żeby parametry nie rozjeżdżały się w tłumaczeniach
- * (każdy język ma dowolną kolejność / fleksję).
- *
- * Nieobjęte tym słownikiem:
- * - `src/utils/relationshipLabels.ts` — dynamiczny generator ~100 kombinacji
- *   (ścieżka + płeć + tryb). Osobny problem do lokalizacji.
+ * Konwencja:
+ * - Stringi z parametrami używają interpolacji i18next: '{{nazwa}}'.
+ * - Nazwy pokrewieństwa siedzą w `src/utils/kinshipLabels.ts`, bo wymagają
+ *   prawdziwych funkcji (zob. logika 'Pra'.repeat(N)).
  */
 export const pl = {
   app: {
-    // Nazwa aplikacji. Nazwa widoczna na pulpicie (home screen) siedzi dodatkowo
-    // w `app.json` → `expo.name` (trzeba zmieniać tam osobno).
     name: 'Drzewo genealogiczne',
   },
 
@@ -103,8 +97,7 @@ export const pl = {
     btnAddRelationship: 'Dodaj relację',
     btnDelete: 'Usuń osobę',
     deleteTitle: 'Usuń osobę',
-    deleteBody: (firstName: string, lastName: string) =>
-      `Czy na pewno chcesz usunąć ${firstName} ${lastName}? Usunięte zostaną również wszystkie powiązane relacje.`,
+    deleteBody: 'Czy na pewno chcesz usunąć {{firstName}} {{lastName}}? Usunięte zostaną również wszystkie powiązane relacje.',
     removeRelationshipTitle: 'Usuń relację',
     removeRelationshipBody: 'Czy na pewno chcesz usunąć tę relację?',
   },
@@ -112,16 +105,14 @@ export const pl = {
   addPerson: {
     title: 'Dodaj osobę',
     saveLabel: 'Zapisz',
-    relationLabelFor: (firstName: string, lastName: string) => `dla ${firstName} ${lastName}`,
+    relationLabelFor: 'dla {{firstName}} {{lastName}}',
     relationParent: 'Rodzic dla',
     relationChild: 'Dziecko dla',
     relationSpouse: 'Małżonek dla',
     relationSibling: 'Rodzeństwo dla',
     siblingPreviewTitle: 'Automatyczne powiązania',
-    siblingPreviewBody: (firstName: string) =>
-      `Nowa osoba zostanie przypisana jako dziecko tych samych rodziców co ${firstName}:`,
-    siblingPreviewEmpty: (firstName: string) =>
-      `${firstName} nie ma jeszcze przypisanych rodziców, więc żadne relacje nie zostaną dodane automatycznie.`,
+    siblingPreviewBody: 'Nowa osoba zostanie przypisana jako dziecko tych samych rodziców co {{firstName}}:',
+    siblingPreviewEmpty: '{{firstName}} nie ma jeszcze przypisanych rodziców, więc żadne relacje nie zostaną dodane automatycznie.',
   },
 
   editPerson: {
@@ -131,10 +122,10 @@ export const pl = {
 
   addRelationship: {
     title: 'Dodaj relację',
-    forSubtitle: (firstName: string, lastName: string) => `dla ${firstName} ${lastName}`,
+    forSubtitle: 'dla {{firstName}} {{lastName}}',
     typeLabel: 'Typ relacji',
-    typeParentChild: (firstName: string) => `${firstName} jest rodzicem`,
-    typeChildParent: (firstName: string) => `${firstName} jest dzieckiem`,
+    typeParentChild: '{{firstName}} jest rodzicem',
+    typeChildParent: '{{firstName}} jest dzieckiem',
     typeMarriage: 'Małżeństwo',
     marriageDateLabel: 'Data ślubu (opcjonalne)',
     selectPersonLabel: 'Wybierz osobę',
@@ -148,7 +139,8 @@ export const pl = {
   settings: {
     title: 'Ustawienia',
     language: 'Język',
-    history: (count: number) => `Historia zmian (${count})`,
+    loadSample: 'Wczytaj przykładową rodzinę',
+    history: 'Historia zmian ({{count}})',
     importJson: 'Importuj dane (JSON)',
     exportJson: 'Eksportuj dane (JSON)',
     clearAll: 'Wyczyść wszystkie dane',
@@ -158,8 +150,7 @@ export const pl = {
     importInvalidTitle: 'Nieprawidłowy plik',
     importFail: 'Nie udało się zaimportować danych.',
     importConfirmTitle: 'Import danych',
-    importConfirmBody: (people: number, relations: number, marriages: number) =>
-      `Znaleziono ${people} osób, ${relations} relacji, ${marriages} małżeństw. Zastąpić obecne dane?`,
+    importConfirmBody: 'Znaleziono {{people}} osób, {{relations}} relacji, {{marriages}} małżeństw. Zastąpić obecne dane?',
     importConfirmCta: 'Importuj',
     clearTitle: 'Wyczyść dane',
     clearBody: 'Czy na pewno chcesz usunąć wszystkie dane? Tej operacji nie można cofnąć.',
@@ -172,56 +163,51 @@ export const pl = {
     currentChip: 'Bieżący',
     initialLabel: 'Stan początkowy',
     loadedLabel: 'Wczytano zapisane dane',
-    // Etykiety dla describeAction
     actions: {
-      addedPerson: (name: string) => `Dodano osobę: ${name}`,
-      updatedPerson: (name: string) => `Zaktualizowano: ${name}`,
-      deletedPerson: (name: string) => `Usunięto osobę: ${name}`,
-      addedParentChild: (parent: string, child: string) =>
-        `Powiązano rodzica i dziecko: ${parent} → ${child}`,
-      addedMarriage: (s1: string, s2: string) => `Dodano małżeństwo: ${s1} ⚭ ${s2}`,
-      removedParentChild: (parent: string, child: string) =>
-        `Usunięto relację: ${parent} → ${child}`,
+      addedPerson: 'Dodano osobę: {{name}}',
+      updatedPerson: 'Zaktualizowano: {{name}}',
+      deletedPerson: 'Usunięto osobę: {{name}}',
+      addedParentChild: 'Powiązano rodzica i dziecko: {{parent}} → {{child}}',
+      addedMarriage: 'Dodano małżeństwo: {{s1}} ⚭ {{s2}}',
+      removedParentChild: 'Usunięto relację: {{parent}} → {{child}}',
       removedParentChildGeneric: 'Usunięto relację rodzic-dziecko',
-      removedMarriage: (s1: string, s2: string) => `Usunięto małżeństwo: ${s1} ⚭ ${s2}`,
+      removedMarriage: 'Usunięto małżeństwo: {{s1}} ⚭ {{s2}}',
       removedMarriageGeneric: 'Usunięto małżeństwo',
-      importedData: (count: number) => `Zaimportowano dane (${count} osób)`,
+      importedData: 'Zaimportowano dane ({{count}} osób)',
       clearedAll: 'Wyczyszczono wszystkie dane',
       unknownPerson: 'nieznana osoba',
     },
   },
 
-  // Komunikaty błędów walidacji pliku importu. Każda funkcja przyjmuje indeks
-  // pozycji (liczony od 0) zgodnie z kolejnością w pliku JSON.
   validateImport: {
     rootNotObject: 'Plik nie zawiera obiektu JSON.',
     missingPeople: 'Brak listy osób (people).',
     missingParentChild: 'Brak listy relacji rodzic-dziecko.',
     missingMarriages: 'Brak listy małżeństw.',
-    personNotObject: (i: number) => `osoba #${i}: nie jest obiektem`,
-    personMissingId: (i: number) => `osoba #${i}: brak id`,
-    personMissingFirstName: (i: number) => `osoba #${i}: brak imienia`,
-    personMissingLastName: (i: number) => `osoba #${i}: brak nazwiska`,
-    personInvalidGender: (i: number) => `osoba #${i}: nieprawidłowa płeć`,
-    personInvalidBirth: (i: number) => `osoba #${i}: nieprawidłowa data urodzenia`,
-    personInvalidDeath: (i: number) => `osoba #${i}: nieprawidłowa data śmierci`,
-    personMissingNotes: (i: number) => `osoba #${i}: brak notatek`,
-    personDuplicateId: (i: number, id: string) => `osoba #${i}: zduplikowane id ${id}`,
-    pcNotObject: (i: number) => `relacja rodzic-dziecko #${i}: nie jest obiektem`,
-    pcMissingId: (i: number) => `relacja rodzic-dziecko #${i}: brak id`,
-    pcMissingParentId: (i: number) => `relacja rodzic-dziecko #${i}: brak parentId`,
-    pcMissingChildId: (i: number) => `relacja rodzic-dziecko #${i}: brak childId`,
-    pcUnknownParent: (i: number) => `relacja rodzic-dziecko #${i}: parentId wskazuje nieistniejącą osobę`,
-    pcUnknownChild: (i: number) => `relacja rodzic-dziecko #${i}: childId wskazuje nieistniejącą osobę`,
-    pcSelfReference: (i: number) => `relacja rodzic-dziecko #${i}: parent i child to ta sama osoba`,
-    marNotObject: (i: number) => `małżeństwo #${i}: nie jest obiektem`,
-    marMissingId: (i: number) => `małżeństwo #${i}: brak id`,
-    marMissingSpouse1: (i: number) => `małżeństwo #${i}: brak spouse1Id`,
-    marMissingSpouse2: (i: number) => `małżeństwo #${i}: brak spouse2Id`,
-    marUnknownSpouse1: (i: number) => `małżeństwo #${i}: spouse1Id wskazuje nieistniejącą osobę`,
-    marUnknownSpouse2: (i: number) => `małżeństwo #${i}: spouse2Id wskazuje nieistniejącą osobę`,
-    marSelfReference: (i: number) => `małżeństwo #${i}: małżonkowie to ta sama osoba`,
-    marInvalidMarriageDate: (i: number) => `małżeństwo #${i}: nieprawidłowa data ślubu`,
-    marInvalidDivorceDate: (i: number) => `małżeństwo #${i}: nieprawidłowa data rozwodu`,
+    personNotObject: 'osoba #{{i}}: nie jest obiektem',
+    personMissingId: 'osoba #{{i}}: brak id',
+    personMissingFirstName: 'osoba #{{i}}: brak imienia',
+    personMissingLastName: 'osoba #{{i}}: brak nazwiska',
+    personInvalidGender: 'osoba #{{i}}: nieprawidłowa płeć',
+    personInvalidBirth: 'osoba #{{i}}: nieprawidłowa data urodzenia',
+    personInvalidDeath: 'osoba #{{i}}: nieprawidłowa data śmierci',
+    personMissingNotes: 'osoba #{{i}}: brak notatek',
+    personDuplicateId: 'osoba #{{i}}: zduplikowane id {{id}}',
+    pcNotObject: 'relacja rodzic-dziecko #{{i}}: nie jest obiektem',
+    pcMissingId: 'relacja rodzic-dziecko #{{i}}: brak id',
+    pcMissingParentId: 'relacja rodzic-dziecko #{{i}}: brak parentId',
+    pcMissingChildId: 'relacja rodzic-dziecko #{{i}}: brak childId',
+    pcUnknownParent: 'relacja rodzic-dziecko #{{i}}: parentId wskazuje nieistniejącą osobę',
+    pcUnknownChild: 'relacja rodzic-dziecko #{{i}}: childId wskazuje nieistniejącą osobę',
+    pcSelfReference: 'relacja rodzic-dziecko #{{i}}: parent i child to ta sama osoba',
+    marNotObject: 'małżeństwo #{{i}}: nie jest obiektem',
+    marMissingId: 'małżeństwo #{{i}}: brak id',
+    marMissingSpouse1: 'małżeństwo #{{i}}: brak spouse1Id',
+    marMissingSpouse2: 'małżeństwo #{{i}}: brak spouse2Id',
+    marUnknownSpouse1: 'małżeństwo #{{i}}: spouse1Id wskazuje nieistniejącą osobę',
+    marUnknownSpouse2: 'małżeństwo #{{i}}: spouse2Id wskazuje nieistniejącą osobę',
+    marSelfReference: 'małżeństwo #{{i}}: małżonkowie to ta sama osoba',
+    marInvalidMarriageDate: 'małżeństwo #{{i}}: nieprawidłowa data ślubu',
+    marInvalidDivorceDate: 'małżeństwo #{{i}}: nieprawidłowa data rozwodu',
   },
 };

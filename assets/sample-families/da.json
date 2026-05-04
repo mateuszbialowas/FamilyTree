@@ -1,0 +1,52 @@
+{
+  "people": [
+    { "id": "p-grandfather",   "firstName": "Niels",    "lastName": "Jensen",  "gender": "male",   "birthDate": "1925-04-12", "deathDate": "2003-08-19", "notes": "Skoleleder i København. Lokalhistorisk interesseret." },
+    { "id": "p-grandmother",   "firstName": "Else",     "lastName": "Jensen",  "gender": "female", "birthDate": "1928-09-22", "deathDate": "2015-03-14", "notes": "Født Madsen. Pensioneret sygeplejerske." },
+    { "id": "p-son1",          "firstName": "Søren",    "lastName": "Jensen",  "gender": "male",   "birthDate": "1952-07-05", "deathDate": null, "notes": "Civilingeniør. Bor i Aarhus." },
+    { "id": "p-son1-spouse",   "firstName": "Lone",     "lastName": "Jensen",  "gender": "female", "birthDate": "1955-02-18", "deathDate": null, "notes": "Født Christensen. Dansklærer." },
+    { "id": "p-son2",          "firstName": "Henrik",   "lastName": "Jensen",  "gender": "male",   "birthDate": "1955-11-30", "deathDate": null, "notes": "Børnelæge. Far til to børn." },
+    { "id": "p-son2-spouse",   "firstName": "Mette",    "lastName": "Jensen",  "gender": "female", "birthDate": "1958-05-09", "deathDate": null, "notes": "Født Sørensen. Arkitekt." },
+    { "id": "p-daughter",      "firstName": "Lise",     "lastName": "Nielsen", "gender": "female", "birthDate": "1960-10-23", "deathDate": null, "notes": "Født Jensen. Oversætter." },
+    { "id": "p-daughter-spouse","firstName": "Lars",    "lastName": "Nielsen", "gender": "male",   "birthDate": "1958-03-15", "deathDate": null, "notes": "Advokat. Bor i Odense." },
+    { "id": "p-gc1",           "firstName": "Kasper",   "lastName": "Jensen",  "gender": "male",   "birthDate": "1980-06-14", "deathDate": null, "notes": "Softwareudvikler. Søn af Søren og Lone." },
+    { "id": "p-gc1-spouse",    "firstName": "Anne",     "lastName": "Jensen",  "gender": "female", "birthDate": "1982-12-03", "deathDate": null, "notes": "Født Hansen. Indretningsarkitekt." },
+    { "id": "p-gc2",           "firstName": "Sofie",    "lastName": "Jensen",  "gender": "female", "birthDate": "1983-08-27", "deathDate": null, "notes": "Datter af Søren og Lone. Læge." },
+    { "id": "p-gc3",           "firstName": "Mads",     "lastName": "Jensen",  "gender": "male",   "birthDate": "1985-01-19", "deathDate": null, "notes": "Søn af Henrik og Mette. IT-ingeniør." },
+    { "id": "p-gc4",           "firstName": "Ida",      "lastName": "Jensen",  "gender": "female", "birthDate": "1988-04-11", "deathDate": null, "notes": "Datter af Henrik og Mette. Journalist." },
+    { "id": "p-gc5",           "firstName": "Mikkel",   "lastName": "Nielsen", "gender": "male",   "birthDate": "1986-07-22", "deathDate": null, "notes": "Søn af Lise og Lars. Arkitekt." },
+    { "id": "p-gc6",           "firstName": "Line",     "lastName": "Nielsen", "gender": "female", "birthDate": "1990-11-08", "deathDate": null, "notes": "Datter af Lise og Lars. Medicinstuderende." },
+    { "id": "p-ggc1",          "firstName": "Oliver",   "lastName": "Jensen",  "gender": "male",   "birthDate": "2010-03-21", "deathDate": null, "notes": "Søn af Kasper og Anne. Folkeskoleelev." },
+    { "id": "p-ggc2",          "firstName": "Frida",    "lastName": "Jensen",  "gender": "female", "birthDate": "2013-09-17", "deathDate": null, "notes": "Datter af Kasper og Anne." }
+  ],
+  "parentChildRelationships": [
+    { "id": "r-01", "parentId": "p-grandfather",  "childId": "p-son1" },
+    { "id": "r-02", "parentId": "p-grandmother",  "childId": "p-son1" },
+    { "id": "r-03", "parentId": "p-grandfather",  "childId": "p-son2" },
+    { "id": "r-04", "parentId": "p-grandmother",  "childId": "p-son2" },
+    { "id": "r-05", "parentId": "p-grandfather",  "childId": "p-daughter" },
+    { "id": "r-06", "parentId": "p-grandmother",  "childId": "p-daughter" },
+    { "id": "r-07", "parentId": "p-son1",         "childId": "p-gc1" },
+    { "id": "r-08", "parentId": "p-son1-spouse",  "childId": "p-gc1" },
+    { "id": "r-09", "parentId": "p-son1",         "childId": "p-gc2" },
+    { "id": "r-10", "parentId": "p-son1-spouse",  "childId": "p-gc2" },
+    { "id": "r-11", "parentId": "p-son2",         "childId": "p-gc3" },
+    { "id": "r-12", "parentId": "p-son2-spouse",  "childId": "p-gc3" },
+    { "id": "r-13", "parentId": "p-son2",         "childId": "p-gc4" },
+    { "id": "r-14", "parentId": "p-son2-spouse",  "childId": "p-gc4" },
+    { "id": "r-15", "parentId": "p-daughter",     "childId": "p-gc5" },
+    { "id": "r-16", "parentId": "p-daughter-spouse","childId": "p-gc5" },
+    { "id": "r-17", "parentId": "p-daughter",     "childId": "p-gc6" },
+    { "id": "r-18", "parentId": "p-daughter-spouse","childId": "p-gc6" },
+    { "id": "r-19", "parentId": "p-gc1",          "childId": "p-ggc1" },
+    { "id": "r-20", "parentId": "p-gc1-spouse",   "childId": "p-ggc1" },
+    { "id": "r-21", "parentId": "p-gc1",          "childId": "p-ggc2" },
+    { "id": "r-22", "parentId": "p-gc1-spouse",   "childId": "p-ggc2" }
+  ],
+  "marriages": [
+    { "id": "m-01", "spouse1Id": "p-grandfather", "spouse2Id": "p-grandmother",   "marriageDate": "1950-06-17", "divorceDate": null },
+    { "id": "m-02", "spouse1Id": "p-son1",        "spouse2Id": "p-son1-spouse",   "marriageDate": "1978-09-02", "divorceDate": null },
+    { "id": "m-03", "spouse1Id": "p-son2",        "spouse2Id": "p-son2-spouse",   "marriageDate": "1982-05-15", "divorceDate": null },
+    { "id": "m-04", "spouse1Id": "p-daughter",    "spouse2Id": "p-daughter-spouse","marriageDate": "1984-08-11", "divorceDate": null },
+    { "id": "m-05", "spouse1Id": "p-gc1",         "spouse2Id": "p-gc1-spouse",    "marriageDate": "2008-07-19", "divorceDate": null }
+  ]
+}

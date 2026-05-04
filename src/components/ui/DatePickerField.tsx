@@ -4,7 +4,7 @@ import {
 } from 'react-native';
 import DateTimePicker from '@react-native-community/datetimepicker';
 import { formatDateISO } from '../../utils/date';
-import { t } from '../../i18n';
+import { useTranslation } from 'react-i18next';
 import { formStyles } from '../../theme/formStyles';
 import { colors } from '../../theme/colors';
 import { fonts, fontSizes } from '../../theme/typography';
@@ -24,11 +24,13 @@ export function DatePickerField({
   value,
   onChange,
   clearLabel,
-  placeholder = t.common.selectDate,
+  placeholder,
   testID,
 }: Props) {
+  const { t } = useTranslation();
   const [open, setOpen] = useState(false);
   const [pending, setPending] = useState<Date | null>(null);
+  const effectivePlaceholder = placeholder ?? t('common.selectDate');
 
   const openPicker = () => {
     setPending(value ?? new Date());
@@ -54,7 +56,7 @@ export function DatePickerField({
         onPress={openPicker}
       >
         <Text style={value ? formStyles.dateText : formStyles.datePlaceholder}>
-          {value ? formatDateISO(value) : placeholder}
+          {value ? formatDateISO(value) : effectivePlaceholder}
         </Text>
       </TouchableOpacity>
       {value && clearLabel && (
@@ -75,11 +77,11 @@ export function DatePickerField({
             <Pressable style={styles.sheet} onPress={() => { /* swallow */ }}>
               <View style={styles.toolbar}>
                 <TouchableOpacity onPress={cancel} testID="date-cancel">
-                  <Text style={styles.cancel}>{t.common.cancel}</Text>
+                  <Text style={styles.cancel}>{t('common.cancel')}</Text>
                 </TouchableOpacity>
                 <Text style={styles.toolbarTitle}>{label}</Text>
                 <TouchableOpacity onPress={confirm} testID="date-confirm">
-                  <Text style={styles.done}>{t.common.done}</Text>
+                  <Text style={styles.done}>{t('common.done')}</Text>
                 </TouchableOpacity>
               </View>
               <DateTimePicker

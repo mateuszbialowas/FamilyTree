@@ -7,14 +7,17 @@ import { AddPersonScreen } from '../screens/AddPersonScreen';
 import { EditPersonScreen } from '../screens/EditPersonScreen';
 import { AddRelationshipScreen } from '../screens/AddRelationshipScreen';
 import { Logo } from '../components/Logo';
-import { SHARED_SCREEN_OPTIONS, SCREEN_TITLES, headerStyles } from './stackConfig';
-import { t } from '../i18n';
+import { useSharedScreenOptions, useScreenTitles, headerStyles } from './stackConfig';
+import { useTranslation } from 'react-i18next';
 
 const Stack = createNativeStackNavigator();
 
 export function TreeStack() {
+  const { t } = useTranslation();
+  const screenOptions = useSharedScreenOptions();
+  const titles = useScreenTitles();
   return (
-    <Stack.Navigator screenOptions={SHARED_SCREEN_OPTIONS}>
+    <Stack.Navigator screenOptions={screenOptions}>
       <Stack.Screen
         name="TreeHome"
         component={TreeScreen}
@@ -22,15 +25,15 @@ export function TreeStack() {
           headerTitle: () => (
             <View style={headerStyles.headerTitle}>
               <Logo size={28} />
-              <Text style={headerStyles.headerText}>{t.nav.homeTree}</Text>
+              <Text style={headerStyles.headerText}>{t('nav.homeTree')}</Text>
             </View>
           ),
         }}
       />
-      <Stack.Screen name="PersonDetail" component={PersonDetailScreen} options={{ title: SCREEN_TITLES.PersonDetail }} />
-      <Stack.Screen name="AddPerson" component={AddPersonScreen} options={{ title: SCREEN_TITLES.AddPerson }} />
-      <Stack.Screen name="EditPerson" component={EditPersonScreen} options={{ title: SCREEN_TITLES.EditPerson }} />
-      <Stack.Screen name="AddRelationship" component={AddRelationshipScreen} options={{ title: SCREEN_TITLES.AddRelationship }} />
+      <Stack.Screen name="PersonDetail" component={PersonDetailScreen} options={{ title: titles.PersonDetail }} />
+      <Stack.Screen name="AddPerson" component={AddPersonScreen} options={{ title: titles.AddPerson }} />
+      <Stack.Screen name="EditPerson" component={EditPersonScreen} options={{ title: titles.EditPerson }} />
+      <Stack.Screen name="AddRelationship" component={AddRelationshipScreen} options={{ title: titles.AddRelationship }} />
     </Stack.Navigator>
   );
 }

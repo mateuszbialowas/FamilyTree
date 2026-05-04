@@ -1,0 +1,75 @@
+appId: com.mateuszbialowas.FamilyTree
+name: Capture localized screenshots
+# All env vars must be supplied via `-e KEY=VALUE` from scripts/screenshots.sh.
+# Maestro 2.2.0 lets YAML `env:` defaults win over `-e` overrides, which is
+# why this block is intentionally absent.
+---
+# Driven by scripts/screenshots.sh — overrides env per locale.
+# Uses the family-tree://load-sample/<locale>[?zoom=<n>] deep link
+# (handled in FamilyContext.tsx) to set language + import the bundled
+# sample family. The ?zoom= variant primes the tree's initial centering
+# so we can capture a zoomed-out variant without needing a real pinch.
+
+- launchApp:
+    clearState: true
+    clearKeychain: true
+
+- extendedWaitUntil:
+    visible: ".*tab.*"
+    timeout: 10000
+
+# Set locale + import the bundled sample family for this locale
+- openLink: "family-tree://load-sample/${APP_LOCALE}"
+- waitForAnimationToEnd
+
+# Settings
+- tapOn: "${TAB_SETTINGS}, tab.*"
+- waitForAnimationToEnd
+- takeScreenshot: "screenshots/${APP_LOCALE}/settings"
+
+# People list
+- tapOn: "${TAB_LIST}, tab.*"
+- waitForAnimationToEnd
+- takeScreenshot: "screenshots/${APP_LOCALE}/list"
+
+# First person → person detail
+- tapOn:
+    index: 0
+    text: ".*"
+- waitForAnimationToEnd
+- takeScreenshot: "screenshots/${APP_LOCALE}/person-detail"
+- back
+
+# Tree (default centered, scale 1)
+- tapOn: "${TAB_TREE}, tab.*"
+- waitForAnimationToEnd
+- takeScreenshot: "screenshots/${APP_LOCALE}/tree"
+
+# Tree scrolled — small pan up so the empty area at the top shrinks
+# without hiding the root generation.
+- swipe:
+    start: 50%, 65%
+    end: 50%, 50%
+    duration: 600
+- waitForAnimationToEnd
+- takeScreenshot: "screenshots/${APP_LOCALE}/tree-scrolled"
+
+# Tree zoomed out — relaunch with ?zoom=0.55 so the canvas fits more nodes.
+# Maestro can't pinch, so we re-import via the deep link with a zoom override.
+- launchApp:
+    clearState: true
+    clearKeychain: true
+- extendedWaitUntil:
+    visible: ".*tab.*"
+    timeout: 10000
+- openLink: "family-tree://load-sample/${APP_LOCALE}?zoom=0.55"
+- waitForAnimationToEnd
+- tapOn: "${TAB_TREE}, tab.*"
+- waitForAnimationToEnd
+# Nudge the camera down so the lower generations come into view.
+- swipe:
+    start: 50%, 60%
+    end: 50%, 45%
+    duration: 600
+- waitForAnimationToEnd
+- takeScreenshot: "screenshots/${APP_LOCALE}/tree-zoomed-out"
