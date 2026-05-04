@@ -1,0 +1,188 @@
+{
+  "people": [
+    {
+      "id": "p-stanislaw",
+      "firstName": "Stanisław",
+      "lastName": "Kowalski",
+      "gender": "male",
+      "birthDate": "1925-04-12",
+      "deathDate": "2003-08-19",
+      "notes": "Kierownik szkoły w Krakowie. Pasjonat historii."
+    },
+    {
+      "id": "p-helena",
+      "firstName": "Helena",
+      "lastName": "Kowalska",
+      "gender": "female",
+      "birthDate": "1928-09-22",
+      "deathDate": "2015-03-14",
+      "notes": "Z domu Wiśniewska. Emerytowana pielęgniarka."
+    },
+    {
+      "id": "p-andrzej",
+      "firstName": "Andrzej",
+      "lastName": "Kowalski",
+      "gender": "male",
+      "birthDate": "1952-07-05",
+      "deathDate": null,
+      "notes": "Inżynier budownictwa. Mieszka w Warszawie."
+    },
+    {
+      "id": "p-maria",
+      "firstName": "Maria",
+      "lastName": "Kowalska",
+      "gender": "female",
+      "birthDate": "1955-02-18",
+      "deathDate": null,
+      "notes": "Z domu Lewandowska. Nauczycielka języka polskiego."
+    },
+    {
+      "id": "p-tomasz",
+      "firstName": "Tomasz",
+      "lastName": "Kowalski",
+      "gender": "male",
+      "birthDate": "1955-11-30",
+      "deathDate": null,
+      "notes": "Lekarz pediatra. Ojciec dwójki dzieci."
+    },
+    {
+      "id": "p-anna",
+      "firstName": "Anna",
+      "lastName": "Kowalska",
+      "gender": "female",
+      "birthDate": "1958-05-09",
+      "deathDate": null,
+      "notes": "Z domu Zielińska. Architektka."
+    },
+    {
+      "id": "p-ewa",
+      "firstName": "Ewa",
+      "lastName": "Nowak",
+      "gender": "female",
+      "birthDate": "1960-10-23",
+      "deathDate": null,
+      "notes": "Z domu Kowalska. Tłumaczka języków obcych."
+    },
+    {
+      "id": "p-piotr",
+      "firstName": "Piotr",
+      "lastName": "Nowak",
+      "gender": "male",
+      "birthDate": "1958-03-15",
+      "deathDate": null,
+      "notes": "Prawnik. Mieszka w Gdańsku."
+    },
+    {
+      "id": "p-michal",
+      "firstName": "Michał",
+      "lastName": "Kowalski",
+      "gender": "male",
+      "birthDate": "1980-06-14",
+      "deathDate": null,
+      "notes": "Programista. Syn Andrzeja i Marii."
+    },
+    {
+      "id": "p-katarzyna",
+      "firstName": "Katarzyna",
+      "lastName": "Kowalska",
+      "gender": "female",
+      "birthDate": "1982-12-03",
+      "deathDate": null,
+      "notes": "Z domu Wójcik. Architektka wnętrz."
+    },
+    {
+      "id": "p-aleksandra",
+      "firstName": "Aleksandra",
+      "lastName": "Kowalska",
+      "gender": "female",
+      "birthDate": "1983-08-27",
+      "deathDate": null,
+      "notes": "Córka Andrzeja i Marii. Lekarka."
+    },
+    {
+      "id": "p-bartosz",
+      "firstName": "Bartosz",
+      "lastName": "Kowalski",
+      "gender": "male",
+      "birthDate": "1985-01-19",
+      "deathDate": null,
+      "notes": "Syn Tomasza i Anny. Inżynier IT."
+    },
+    {
+      "id": "p-julia",
+      "firstName": "Julia",
+      "lastName": "Kowalska",
+      "gender": "female",
+      "birthDate": "1988-04-11",
+      "deathDate": null,
+      "notes": "Córka Tomasza i Anny. Dziennikarka."
+    },
+    {
+      "id": "p-marek",
+      "firstName": "Marek",
+      "lastName": "Nowak",
+      "gender": "male",
+      "birthDate": "1986-07-22",
+      "deathDate": null,
+      "notes": "Syn Ewy i Piotra. Architekt."
+    },
+    {
+      "id": "p-zofia",
+      "firstName": "Zofia",
+      "lastName": "Nowak",
+      "gender": "female",
+      "birthDate": "1990-11-08",
+      "deathDate": null,
+      "notes": "Córka Ewy i Piotra. Studiuje medycynę."
+    },
+    {
+      "id": "p-jakub",
+      "firstName": "Jakub",
+      "lastName": "Kowalski",
+      "gender": "male",
+      "birthDate": "2010-03-21",
+      "deathDate": null,
+      "notes": "Syn Michała i Katarzyny. Uczeń szkoły podstawowej."
+    },
+    {
+      "id": "p-emilia",
+      "firstName": "Emilia",
+      "lastName": "Kowalska",
+      "gender": "female",
+      "birthDate": "2013-09-17",
+      "deathDate": null,
+      "notes": "Córka Michała i Katarzyny."
+    }
+  ],
+  "parentChildRelationships": [
+    { "id": "r-01", "parentId": "p-stanislaw", "childId": "p-andrzej" },
+    { "id": "r-02", "parentId": "p-helena",    "childId": "p-andrzej" },
+    { "id": "r-03", "parentId": "p-stanislaw", "childId": "p-tomasz" },
+    { "id": "r-04", "parentId": "p-helena",    "childId": "p-tomasz" },
+    { "id": "r-05", "parentId": "p-stanislaw", "childId": "p-ewa" },
+    { "id": "r-06", "parentId": "p-helena",    "childId": "p-ewa" },
+    { "id": "r-07", "parentId": "p-andrzej",   "childId": "p-michal" },
+    { "id": "r-08", "parentId": "p-maria",     "childId": "p-michal" },
+    { "id": "r-09", "parentId": "p-andrzej",   "childId": "p-aleksandra" },
+    { "id": "r-10", "parentId": "p-maria",     "childId": "p-aleksandra" },
+    { "id": "r-11", "parentId": "p-tomasz",    "childId": "p-bartosz" },
+    { "id": "r-12", "parentId": "p-anna",      "childId": "p-bartosz" },
+    { "id": "r-13", "parentId": "p-tomasz",    "childId": "p-julia" },
+    { "id": "r-14", "parentId": "p-anna",      "childId": "p-julia" },
+    { "id": "r-15", "parentId": "p-ewa",       "childId": "p-marek" },
+    { "id": "r-16", "parentId": "p-piotr",     "childId": "p-marek" },
+    { "id": "r-17", "parentId": "p-ewa",       "childId": "p-zofia" },
+    { "id": "r-18", "parentId": "p-piotr",     "childId": "p-zofia" },
+    { "id": "r-19", "parentId": "p-michal",    "childId": "p-jakub" },
+    { "id": "r-20", "parentId": "p-katarzyna", "childId": "p-jakub" },
+    { "id": "r-21", "parentId": "p-michal",    "childId": "p-emilia" },
+    { "id": "r-22", "parentId": "p-katarzyna", "childId": "p-emilia" }
+  ],
+  "marriages": [
+    { "id": "m-01", "spouse1Id": "p-stanislaw", "spouse2Id": "p-helena",     "marriageDate": "1950-06-17", "divorceDate": null },
+    { "id": "m-02", "spouse1Id": "p-andrzej",   "spouse2Id": "p-maria",      "marriageDate": "1978-09-02", "divorceDate": null },
+    { "id": "m-03", "spouse1Id": "p-tomasz",    "spouse2Id": "p-anna",       "marriageDate": "1982-05-15", "divorceDate": null },
+    { "id": "m-04", "spouse1Id": "p-ewa",       "spouse2Id": "p-piotr",      "marriageDate": "1984-08-11", "divorceDate": null },
+    { "id": "m-05", "spouse1Id": "p-michal",    "spouse2Id": "p-katarzyna",  "marriageDate": "2008-07-19", "divorceDate": null }
+  ]
+}
