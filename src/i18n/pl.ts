@@ -147,6 +147,7 @@ export const pl = {
 
   settings: {
     title: 'Ustawienia',
+    language: 'Język',
     history: (count: number) => `Historia zmian (${count})`,
     importJson: 'Importuj dane (JSON)',
     exportJson: 'Eksportuj dane (JSON)',

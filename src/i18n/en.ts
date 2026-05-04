@@ -141,6 +141,7 @@ export const en: Translations = {
 
   settings: {
     title: 'Settings',
+    language: 'Language',
     history: (count) => `Change history (${count})`,
     importJson: 'Import data (JSON)',
     exportJson: 'Export data (JSON)',
