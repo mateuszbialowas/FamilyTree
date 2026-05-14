@@ -1,6 +1,6 @@
 # Mitwirken
 
-Vielen Dank für Ihr Interesse, zu FamilyTree beizutragen!
+Vielen Dank für Ihr Interesse, zu Stammbaum beizutragen!
 
 ## Erste Schritte
 

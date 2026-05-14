@@ -2,12 +2,12 @@
 layout: home
 
 hero:
-  name: FamilyTree
+  name: Family Tree
   text: Your Family History, Beautifully Preserved
   tagline: Capture your roots, celebrate your heritage, and pass your story on to the next generation.
   image:
     src: /screenshots/hero.png
-    alt: FamilyTree app screenshots
+    alt: Family Tree app screenshots
   actions:
     - theme: brand
       text: Get Started

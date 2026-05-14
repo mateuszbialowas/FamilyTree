@@ -4,11 +4,11 @@
 
 ## Overzicht
 
-FamilyTree is een mobiele applicatie voor het maken en beheren van stambomen. Uw privacy is belangrijk voor ons — de app is ontworpen om al uw gegevens op uw apparaat te houden.
+Stamboom is een mobiele applicatie voor het maken en beheren van stambomen. Uw privacy is belangrijk voor ons — de app is ontworpen om al uw gegevens op uw apparaat te houden.
 
 ## Gegevensverzameling
 
-FamilyTree verzamelt, verzendt of bewaart **geen** persoonlijke gegevens op externe servers. Alle familiegegevens (namen, datums, relaties) worden uitsluitend op uw apparaat opgeslagen via lokale opslag (AsyncStorage).
+Stamboom verzamelt, verzendt of bewaart **geen** persoonlijke gegevens op externe servers. Alle familiegegevens (namen, datums, relaties) worden uitsluitend op uw apparaat opgeslagen via lokale opslag (AsyncStorage).
 
 ## Gegevensopslag
 
@@ -23,7 +23,7 @@ De app stelt u in staat uw familiegegevens als JSON-bestand te exporteren. Dit b
 
 ## Diensten van derden
 
-FamilyTree integreert geen diensten van derden die gebruikersgegevens verzamelen.
+Stamboom integreert geen diensten van derden die gebruikersgegevens verzamelen.
 
 ## Privacy van kinderen
 

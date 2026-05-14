@@ -136,38 +136,6 @@ src/
 | `npm run test:e2e:single <file>` | Run a single Maestro test |
 | `npx expo prebuild --clean` | Regenerate native projects |
 
-## Localization Roadmap
-
-The app is currently Polish-only. Planned languages are prioritized by willingness to pay for genealogy apps (based on Ancestry / MyHeritage market data).
-
-### Top spenders — prioritize
-
-| Language | Market | Why |
-|---|---|---|
-| **English** (US/UK/CA/AU) | Largest paying genealogy market worldwide | Ancestry.com is a multi-billion-dollar US business; hobby genealogy is mainstream |
-| **German** (DE/AT/CH) | High disposable income, strong genealogy culture | MyHeritage's second-biggest market; Switzerland pays especially well for apps |
-| **Hebrew** (IL) | Deeply funded niche | MyHeritage is Israeli; Jewish genealogy has high willingness to pay |
-| **Dutch** (NL) | High app spend per capita | Strong genealogy hobbyist base (CBG, WieWasWie) |
-| **Norwegian / Swedish / Danish** | Top app revenue per user | Genealogy popular via Arkivverket, Riksarkivet |
-
-### Solid second tier
-
-| Language | Market | Why |
-|---|---|---|
-| **French** (FR/CA/BE/CH) | Large paying market | Established genealogy societies |
-| **Spanish** (ES + US Hispanic) | Mid-spend in Spain, high in US | US Hispanic users pay in USD and care about ancestry |
-| **Italian** (IT) | Diaspora-driven interest | Italian-Americans researching roots |
-| **Portuguese** (BR) | Large market, lower ARPU | Worth it after the above |
-
-### Lower priority for monetization
-
-- **Ukrainian, Russian, Belarusian, Czech, Slovak, Lithuanian** — culturally relevant to a Polish-origin app, but historically low app spend. Add for goodwill/reach, not revenue.
-- **Japanese / Korean** — high spenders generally, but low cultural fit for Western-style genealogy apps; family records work very differently (koseki, jokbo).
-
-### Recommended launch set
-
-**English, German, Hebrew, Dutch, French** — covers the highest-ARPU genealogy audiences worldwide. Add Norwegian/Swedish next if traction appears in Nordic stores.
-
 ## Contributing
 
 Contributions are welcome! Please read the [contributing guide](https://mateuszbialowas.github.io/FamilyTree/guide/contributing) before submitting a PR.

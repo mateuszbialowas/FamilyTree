@@ -2,12 +2,12 @@
 layout: home
 
 hero:
-  name: FamilyTree
+  name: Slektstre
   text: Familiehistorien din, vakkert bevart
   tagline: Fang røttene dine, feire arven din, og gi historien videre til neste generasjon.
   image:
     src: /screenshots/hero.png
-    alt: FamilyTree app-skjermbilder
+    alt: Slektstre app-skjermbilder
   actions:
     - theme: brand
       text: Kom i gang

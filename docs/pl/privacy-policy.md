@@ -4,11 +4,11 @@
 
 ## Przegląd
 
-FamilyTree to mobilna aplikacja do tworzenia i zarządzania drzewami rodzinnymi. Twoja prywatność jest dla nas ważna — aplikacja została zaprojektowana tak, aby wszystkie dane pozostawały na Twoim urządzeniu.
+Drzewo genealogiczne to mobilna aplikacja do tworzenia i zarządzania drzewami rodzinnymi. Twoja prywatność jest dla nas ważna — aplikacja została zaprojektowana tak, aby wszystkie dane pozostawały na Twoim urządzeniu.
 
 ## Zbieranie danych
 
-FamilyTree **nie** zbiera, nie przesyła ani nie przechowuje żadnych danych osobowych na zewnętrznych serwerach. Wszystkie dane rodzinne (imiona, daty, relacje) są przechowywane wyłącznie na Twoim urządzeniu za pomocą lokalnej pamięci (AsyncStorage).
+Drzewo genealogiczne **nie** zbiera, nie przesyła ani nie przechowuje żadnych danych osobowych na zewnętrznych serwerach. Wszystkie dane rodzinne (imiona, daty, relacje) są przechowywane wyłącznie na Twoim urządzeniu za pomocą lokalnej pamięci (AsyncStorage).
 
 ## Przechowywanie danych
 
@@ -23,7 +23,7 @@ Aplikacja umożliwia eksport danych rodzinnych jako plik JSON. Plik ten jest two
 
 ## Usługi zewnętrzne
 
-FamilyTree nie integruje się z żadnymi usługami zewnętrznymi, które zbierają dane użytkowników.
+Drzewo genealogiczne nie integruje się z żadnymi usługami zewnętrznymi, które zbierają dane użytkowników.
 
 ## Prywatność dzieci
 

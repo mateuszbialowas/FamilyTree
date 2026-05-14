@@ -4,11 +4,11 @@
 
 ## Oversigt
 
-FamilyTree er en mobilapplikation til at oprette og administrere stamtræer. Dit privatliv er vigtigt for os — appen er designet til at holde alle dine data på din enhed.
+Stamtræ er en mobilapplikation til at oprette og administrere stamtræer. Dit privatliv er vigtigt for os — appen er designet til at holde alle dine data på din enhed.
 
 ## Dataindsamling
 
-FamilyTree indsamler, overfører eller gemmer **ikke** nogen personlige data på eksterne servere. Alle familiedata (navne, datoer, relationer) gemmes udelukkende på din enhed via lokal lagring (AsyncStorage).
+Stamtræ indsamler, overfører eller gemmer **ikke** nogen personlige data på eksterne servere. Alle familiedata (navne, datoer, relationer) gemmes udelukkende på din enhed via lokal lagring (AsyncStorage).
 
 ## Datalagring
 
@@ -23,7 +23,7 @@ Appen lader dig eksportere dine familiedata som en JSON-fil. Filen oprettes loka
 
 ## Tredjepartstjenester
 
-FamilyTree integreres ikke med tredjepartstjenester, der indsamler brugerdata.
+Stamtræ integreres ikke med tredjepartstjenester, der indsamler brugerdata.
 
 ## Børns privatliv
 

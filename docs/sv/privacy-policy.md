@@ -4,11 +4,11 @@
 
 ## Översikt
 
-FamilyTree är en mobilapplikation för att skapa och hantera släktträd. Din integritet är viktig för oss — appen är designad för att hålla all din data på din enhet.
+Släktträd är en mobilapplikation för att skapa och hantera släktträd. Din integritet är viktig för oss — appen är designad för att hålla all din data på din enhet.
 
 ## Datainsamling
 
-FamilyTree samlar **inte** in, överför eller lagrar någon personlig data på externa servrar. All familjedata (namn, datum, relationer) lagras uteslutande på din enhet via lokal lagring (AsyncStorage).
+Släktträd samlar **inte** in, överför eller lagrar någon personlig data på externa servrar. All familjedata (namn, datum, relationer) lagras uteslutande på din enhet via lokal lagring (AsyncStorage).
 
 ## Datalagring
 
@@ -23,7 +23,7 @@ Appen låter dig exportera din familjedata som en JSON-fil. Filen skapas lokalt 
 
 ## Tredjepartstjänster
 
-FamilyTree integrerar inte med några tredjepartstjänster som samlar in användardata.
+Släktträd integrerar inte med några tredjepartstjänster som samlar in användardata.
 
 ## Barns integritet
 

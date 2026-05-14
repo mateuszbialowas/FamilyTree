@@ -1,6 +1,6 @@
 # Bidra
 
-Tack för ditt intresse för att bidra till FamilyTree!
+Tack för ditt intresse för att bidra till Släktträd!
 
 ## Kom igång
 

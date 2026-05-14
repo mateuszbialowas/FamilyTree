@@ -1,6 +1,6 @@
 # Bidrag
 
-Tak for din interesse i at bidrage til FamilyTree!
+Tak for din interesse i at bidrage til Stamtræ!
 
 ## Kom godt i gang
 

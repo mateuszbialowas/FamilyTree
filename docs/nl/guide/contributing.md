@@ -1,6 +1,6 @@
 # Bijdragen
 
-Bedankt voor uw interesse om bij te dragen aan FamilyTree!
+Bedankt voor uw interesse om bij te dragen aan Stamboom!
 
 ## Aan de slag
 

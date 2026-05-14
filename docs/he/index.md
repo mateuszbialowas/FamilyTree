@@ -2,12 +2,12 @@
 layout: home
 
 hero:
-  name: FamilyTree
+  name: אילן יוחסין
   text: היסטוריית המשפחה שלך, נשמרת ביופי
   tagline: לכדו את שורשיכם, חגגו את המורשת שלכם, והעבירו את הסיפור לדור הבא.
   image:
     src: /screenshots/hero.png
-    alt: צילומי מסך של אפליקציית FamilyTree
+    alt: צילומי מסך של אפליקציית אילן יוחסין
   actions:
     - theme: brand
       text: התחילו כאן

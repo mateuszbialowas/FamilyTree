@@ -2,12 +2,12 @@
 layout: home
 
 hero:
-  name: FamilyTree
+  name: Drzewo genealogiczne
   text: Historia Twojej Rodziny, Pięknie Zachowana
   tagline: Odkryj swoje korzenie, celebruj dziedzictwo i przekaż swoją historię kolejnym pokoleniom.
   image:
     src: /screenshots/hero.png
-    alt: Zrzuty ekranu aplikacji FamilyTree
+    alt: Zrzuty ekranu aplikacji Drzewo genealogiczne
   actions:
     - theme: brand
       text: Rozpocznij

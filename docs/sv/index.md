@@ -2,12 +2,12 @@
 layout: home
 
 hero:
-  name: FamilyTree
+  name: Släktträd
   text: Din familjehistoria, vackert bevarad
   tagline: Fånga dina rötter, fira ditt arv och föra vidare din berättelse till nästa generation.
   image:
     src: /screenshots/hero.png
-    alt: FamilyTree app-skärmbilder
+    alt: Släktträd app-skärmbilder
   actions:
     - theme: brand
       text: Kom igång

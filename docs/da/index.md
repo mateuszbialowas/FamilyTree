@@ -2,12 +2,12 @@
 layout: home
 
 hero:
-  name: FamilyTree
+  name: Stamtræ
   text: Din familiehistorie, smukt bevaret
   tagline: Indfang dine rødder, fejr din arv, og giv din historie videre til næste generation.
   image:
     src: /screenshots/hero.png
-    alt: FamilyTree app-skærmbilleder
+    alt: Stamtræ app-skærmbilleder
   actions:
     - theme: brand
       text: Kom godt i gang

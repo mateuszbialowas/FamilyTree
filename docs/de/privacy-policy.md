@@ -4,11 +4,11 @@
 
 ## Überblick
 
-FamilyTree ist eine mobile Anwendung zum Erstellen und Verwalten von Stammbäumen. Ihre Privatsphäre ist uns wichtig — die App ist so konzipiert, dass alle Ihre Daten auf Ihrem Gerät bleiben.
+Stammbaum ist eine mobile Anwendung zum Erstellen und Verwalten von Stammbäumen. Ihre Privatsphäre ist uns wichtig — die App ist so konzipiert, dass alle Ihre Daten auf Ihrem Gerät bleiben.
 
 ## Datenerhebung
 
-FamilyTree erfasst, überträgt oder speichert **keine** persönlichen Daten auf externen Servern. Alle Familiendaten (Namen, Daten, Beziehungen) werden ausschließlich auf Ihrem Gerät über lokalen Speicher (AsyncStorage) gespeichert.
+Stammbaum erfasst, überträgt oder speichert **keine** persönlichen Daten auf externen Servern. Alle Familiendaten (Namen, Daten, Beziehungen) werden ausschließlich auf Ihrem Gerät über lokalen Speicher (AsyncStorage) gespeichert.
 
 ## Datenspeicherung
 
@@ -23,7 +23,7 @@ Die App ermöglicht den Export Ihrer Familiendaten als JSON-Datei. Diese Datei w
 
 ## Drittanbieterdienste
 
-FamilyTree integriert keine Drittanbieterdienste, die Benutzerdaten erfassen.
+Stammbaum integriert keine Drittanbieterdienste, die Benutzerdaten erfassen.
 
 ## Datenschutz für Kinder
 

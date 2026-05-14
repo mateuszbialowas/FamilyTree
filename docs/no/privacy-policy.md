@@ -4,11 +4,11 @@
 
 ## Oversikt
 
-FamilyTree er en mobilapplikasjon for å lage og administrere slektstrær. Personvernet ditt er viktig for oss — appen er designet for å holde alle dataene dine på enheten din.
+Slektstre er en mobilapplikasjon for å lage og administrere slektstrær. Personvernet ditt er viktig for oss — appen er designet for å holde alle dataene dine på enheten din.
 
 ## Datainnsamling
 
-FamilyTree samler **ikke** inn, overfører eller lagrer personlige data på eksterne servere. Alle familiedata (navn, datoer, relasjoner) lagres utelukkende på enheten din ved hjelp av lokal lagring (AsyncStorage).
+Slektstre samler **ikke** inn, overfører eller lagrer personlige data på eksterne servere. Alle familiedata (navn, datoer, relasjoner) lagres utelukkende på enheten din ved hjelp av lokal lagring (AsyncStorage).
 
 ## Datalagring
 
@@ -23,7 +23,7 @@ Appen lar deg eksportere familiedataene som en JSON-fil. Filen opprettes lokalt 
 
 ## Tredjepartstjenester
 
-FamilyTree integreres ikke med tredjepartstjenester som samler inn brukerdata.
+Slektstre integreres ikke med tredjepartstjenester som samler inn brukerdata.
 
 ## Barns personvern
 

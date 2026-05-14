@@ -4,11 +4,11 @@
 
 ## Overview
 
-FamilyTree is a mobile application for creating and managing family trees. Your privacy is important to us — the app is designed to keep all your data on your device.
+Family Tree is a mobile application for creating and managing family trees. Your privacy is important to us — the app is designed to keep all your data on your device.
 
 ## Data Collection
 
-FamilyTree does **not** collect, transmit, or store any personal data on external servers. All family data (names, dates, relationships) is stored exclusively on your device using local storage (AsyncStorage).
+Family Tree does **not** collect, transmit, or store any personal data on external servers. All family data (names, dates, relationships) is stored exclusively on your device using local storage (AsyncStorage).
 
 ## Data Storage
 
@@ -23,7 +23,7 @@ The app allows you to export your family data as a JSON file. This file is creat
 
 ## Third-Party Services
 
-FamilyTree does not integrate with any third-party services that collect user data.
+Family Tree does not integrate with any third-party services that collect user data.
 
 ## Children's Privacy
 

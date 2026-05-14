@@ -1,6 +1,6 @@
 # Współpraca
 
-Dziękujemy za zainteresowanie współpracą nad FamilyTree!
+Dziękujemy za zainteresowanie współpracą nad Drzewo genealogiczne!
 
 ## Rozpoczęcie
 

@@ -1,6 +1,6 @@
 # Contributing
 
-Thank you for your interest in contributing to FamilyTree!
+Thank you for your interest in contributing to Family Tree!
 
 ## Getting Started
 

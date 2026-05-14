@@ -2,12 +2,12 @@
 layout: home
 
 hero:
-  name: FamilyTree
+  name: Stamboom
   text: Uw familiegeschiedenis, prachtig bewaard
   tagline: Leg uw wortels vast, vier uw erfgoed en geef uw verhaal door aan de volgende generatie.
   image:
     src: /screenshots/hero.png
-    alt: FamilyTree app schermafbeeldingen
+    alt: Stamboom app schermafbeeldingen
   actions:
     - theme: brand
       text: Aan de slag
