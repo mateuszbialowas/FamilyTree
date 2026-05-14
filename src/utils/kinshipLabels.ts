@@ -217,47 +217,6 @@ const de: KinshipLabels = {
   relative: () => 'Verwandter', inLaw: () => 'Angeheiratet',
 };
 
-const he: KinshipLabels = {
-  father: 'אבא', mother: 'אמא', son: 'בן', daughter: 'בת',
-  husband: 'בעל', wife: 'אשה', brother: 'אח', sister: 'אחות',
-  ancestor: (g, f) => {
-    if (g === 0) return f ? 'סבתא' : 'סבא';
-    if (g === 1) return f ? 'סבתא רבא' : 'סבא רבא';
-    return f ? `סבתא רבא רבא (דור ${g + 1})` : `סבא רבא רבא (דור ${g + 1})`;
-  },
-  descendant: (g, f) => {
-    if (g === 0) return f ? 'נכדה' : 'נכד';
-    if (g === 1) return f ? 'נינה' : 'נין';
-    return f ? `נינה (דור ${g + 1})` : `נין (דור ${g + 1})`;
-  },
-  uncle: 'דוד', aunt: 'דודה',
-  nephew: () => 'אחיין', niece: () => 'אחיינית',
-  cousin: (f) => (f ? 'בת דודה' : 'בן דוד'),
-  cousinNumbered: (n, f) => (f ? `בת דודה מדרגה ${n}` : `בן דוד מדרגה ${n}`),
-  fatherInLaw: 'חם', motherInLaw: 'חמות',
-  sonInLaw: 'חתן', daughterInLaw: 'כלה',
-  brotherInLaw: 'גיס', sisterInLaw: 'גיסה',
-  stepfather: 'אב חורג', stepmother: 'אם חורגת',
-  stepson: 'בן חורג', stepdaughter: 'בת חורגת',
-  halfBrother: 'אח למחצה', halfSister: 'אחות למחצה',
-  spousesGrandfather: () => 'סבא של בן/בת הזוג',
-  spousesGrandmother: () => 'סבתא של בן/בת הזוג',
-  spousesUncle: 'דוד של בן/בת הזוג', spousesAunt: 'דודה של בן/בת הזוג',
-  spousesNephew: 'אחיין של בן/בת הזוג', spousesNiece: 'אחיינית של בן/בת הזוג',
-  spousesGrandson: () => 'נכד של בן/בת הזוג',
-  spousesGranddaughter: () => 'נכדה של בן/בת הזוג',
-  spousesDescendant: () => 'צאצא של בן/בת הזוג',
-  spousesCousin: (f) => (f ? 'בת דודה של בן/בת הזוג' : 'בן דוד של בן/בת הזוג'),
-  spousesHalfRelative: () => 'קרוב למחצה',
-  granddaughterHusband: 'בעל הנכדה', grandsonWife: 'אשת הנכד',
-  descendantSpouse: () => 'בן/בת זוג של צאצא',
-  nieceHusband: 'בעל האחיינית', nephewWife: 'אשת האחיין',
-  cousinHusband: 'בעל בת הדודה', cousinWife: 'אשת בן הדוד',
-  siblingGrandchild: (_, f) => (f ? 'נכדה של אח/אחות' : 'נכד של אח/אחות'),
-  siblingGrandchildSpouse: () => 'בן/בת זוג של נכד אח',
-  relative: () => 'קרוב משפחה', inLaw: () => 'מחותן',
-};
-
 const nl: KinshipLabels = {
   father: 'Vader', mother: 'Moeder', son: 'Zoon', daughter: 'Dochter',
   husband: 'Echtgenoot', wife: 'Echtgenote', brother: 'Broer', sister: 'Zus',
@@ -428,7 +387,7 @@ const da: KinshipLabels = {
   relative: () => 'Slægtning', inLaw: () => 'Indgift',
 };
 
-const dictionaries: Record<Locale, KinshipLabels> = { pl, en, de, he, nl, no, sv, da };
+const dictionaries: Record<Locale, KinshipLabels> = { pl, en, de, nl, no, sv, da };
 
 export function getKinshipLabels(): KinshipLabels {
   return dictionaries[(i18n.language as Locale) ?? 'pl'] ?? pl;

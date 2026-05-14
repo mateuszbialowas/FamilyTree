@@ -73,28 +73,6 @@ export default defineConfig({
         ],
       },
     },
-    he: {
-      label: 'עברית',
-      lang: 'he',
-      dir: 'rtl',
-      themeConfig: {
-        nav: [
-          { text: 'מדריך', link: '/he/guide/getting-started' },
-          { text: 'מדיניות פרטיות', link: '/he/privacy-policy' },
-        ],
-        sidebar: [
-          {
-            text: 'מדריך',
-            items: [
-              { text: 'תחילת העבודה', link: '/he/guide/getting-started' },
-              { text: 'תכונות', link: '/he/guide/features' },
-              { text: 'ארכיטקטורה', link: '/he/guide/architecture' },
-              { text: 'תרומה לפרויקט', link: '/he/guide/contributing' },
-            ],
-          },
-        ],
-      },
-    },
     nl: {
       label: 'Nederlands',
       lang: 'nl',

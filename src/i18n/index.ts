@@ -5,13 +5,12 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import { pl } from './pl';
 import { en } from './en';
 import { de } from './de';
-import { he } from './he';
 import { nl } from './nl';
 import { no } from './no';
 import { sv } from './sv';
 import { da } from './da';
 
-export type Locale = 'pl' | 'en' | 'de' | 'he' | 'nl' | 'no' | 'sv' | 'da';
+export type Locale = 'pl' | 'en' | 'de' | 'nl' | 'no' | 'sv' | 'da';
 
 const STORAGE_KEY = 'familyTree.locale.v1';
 const DEFAULT_LOCALE: Locale = 'pl';
@@ -20,7 +19,6 @@ export const SUPPORTED_LOCALES: { code: Locale; label: string }[] = [
   { code: 'pl', label: 'Polski' },
   { code: 'en', label: 'English' },
   { code: 'de', label: 'Deutsch' },
-  { code: 'he', label: 'עברית' },
   { code: 'nl', label: 'Nederlands' },
   { code: 'no', label: 'Norsk' },
   { code: 'sv', label: 'Svenska' },
@@ -38,7 +36,6 @@ i18n
       pl: { translation: pl },
       en: { translation: en },
       de: { translation: de },
-      he: { translation: he },
       nl: { translation: nl },
       no: { translation: no },
       sv: { translation: sv },
