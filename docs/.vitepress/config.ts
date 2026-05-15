@@ -7,6 +7,14 @@ export default defineConfig({
 
   head: [
     ['link', { rel: 'icon', type: 'image/png', href: '/FamilyTree/icon.png' }],
+    ['link', { rel: 'alternate', hreflang: 'en', href: 'https://mateuszbialowas.github.io/FamilyTree/' }],
+    ['link', { rel: 'alternate', hreflang: 'pl', href: 'https://mateuszbialowas.github.io/FamilyTree/pl/' }],
+    ['link', { rel: 'alternate', hreflang: 'de', href: 'https://mateuszbialowas.github.io/FamilyTree/de/' }],
+    ['link', { rel: 'alternate', hreflang: 'nl', href: 'https://mateuszbialowas.github.io/FamilyTree/nl/' }],
+    ['link', { rel: 'alternate', hreflang: 'no', href: 'https://mateuszbialowas.github.io/FamilyTree/no/' }],
+    ['link', { rel: 'alternate', hreflang: 'sv', href: 'https://mateuszbialowas.github.io/FamilyTree/sv/' }],
+    ['link', { rel: 'alternate', hreflang: 'da', href: 'https://mateuszbialowas.github.io/FamilyTree/da/' }],
+    ['link', { rel: 'alternate', hreflang: 'x-default', href: 'https://mateuszbialowas.github.io/FamilyTree/' }],
   ],
 
   locales: {
