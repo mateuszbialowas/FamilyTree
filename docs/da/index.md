@@ -1,5 +1,7 @@
 ---
 layout: home
+title: FamilyTree — Privat stamtræ-app til iPhone (offline)
+description: FamilyTree — iPhone-app til dit stamtræ. Offline, uden konto, uden sky, uden abonnement — engangskøb. Smukt designet til iOS.
 
 hero:
   name: Stamtræ
@@ -10,6 +12,9 @@ hero:
     alt: Stamtræ app-skærmbilleder
   actions:
     - theme: brand
+      text: Hent i App Store
+      link: https://apps.apple.com/dk/app/drzewo-genealogiczne/id6760984404
+    - theme: alt
       text: Kom godt i gang
       link: /da/guide/getting-started
     - theme: alt

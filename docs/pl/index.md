@@ -1,5 +1,7 @@
 ---
 layout: home
+title: FamilyTree — Drzewo genealogiczne na iPhone (offline, prywatnie)
+description: FamilyTree — aplikacja na iPhone do tworzenia drzewa genealogicznego. Działa offline, bez konta i chmury, bez subskrypcji — jednorazowy zakup. Pięknie zaprojektowana genealogia na iOS.
 
 hero:
   name: Drzewo genealogiczne
@@ -10,6 +12,9 @@ hero:
     alt: Zrzuty ekranu aplikacji Drzewo genealogiczne
   actions:
     - theme: brand
+      text: Pobierz w App Store
+      link: https://apps.apple.com/pl/app/drzewo-genealogiczne/id6760984404
+    - theme: alt
       text: Rozpocznij
       link: /pl/guide/getting-started
     - theme: alt

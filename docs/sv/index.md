@@ -1,5 +1,7 @@
 ---
 layout: home
+title: FamilyTree — Privat släktträd-app för iPhone (offline)
+description: FamilyTree — iPhone-app för ditt släktträd. Offline, utan konto, utan moln, utan prenumeration — engångsköp. Vackert designad för iOS.
 
 hero:
   name: Släktträd
@@ -10,6 +12,9 @@ hero:
     alt: Släktträd app-skärmbilder
   actions:
     - theme: brand
+      text: Ladda ned i App Store
+      link: https://apps.apple.com/se/app/drzewo-genealogiczne/id6760984404
+    - theme: alt
       text: Kom igång
       link: /sv/guide/getting-started
     - theme: alt

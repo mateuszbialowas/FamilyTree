@@ -1,5 +1,7 @@
 ---
 layout: home
+title: FamilyTree — Private Offline iPhone Family Tree App
+description: Offline iPhone app to build your family tree privately. No account, no cloud, no subscription — one-time purchase. Beautiful, hand-drawn-style genealogy for iOS.
 
 hero:
   name: Family Tree
@@ -10,6 +12,9 @@ hero:
     alt: Family Tree app screenshots
   actions:
     - theme: brand
+      text: Download on App Store
+      link: https://apps.apple.com/us/app/drzewo-genealogiczne/id6760984404
+    - theme: alt
       text: Get Started
       link: /guide/getting-started
     - theme: alt

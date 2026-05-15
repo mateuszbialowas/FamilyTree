@@ -1,5 +1,7 @@
 ---
 layout: home
+title: FamilyTree — Privé stamboom-app voor iPhone (offline)
+description: FamilyTree — iPhone-app voor je stamboom. Offline, zonder account, zonder cloud, zonder abonnement — eenmalige aankoop. Prachtig vormgegeven voor iOS.
 
 hero:
   name: Stamboom
@@ -10,6 +12,9 @@ hero:
     alt: Stamboom app schermafbeeldingen
   actions:
     - theme: brand
+      text: Download in de App Store
+      link: https://apps.apple.com/nl/app/drzewo-genealogiczne/id6760984404
+    - theme: alt
       text: Aan de slag
       link: /nl/guide/getting-started
     - theme: alt

@@ -1,5 +1,7 @@
 ---
 layout: home
+title: FamilyTree — Privat slektstre-app for iPhone (offline)
+description: FamilyTree — iPhone-app for slektstreet ditt. Offline, uten konto, uten sky, uten abonnement — engangskjøp. Vakkert design for iOS.
 
 hero:
   name: Slektstre
@@ -10,6 +12,9 @@ hero:
     alt: Slektstre app-skjermbilder
   actions:
     - theme: brand
+      text: Last ned i App Store
+      link: https://apps.apple.com/no/app/drzewo-genealogiczne/id6760984404
+    - theme: alt
       text: Kom i gang
       link: /no/guide/getting-started
     - theme: alt

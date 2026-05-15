@@ -1,5 +1,7 @@
 ---
 layout: home
+title: FamilyTree — Private Stammbaum-App für iPhone (offline)
+description: FamilyTree — iPhone-App für deinen Stammbaum. Offline, ohne Konto, ohne Cloud, ohne Abo — einmaliger Kauf. Wunderschön gestaltet, nur für iOS.
 
 hero:
   name: Stammbaum
@@ -10,6 +12,9 @@ hero:
     alt: Stammbaum App-Screenshots
   actions:
     - theme: brand
+      text: Im App Store laden
+      link: https://apps.apple.com/de/app/drzewo-genealogiczne/id6760984404
+    - theme: alt
       text: Loslegen
       link: /de/guide/getting-started
     - theme: alt
