@@ -1,3 +1,11 @@
+/* Brand fonts — match the app's identity:
+ *   Playfair Display Bold for headlines (used in Skia tree canvas
+ *   + App Store screenshots).
+ *   Lora for body / tagline (used in person details, list rows).
+ * Loaded from Google Fonts at build/runtime so we don't have to vendor
+ * the .ttf files into the docs bundle. */
+@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700;800&family=Lora:wght@400;500&display=swap');
+
 :root {
   --vp-c-brand-1: #8B6914;
   --vp-c-brand-2: #6B4C3B;
@@ -16,11 +24,42 @@
   --vp-c-brand-3: #8B6914;
 }
 
+/* Hero — brand name + headline share the same serif so they read as one
+ * unit. Sizes tuned so the "Family Tree" label is a clear subtitle
+ * (~40% the size of the headline) rather than a competing first line. */
+.VPHero .name,
 .VPHero .text {
-  font-family: 'Georgia', serif;
+  font-family: 'Playfair Display', Georgia, serif;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+}
+
+.VPHero .name {
+  font-size: 1.5rem;
+  font-weight: 500;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  margin-bottom: 0.5rem;
+}
+
+.VPHero .text {
+  font-size: 3.5rem;
+  line-height: 1.1;
+}
+
+.VPHero .tagline {
+  font-family: 'Lora', Georgia, serif;
+  font-weight: 400;
+  font-size: 1.15rem;
+  line-height: 1.6;
+  margin-top: 1.25rem;
 }
 
 @media (min-width: 960px) {
+  .VPHero .text {
+    font-size: 4.5rem;
+  }
+
   .VPHero .image-container {
     transform: scale(2);
     transform-origin: center center;
