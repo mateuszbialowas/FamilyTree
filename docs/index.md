@@ -5,8 +5,8 @@ description: Offline iPhone app to build your family tree privately. No account,
 
 hero:
   name: Family Tree
-  text: Your Family History, Beautifully Preserved
-  tagline: Capture your roots, celebrate your heritage, and pass your story on to the next generation.
+  text: Your roots. Your story.
+  tagline: An iPhone family tree app — offline, private, one-time purchase. Unlimited generations, no cloud, no subscription.
   image:
     src: /screenshots/hero.png
     alt: Family Tree app screenshots
