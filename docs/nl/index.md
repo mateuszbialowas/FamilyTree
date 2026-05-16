@@ -8,8 +8,8 @@ hero:
   text: Uw familiegeschiedenis, prachtig bewaard
   tagline: Leg uw wortels vast, vier uw erfgoed en geef uw verhaal door aan de volgende generatie.
   image:
-    src: /screenshots/hero.png
-    alt: Stamboom app schermafbeeldingen
+    src: /screenshots/nl/tree.png
+    alt: Stamboom-app — Jouw wortels, jouw verhaal
   actions:
     - theme: brand
       text: Download in de App Store

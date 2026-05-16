@@ -8,8 +8,8 @@ hero:
   text: Ihre Familiengeschichte, wunderschön bewahrt
   tagline: Halten Sie Ihre Wurzeln fest, feiern Sie Ihr Erbe und geben Sie Ihre Geschichte an die nächste Generation weiter.
   image:
-    src: /screenshots/hero.png
-    alt: Stammbaum App-Screenshots
+    src: /screenshots/de/tree.png
+    alt: Stammbaum-App — Deine Wurzeln, deine Geschichte
   actions:
     - theme: brand
       text: Im App Store laden

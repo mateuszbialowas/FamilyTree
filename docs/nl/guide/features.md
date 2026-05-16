@@ -10,7 +10,7 @@ De stamboomweergave rendert een organische, handgetekende stamboom met `@shopify
 
 <div style="display: flex; gap: 16px; justify-content: center; flex-wrap: wrap; margin: 24px 0;">
   <img src="/screenshots/nl/tree.png" alt="Stamboom — afstammelingen" style="max-height: 420px; border-radius: 12px; box-shadow: 0 2px 12px rgba(0,0,0,0.12);" />
-  <img src="/screenshots/nl/tree-zoomed-out.png" alt="Stamboom — voorouders" style="max-height: 420px; border-radius: 12px; box-shadow: 0 2px 12px rgba(0,0,0,0.12);" />
+  <img src="/screenshots/nl/tree-rooted-at-ancestor.png" alt="Stamboom vanuit overgrootvader — de hele familie" style="max-height: 420px; border-radius: 12px; box-shadow: 0 2px 12px rgba(0,0,0,0.12);" />
 </div>
 
 ## Personenbeheer

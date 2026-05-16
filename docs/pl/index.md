@@ -8,8 +8,8 @@ hero:
   text: Historia Twojej Rodziny, Pięknie Zachowana
   tagline: Odkryj swoje korzenie, celebruj dziedzictwo i przekaż swoją historię kolejnym pokoleniom.
   image:
-    src: /screenshots/hero.png
-    alt: Zrzuty ekranu aplikacji Drzewo genealogiczne
+    src: /screenshots/pl/tree.png
+    alt: Drzewo genealogiczne — Twoje korzenie, Twoja historia
   actions:
     - theme: brand
       text: Pobierz w App Store

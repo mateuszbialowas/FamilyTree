@@ -10,7 +10,7 @@ Die Stammbaumansicht rendert einen organischen, handgezeichneten Familienstammba
 
 <div style="display: flex; gap: 16px; justify-content: center; flex-wrap: wrap; margin: 24px 0;">
   <img src="/screenshots/de/tree.png" alt="Stammbaumansicht — Nachkommen" style="max-height: 420px; border-radius: 12px; box-shadow: 0 2px 12px rgba(0,0,0,0.12);" />
-  <img src="/screenshots/de/tree-zoomed-out.png" alt="Stammbaumansicht — Vorfahren" style="max-height: 420px; border-radius: 12px; box-shadow: 0 2px 12px rgba(0,0,0,0.12);" />
+  <img src="/screenshots/de/tree-rooted-at-ancestor.png" alt="Stammbaum vom Urgroßvater aus — die ganze Familie" style="max-height: 420px; border-radius: 12px; box-shadow: 0 2px 12px rgba(0,0,0,0.12);" />
 </div>
 
 ## Personenverwaltung

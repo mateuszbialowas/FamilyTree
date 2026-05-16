@@ -10,7 +10,7 @@ Slektstrevisningen rendrer et organisk, håndtegnet slektstre med `@shopify/reac
 
 <div style="display: flex; gap: 16px; justify-content: center; flex-wrap: wrap; margin: 24px 0;">
   <img src="/screenshots/no/tree.png" alt="Slektstre — etterkommere" style="max-height: 420px; border-radius: 12px; box-shadow: 0 2px 12px rgba(0,0,0,0.12);" />
-  <img src="/screenshots/no/tree-zoomed-out.png" alt="Slektstre — forfedre" style="max-height: 420px; border-radius: 12px; box-shadow: 0 2px 12px rgba(0,0,0,0.12);" />
+  <img src="/screenshots/no/tree-rooted-at-ancestor.png" alt="Slektstre fra oldefar — hele familien" style="max-height: 420px; border-radius: 12px; box-shadow: 0 2px 12px rgba(0,0,0,0.12);" />
 </div>
 
 ## Personhåndtering

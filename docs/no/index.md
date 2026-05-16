@@ -8,8 +8,8 @@ hero:
   text: Familiehistorien din, vakkert bevart
   tagline: Fang røttene dine, feire arven din, og gi historien videre til neste generasjon.
   image:
-    src: /screenshots/hero.png
-    alt: Slektstre app-skjermbilder
+    src: /screenshots/no/tree.png
+    alt: Slektstre-app — Dine røtter, din historie
   actions:
     - theme: brand
       text: Last ned i App Store

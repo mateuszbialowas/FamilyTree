@@ -8,8 +8,8 @@ hero:
   text: Din familjehistoria, vackert bevarad
   tagline: Fånga dina rötter, fira ditt arv och föra vidare din berättelse till nästa generation.
   image:
-    src: /screenshots/hero.png
-    alt: Släktträd app-skärmbilder
+    src: /screenshots/sv/tree.png
+    alt: Släktträd-app — Dina rötter, din historia
   actions:
     - theme: brand
       text: Ladda ned i App Store

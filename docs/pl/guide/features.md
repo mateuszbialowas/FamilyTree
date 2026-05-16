@@ -10,7 +10,7 @@ Widok drzewa renderuje organiczne, ręcznie rysowane drzewo rodzinne za pomocą 
 
 <div style="display: flex; gap: 16px; justify-content: center; flex-wrap: wrap; margin: 24px 0;">
   <img src="/screenshots/pl/tree.png" alt="Widok drzewa — potomkowie" style="max-height: 420px; border-radius: 12px; box-shadow: 0 2px 12px rgba(0,0,0,0.12);" />
-  <img src="/screenshots/pl/tree-zoomed-out.png" alt="Widok drzewa — przodkowie" style="max-height: 420px; border-radius: 12px; box-shadow: 0 2px 12px rgba(0,0,0,0.12);" />
+  <img src="/screenshots/pl/tree-rooted-at-ancestor.png" alt="Drzewo z perspektywy pradziadka — cała rodzina" style="max-height: 420px; border-radius: 12px; box-shadow: 0 2px 12px rgba(0,0,0,0.12);" />
 </div>
 
 ## Zarządzanie osobami

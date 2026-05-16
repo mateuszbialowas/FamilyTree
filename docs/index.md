@@ -8,8 +8,8 @@ hero:
   text: Your roots. Your story.
   tagline: An iPhone family tree app — offline, private, one-time purchase. Unlimited generations, no cloud, no subscription.
   image:
-    src: /screenshots/hero.png
-    alt: Family Tree app screenshots
+    src: /screenshots/en/tree.png
+    alt: Family Tree app — your roots, your story
   actions:
     - theme: brand
       text: Download on App Store

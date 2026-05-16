@@ -8,8 +8,8 @@ hero:
   text: Din familiehistorie, smukt bevaret
   tagline: Indfang dine rødder, fejr din arv, og giv din historie videre til næste generation.
   image:
-    src: /screenshots/hero.png
-    alt: Stamtræ app-skærmbilleder
+    src: /screenshots/da/tree.png
+    alt: Stamtræ-app — Dine rødder, din historie
   actions:
     - theme: brand
       text: Hent i App Store

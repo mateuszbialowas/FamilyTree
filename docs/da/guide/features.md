@@ -10,7 +10,7 @@ Trævisningen renderer et organisk, håndtegnet stamtræ med `@shopify/react-nat
 
 <div style="display: flex; gap: 16px; justify-content: center; flex-wrap: wrap; margin: 24px 0;">
   <img src="/screenshots/da/tree.png" alt="Trævisning — efterkommere" style="max-height: 420px; border-radius: 12px; box-shadow: 0 2px 12px rgba(0,0,0,0.12);" />
-  <img src="/screenshots/da/tree-zoomed-out.png" alt="Trævisning — forfædre" style="max-height: 420px; border-radius: 12px; box-shadow: 0 2px 12px rgba(0,0,0,0.12);" />
+  <img src="/screenshots/da/tree-rooted-at-ancestor.png" alt="Stamtræ fra oldefar — hele familien" style="max-height: 420px; border-radius: 12px; box-shadow: 0 2px 12px rgba(0,0,0,0.12);" />
 </div>
 
 ## Personhåndtering
