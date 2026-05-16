@@ -2,7 +2,7 @@
   "expo": {
     "name": "Family Tree",
     "slug": "family-tree",
-    "version": "1.1.0",
+    "version": "1.1.1",
     "scheme": "family-tree",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
@@ -42,6 +42,6 @@
       "eas": {
         "projectId": "fa7d8a97-29fa-46f9-a3da-69a3549740d6"
       }
-    }
+        }
   }
 }
