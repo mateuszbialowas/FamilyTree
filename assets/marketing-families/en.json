@@ -1,0 +1,211 @@
+{
+  "people": [
+    {
+      "id": "p-me",
+      "firstName": "Michael",
+      "lastName": "Smith",
+      "gender": "male",
+      "birthDate": "1989-07-19",
+      "deathDate": null,
+      "notes": "Software engineer from Manchester. Keen on genealogy and photography."
+    },
+    {
+      "id": "p-sibling",
+      "firstName": "Emma",
+      "lastName": "Smith",
+      "gender": "female",
+      "birthDate": "1992-11-30",
+      "deathDate": null,
+      "notes": "Graphic designer. Lives in Bristol."
+    },
+    {
+      "id": "p-parent-f",
+      "firstName": "Robert",
+      "lastName": "Smith",
+      "gender": "male",
+      "birthDate": "1958-04-02",
+      "deathDate": null,
+      "notes": "Civil engineer, worked on the M62 motorway extension."
+    },
+    {
+      "id": "p-parent-m",
+      "firstName": "Elizabeth",
+      "lastName": "Smith",
+      "gender": "female",
+      "birthDate": "1962-09-14",
+      "deathDate": null,
+      "notes": "Née Wilson. English teacher."
+    },
+    {
+      "id": "p-g-p-h",
+      "firstName": "William",
+      "lastName": "Smith",
+      "gender": "male",
+      "birthDate": "1927-06-10",
+      "deathDate": "2010-02-25",
+      "notes": "Accountant, lived all his life in Manchester. Loved chess."
+    },
+    {
+      "id": "p-g-p-w",
+      "firstName": "Margaret",
+      "lastName": "Smith",
+      "gender": "female",
+      "birthDate": "1930-10-03",
+      "deathDate": "2015-07-19",
+      "notes": "Née Brown. Nurse at Manchester Royal Infirmary."
+    },
+    {
+      "id": "p-g-m-h",
+      "firstName": "George",
+      "lastName": "Wilson",
+      "gender": "male",
+      "birthDate": "1932-12-15",
+      "deathDate": "2018-05-08",
+      "notes": "Electrician. Moved from London to Birmingham in the 1950s."
+    },
+    {
+      "id": "p-g-m-w",
+      "firstName": "Mary",
+      "lastName": "Wilson",
+      "gender": "female",
+      "birthDate": "1940-08-27",
+      "deathDate": null,
+      "notes": "Née Taylor. Maths teacher. Still alive, lives in Birmingham."
+    },
+    {
+      "id": "p-gp-pp-h",
+      "firstName": "Henry",
+      "lastName": "Smith",
+      "gender": "male",
+      "birthDate": "1898-03-14",
+      "deathDate": "1968-11-02",
+      "notes": "Railway worker on the Manchester-Liverpool line. WWI veteran."
+    },
+    {
+      "id": "p-gp-pp-w",
+      "firstName": "Elsie",
+      "lastName": "Smith",
+      "gender": "female",
+      "birthDate": "1902-07-22",
+      "deathDate": "1975-04-18",
+      "notes": "Née Carter. Seamstress."
+    },
+    {
+      "id": "p-gp-mm-h",
+      "firstName": "Frederick",
+      "lastName": "Taylor",
+      "gender": "male",
+      "birthDate": "1899-02-06",
+      "deathDate": "1969-09-15",
+      "notes": "Postman in Leeds."
+    },
+    {
+      "id": "p-gp-mm-w",
+      "firstName": "Beatrice",
+      "lastName": "Taylor",
+      "gender": "female",
+      "birthDate": "1908-04-21",
+      "deathDate": "1985-01-08",
+      "notes": "Née Green. Village schoolteacher."
+    }
+  ],
+  "parentChildRelationships": [
+    {
+      "id": "r-01",
+      "parentId": "p-gp-pp-h",
+      "childId": "p-g-p-h"
+    },
+    {
+      "id": "r-02",
+      "parentId": "p-gp-pp-w",
+      "childId": "p-g-p-h"
+    },
+    {
+      "id": "r-03",
+      "parentId": "p-gp-mm-h",
+      "childId": "p-g-m-w"
+    },
+    {
+      "id": "r-04",
+      "parentId": "p-gp-mm-w",
+      "childId": "p-g-m-w"
+    },
+    {
+      "id": "r-05",
+      "parentId": "p-g-p-h",
+      "childId": "p-parent-f"
+    },
+    {
+      "id": "r-06",
+      "parentId": "p-g-p-w",
+      "childId": "p-parent-f"
+    },
+    {
+      "id": "r-07",
+      "parentId": "p-g-m-h",
+      "childId": "p-parent-m"
+    },
+    {
+      "id": "r-08",
+      "parentId": "p-g-m-w",
+      "childId": "p-parent-m"
+    },
+    {
+      "id": "r-09",
+      "parentId": "p-parent-f",
+      "childId": "p-me"
+    },
+    {
+      "id": "r-10",
+      "parentId": "p-parent-m",
+      "childId": "p-me"
+    },
+    {
+      "id": "r-11",
+      "parentId": "p-parent-f",
+      "childId": "p-sibling"
+    },
+    {
+      "id": "r-12",
+      "parentId": "p-parent-m",
+      "childId": "p-sibling"
+    }
+  ],
+  "marriages": [
+    {
+      "id": "m-01",
+      "spouse1Id": "p-gp-pp-h",
+      "spouse2Id": "p-gp-pp-w",
+      "marriageDate": "1923-05-12",
+      "divorceDate": null
+    },
+    {
+      "id": "m-02",
+      "spouse1Id": "p-gp-mm-h",
+      "spouse2Id": "p-gp-mm-w",
+      "marriageDate": "1928-08-17",
+      "divorceDate": null
+    },
+    {
+      "id": "m-03",
+      "spouse1Id": "p-g-p-h",
+      "spouse2Id": "p-g-p-w",
+      "marriageDate": "1952-04-26",
+      "divorceDate": null
+    },
+    {
+      "id": "m-04",
+      "spouse1Id": "p-g-m-h",
+      "spouse2Id": "p-g-m-w",
+      "marriageDate": "1959-07-11",
+      "divorceDate": null
+    },
+    {
+      "id": "m-05",
+      "spouse1Id": "p-parent-f",
+      "spouse2Id": "p-parent-m",
+      "marriageDate": "1985-06-22",
+      "divorceDate": null
+    }
+  ]
+}

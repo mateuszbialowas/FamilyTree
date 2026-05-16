@@ -88,7 +88,7 @@ export function AnimatedSplash({ onFinish }: Props) {
   }));
 
   return (
-    <Animated.View style={[styles.container, containerStyle]}>
+    <Animated.View testID="splash-overlay" style={[styles.container, containerStyle]}>
       <View style={styles.logoWrapper}>
         <Svg width={220} height={220} viewBox="1110 369 1779 1762">
           <G>

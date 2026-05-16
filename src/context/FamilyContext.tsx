@@ -10,7 +10,12 @@ import {
 import i18n from 'i18next';
 import { setLocale, SUPPORTED_LOCALE_CODES, type Locale } from '../i18n';
 import { getSampleFamily } from '../utils/sampleFamilies';
-import { setInitialTreeZoom } from '../utils/screenshotMode';
+import { getMarketingFamily } from '../utils/marketingFamilies';
+import {
+  setInitialTreeZoom,
+  setInitialTreeRootName,
+  setInitialTreeRootId,
+} from '../utils/screenshotMode';
 
 export type { HistoryEntry } from './familyReducers';
 
@@ -56,17 +61,29 @@ export function FamilyProvider({ children }: { children: React.ReactNode }) {
   // No-op for unrecognized URLs.
   const applyDeepLink = useCallback(
     (url: string) => {
-      const localeMatch = url.match(/load-sample\/([a-z]{2})/i);
-      if (!localeMatch) return;
-      const locale = localeMatch[1] as Locale;
+      const match = url.match(/load-(sample|marketing)\/([a-z]{2})/i);
+      if (!match) return;
+      const kind = match[1] as 'sample' | 'marketing';
+      const locale = match[2] as Locale;
       if (!SUPPORTED_LOCALE_CODES.includes(locale)) return;
       const zoomMatch = url.match(/[?&]zoom=([0-9.]+)/);
       if (zoomMatch) {
         const z = parseFloat(zoomMatch[1]);
         if (Number.isFinite(z) && z > 0) setInitialTreeZoom(z);
       }
+      const rootIdMatch = url.match(/[?&]rootId=([^&]+)/);
+      if (rootIdMatch) {
+        setInitialTreeRootId(decodeURIComponent(rootIdMatch[1]));
+      }
+      const rootNameMatch = url.match(/[?&]rootName=([^&]+)/);
+      if (rootNameMatch) {
+        setInitialTreeRootName(decodeURIComponent(rootNameMatch[1]));
+      }
       setLocale(locale);
-      dispatch({ type: 'IMPORT_DATA', payload: getSampleFamily(locale) });
+      const payload = kind === 'marketing'
+        ? getMarketingFamily(locale)
+        : getSampleFamily(locale);
+      dispatch({ type: 'IMPORT_DATA', payload });
     },
     [dispatch],
   );
@@ -94,7 +111,13 @@ export function FamilyProvider({ children }: { children: React.ReactNode }) {
     })();
   }, [applyDeepLink]);
 
-  // Deep-link handler: family-tree://load-sample/<locale>[?zoom=<n>]
+  // Deep-link handler. Query params (all optional, can combine):
+  //   ?zoom=<float>        — initial canvas zoom (e.g. 0.55 to fit more)
+  //   ?rootId=<urlencoded> — exact person id (preferred for automation)
+  //   ?rootName=<urlencoded> — "FirstName LastName" (locale-specific)
+  // Routes:
+  //   family-tree://load-sample/<locale>
+  //   family-tree://load-marketing/<locale>
   // Used by the Maestro screenshot flow; the same import is also
   // available to users via Settings → Load sample family. URLs that
   // arrive before loadData() finishes are queued and applied after.

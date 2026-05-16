@@ -1,0 +1,22 @@
+{
+  "tree": {
+    "headline": "Dine røtter.\nDin historie.",
+    "subline": "Ubegrenset antall generasjoner"
+  },
+  "list": {
+    "headline": "Hvert navn. Hver dato.\nBevart for alltid.",
+    "subline": "Hele familien alfabetisk"
+  },
+  "person-detail": {
+    "headline": "Bak hvert navn —\nen hel historie",
+    "subline": "Datoer, steder, anekdoter"
+  },
+  "tree-rooted-at-ancestor": {
+    "headline": "Fra ett par —\nhele din familie",
+    "subline": "Sett en hvilken som helst forfar som rot"
+  },
+  "settings": {
+    "headline": "Din historie.\nKun på din iPhone.",
+    "subline": "Ingen konto, sky eller abonnement"
+  }
+}

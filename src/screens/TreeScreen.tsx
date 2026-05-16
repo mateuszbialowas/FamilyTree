@@ -1,4 +1,4 @@
-import React, { useState, useCallback } from 'react';
+import React, { useState, useCallback, useEffect } from 'react';
 import {
   View, Text, TouchableOpacity, Modal, FlatList, Alert, StyleSheet, Pressable,
 } from 'react-native';
@@ -6,6 +6,10 @@ import { useNavigation } from '@react-navigation/native';
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { useFamily } from '../context/FamilyContext';
+import {
+  consumeInitialTreeRootId,
+  consumeInitialTreeRootName,
+} from '../utils/screenshotMode';
 import { FamilyTreeCanvas } from '../components/tree/FamilyTreeCanvas';
 import { EmptyState } from '../components/ui/EmptyState';
 import { useTranslation } from 'react-i18next';
@@ -19,6 +23,23 @@ export function TreeScreen() {
   const navigation = useNavigation<NativeStackNavigationProp<any>>();
   const [rootId, setRootId] = useState<string | null>(null);
   const [pickerVisible, setPickerVisible] = useState(false);
+
+  useEffect(() => {
+    // rootId is consumed first (locale-independent). Fall back to
+    // rootName for human-readable deep links.
+    const pendingId = consumeInitialTreeRootId();
+    if (pendingId && state.people.some(p => p.id === pendingId)) {
+      setRootId(pendingId);
+      return;
+    }
+    const pendingName = consumeInitialTreeRootName();
+    if (!pendingName) return;
+    const target = pendingName.toLowerCase();
+    const match = state.people.find(p =>
+      `${p.firstName} ${p.lastName}`.toLowerCase() === target,
+    );
+    if (match) setRootId(match.id);
+  }, [state.people]);
 
   const effectiveRootId = rootId && state.people.some(p => p.id === rootId)
     ? rootId
@@ -75,7 +96,7 @@ export function TreeScreen() {
   return (
     <View style={styles.container}>
       {/* Root person selector */}
-      <TouchableOpacity style={styles.selectorBar} onPress={() => setPickerVisible(true)}>
+      <TouchableOpacity style={styles.selectorBar} onPress={() => setPickerVisible(true)} testID="tree-root-selector">
         <Text style={styles.selectorLabel}>{t('tree.rootLabel')}</Text>
         <Text style={styles.selectorName} numberOfLines={1}>
           {rootPerson ? `${rootPerson.firstName} ${rootPerson.lastName}` : '—'}

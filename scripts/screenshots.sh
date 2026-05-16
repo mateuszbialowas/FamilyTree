@@ -1,14 +1,25 @@
 #!/usr/bin/env bash
-# Capture localized App Store screenshots for all 8 supported locales.
+# Capture localized App Store screenshots for all 7 supported locales.
 #
-# Usage: ./scripts/screenshots.sh [pl en de he nl no sv da]
+# Usage: ./scripts/screenshots.sh [pl en de nl no sv da]
 #
 # Prereqs:
 #   - iOS Simulator booted with the FamilyTree app installed
+#     IMPORTANT: install a RELEASE build, not the default dev build.
+#     The dev build shows a blue "Refreshing..." bridge indicator on
+#     top of the screen after every `simctl openurl` (the Maestro flow
+#     uses deep links for navigation), polluting the screenshots.
+#       npx expo run:ios --configuration Release --device "iPhone 16 Pro Max"
 #   - Maestro CLI on PATH (maestro --version)
 #   - The app's bundle id matches com.mateuszbialowas.FamilyTree
 #
-# Output: appstore-screenshots/<locale>/{settings,list,person-detail,tree}.png
+# Output: appstore-screenshots/<locale>/{settings,list,person-detail,tree,...}.png
+#
+# Architecture note: the Maestro flow at .maestro/screenshots.yaml is
+# fully id-based (testID literals like "tab-tree"). The only
+# navigation variable that varies per run is APP_LOCALE, which decides
+# which marketing-family JSON to import. Tab labels, marker texts,
+# person names — none of that needs per-locale env vars anymore.
 
 # Per-locale failures shouldn't abort the whole run, so no `-e`.
 set -uo pipefail
@@ -18,29 +29,16 @@ ROOT="$(pwd)"
 
 LOCALES=("$@")
 if [ ${#LOCALES[@]} -eq 0 ]; then
-  LOCALES=(pl en de he nl no sv da)
+  LOCALES=(pl en de nl no sv da)
 fi
 
 OUT_ROOT="$ROOT/appstore-screenshots"
 mkdir -p "$OUT_ROOT"
 
-# Per-locale label overrides used by .maestro/screenshots.yaml.
-# Match the strings in src/i18n/<lang>.ts: nav.tab*, settings.importJson, settings.importConfirmCta.
-declare -A TAB_TREE=(
-  [pl]="Drzewo"      [en]="Tree"     [de]="Baum"   [he]="אילן"
-  [nl]="Boom"        [no]="Tre"      [sv]="Träd"   [da]="Træ"
-)
-declare -A TAB_LIST=(
-  [pl]="Lista"       [en]="List"     [de]="Liste"  [he]="רשימה"
-  [nl]="Lijst"       [no]="Liste"    [sv]="Lista"  [da]="Liste"
-)
-declare -A TAB_SETTINGS=(
-  [pl]="Ustawienia"  [en]="Settings"      [de]="Einstellungen"  [he]="הגדרות"
-  [nl]="Instellingen" [no]="Innstillinger" [sv]="Inställningar" [da]="Indstillinger"
-)
+# Used only for the per-locale "===" log header. Adds nothing to the flow.
 declare -A LANG_LABEL=(
   [pl]="Polski"  [en]="English"     [de]="Deutsch"
-  [he]="עברית"   [nl]="Nederlands"  [no]="Norsk"
+  [nl]="Nederlands"  [no]="Norsk"
   [sv]="Svenska" [da]="Dansk"
 )
 
@@ -51,18 +49,9 @@ for L in "${LOCALES[@]}"; do
   echo
   echo "=== $L (${LANG_LABEL[$L]}) ==="
 
-  # Run the Maestro flow with locale-specific env. The flow uses the
-  # family-tree://load-sample/<locale> deep link (see FamilyContext.tsx)
-  # which switches the language and loads the bundled sample family —
-  # no file picker, no simctl push.
   # Note: the env var is APP_LOCALE, NOT LANG — LANG is a POSIX shell var
   # (locale, e.g. en_US.UTF-8) and would shadow the Maestro -e override.
-  if maestro test \
-    -e APP_LOCALE="$L" \
-    -e TAB_TREE="${TAB_TREE[$L]}" \
-    -e TAB_LIST="${TAB_LIST[$L]}" \
-    -e TAB_SETTINGS="${TAB_SETTINGS[$L]}" \
-    .maestro/screenshots.yaml; then
+  if maestro test -e APP_LOCALE="$L" .maestro/screenshots.yaml; then
     : # success — fall through to copy screenshots
   else
     echo "FAIL: maestro flow exited non-zero for $L; continuing" >&2
@@ -96,6 +85,11 @@ if [ ${#SUCCEEDED[@]} -gt 0 ]; then
   echo "Framing screenshots..."
   node "$ROOT/scripts/frame-screenshots.mjs" "${SUCCEEDED[@]}" || \
     echo "WARN: framing step failed (raw screenshots are still in $OUT_ROOT)" >&2
+
+  echo
+  echo "Composing App Store marketing images (1290 × 2796)..."
+  node "$ROOT/scripts/marketing-screenshots.mjs" "${SUCCEEDED[@]}" || \
+    echo "WARN: marketing-compose step failed (framed shots are still in $OUT_ROOT/<locale>/framed)" >&2
 fi
 
 [ ${#FAILED[@]} -eq 0 ] || exit 1

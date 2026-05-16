@@ -1,6 +1,6 @@
 {
   "expo": {
-    "name": "Drzewo genealogiczne",
+    "name": "Family Tree",
     "slug": "family-tree",
     "version": "1.1.0",
     "scheme": "family-tree",
@@ -12,6 +12,15 @@
       "image": "./assets/splash-icon.png",
       "resizeMode": "contain",
       "backgroundColor": "#FDF5E6"
+    },
+    "locales": {
+      "pl": "./assets/info-plist-strings/pl.json",
+      "en": "./assets/info-plist-strings/en.json",
+      "de": "./assets/info-plist-strings/de.json",
+      "nl": "./assets/info-plist-strings/nl.json",
+      "no": "./assets/info-plist-strings/no.json",
+      "sv": "./assets/info-plist-strings/sv.json",
+      "da": "./assets/info-plist-strings/da.json"
     },
     "ios": {
       "supportsTablet": true,
@@ -25,7 +34,8 @@
     },
     "plugins": [
       "expo-font",
-      "@react-native-community/datetimepicker"
+      "@react-native-community/datetimepicker",
+      "expo-localization"
     ],
     "owner": "mateuszbialowas",
     "extra": {

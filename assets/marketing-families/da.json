@@ -1,0 +1,211 @@
+{
+  "people": [
+    {
+      "id": "p-me",
+      "firstName": "Mads",
+      "lastName": "Jensen",
+      "gender": "male",
+      "birthDate": "1989-07-19",
+      "deathDate": null,
+      "notes": "Softwareudvikler fra Aarhus. Interesseret i slægtsforskning og fotografering."
+    },
+    {
+      "id": "p-sibling",
+      "firstName": "Freja",
+      "lastName": "Jensen",
+      "gender": "female",
+      "birthDate": "1992-11-30",
+      "deathDate": null,
+      "notes": "Grafisk designer. Bor i København."
+    },
+    {
+      "id": "p-parent-f",
+      "firstName": "Søren",
+      "lastName": "Jensen",
+      "gender": "male",
+      "birthDate": "1958-04-02",
+      "deathDate": null,
+      "notes": "Bygningsingeniør, arbejdede på udvidelsen af motorvejen ved Aarhus."
+    },
+    {
+      "id": "p-parent-m",
+      "firstName": "Lise",
+      "lastName": "Jensen",
+      "gender": "female",
+      "birthDate": "1962-09-14",
+      "deathDate": null,
+      "notes": "Født Nielsen. Dansklærer."
+    },
+    {
+      "id": "p-g-p-h",
+      "firstName": "Henrik",
+      "lastName": "Jensen",
+      "gender": "male",
+      "birthDate": "1927-06-10",
+      "deathDate": "2010-02-25",
+      "notes": "Revisor, boede hele sit liv i Aarhus. Glad for skak."
+    },
+    {
+      "id": "p-g-p-w",
+      "firstName": "Kirsten",
+      "lastName": "Jensen",
+      "gender": "female",
+      "birthDate": "1930-10-03",
+      "deathDate": "2015-07-19",
+      "notes": "Født Nielsen. Sygeplejerske på Aarhus Universitetshospital."
+    },
+    {
+      "id": "p-g-m-h",
+      "firstName": "Niels",
+      "lastName": "Hansen",
+      "gender": "male",
+      "birthDate": "1932-12-15",
+      "deathDate": "2018-05-08",
+      "notes": "Elektriker. Flyttede fra København til Odense i 50’erne."
+    },
+    {
+      "id": "p-g-m-w",
+      "firstName": "Anne",
+      "lastName": "Hansen",
+      "gender": "female",
+      "birthDate": "1940-08-27",
+      "deathDate": null,
+      "notes": "Født Pedersen. Matematiklærer. Lever endnu, bor i Odense."
+    },
+    {
+      "id": "p-gp-pp-h",
+      "firstName": "Christian",
+      "lastName": "Jensen",
+      "gender": "male",
+      "birthDate": "1898-03-14",
+      "deathDate": "1968-11-02",
+      "notes": "Jernbanearbejder på linjen Aarhus-Aalborg. Veteran fra 1. verdenskrig."
+    },
+    {
+      "id": "p-gp-pp-w",
+      "firstName": "Inger",
+      "lastName": "Jensen",
+      "gender": "female",
+      "birthDate": "1902-07-22",
+      "deathDate": "1975-04-18",
+      "notes": "Født Larsen. Syerske."
+    },
+    {
+      "id": "p-gp-mm-h",
+      "firstName": "Anders",
+      "lastName": "Pedersen",
+      "gender": "male",
+      "birthDate": "1899-02-06",
+      "deathDate": "1969-09-15",
+      "notes": "Postbud i Aalborg."
+    },
+    {
+      "id": "p-gp-mm-w",
+      "firstName": "Margrethe",
+      "lastName": "Pedersen",
+      "gender": "female",
+      "birthDate": "1908-04-21",
+      "deathDate": "1985-01-08",
+      "notes": "Født Mortensen. Landsbyskolelærer."
+    }
+  ],
+  "parentChildRelationships": [
+    {
+      "id": "r-01",
+      "parentId": "p-gp-pp-h",
+      "childId": "p-g-p-h"
+    },
+    {
+      "id": "r-02",
+      "parentId": "p-gp-pp-w",
+      "childId": "p-g-p-h"
+    },
+    {
+      "id": "r-03",
+      "parentId": "p-gp-mm-h",
+      "childId": "p-g-m-w"
+    },
+    {
+      "id": "r-04",
+      "parentId": "p-gp-mm-w",
+      "childId": "p-g-m-w"
+    },
+    {
+      "id": "r-05",
+      "parentId": "p-g-p-h",
+      "childId": "p-parent-f"
+    },
+    {
+      "id": "r-06",
+      "parentId": "p-g-p-w",
+      "childId": "p-parent-f"
+    },
+    {
+      "id": "r-07",
+      "parentId": "p-g-m-h",
+      "childId": "p-parent-m"
+    },
+    {
+      "id": "r-08",
+      "parentId": "p-g-m-w",
+      "childId": "p-parent-m"
+    },
+    {
+      "id": "r-09",
+      "parentId": "p-parent-f",
+      "childId": "p-me"
+    },
+    {
+      "id": "r-10",
+      "parentId": "p-parent-m",
+      "childId": "p-me"
+    },
+    {
+      "id": "r-11",
+      "parentId": "p-parent-f",
+      "childId": "p-sibling"
+    },
+    {
+      "id": "r-12",
+      "parentId": "p-parent-m",
+      "childId": "p-sibling"
+    }
+  ],
+  "marriages": [
+    {
+      "id": "m-01",
+      "spouse1Id": "p-gp-pp-h",
+      "spouse2Id": "p-gp-pp-w",
+      "marriageDate": "1923-05-12",
+      "divorceDate": null
+    },
+    {
+      "id": "m-02",
+      "spouse1Id": "p-gp-mm-h",
+      "spouse2Id": "p-gp-mm-w",
+      "marriageDate": "1928-08-17",
+      "divorceDate": null
+    },
+    {
+      "id": "m-03",
+      "spouse1Id": "p-g-p-h",
+      "spouse2Id": "p-g-p-w",
+      "marriageDate": "1952-04-26",
+      "divorceDate": null
+    },
+    {
+      "id": "m-04",
+      "spouse1Id": "p-g-m-h",
+      "spouse2Id": "p-g-m-w",
+      "marriageDate": "1959-07-11",
+      "divorceDate": null
+    },
+    {
+      "id": "m-05",
+      "spouse1Id": "p-parent-f",
+      "spouse2Id": "p-parent-m",
+      "marriageDate": "1985-06-22",
+      "divorceDate": null
+    }
+  ]
+}

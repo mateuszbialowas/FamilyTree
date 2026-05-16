@@ -1,0 +1,22 @@
+{
+  "tree": {
+    "headline": "Twoje korzenie.\nTwoja historia.",
+    "subline": "Bez limitu pokoleń"
+  },
+  "list": {
+    "headline": "Każde imię. Każda data.\nZapisane na zawsze.",
+    "subline": "Cała rodzina alfabetycznie"
+  },
+  "person-detail": {
+    "headline": "Za każdym imieniem —\ncała opowieść",
+    "subline": "Daty, miejsca, anegdoty"
+  },
+  "tree-rooted-at-ancestor": {
+    "headline": "Z jednej pary —\ncała Twoja rodzina",
+    "subline": "Wybierz dowolnego przodka jako korzeń"
+  },
+  "settings": {
+    "headline": "Twoja historia.\nTylko na Twoim iPhonie.",
+    "subline": "Bez konta, chmury, subskrypcji"
+  }
+}

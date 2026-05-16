@@ -1,0 +1,22 @@
+{
+  "tree": {
+    "headline": "Jouw wortels.\nJouw verhaal.",
+    "subline": "Onbeperkt aantal generaties"
+  },
+  "list": {
+    "headline": "Elke naam. Elke datum.\nVoor altijd bewaard.",
+    "subline": "Je hele familie alfabetisch"
+  },
+  "person-detail": {
+    "headline": "Achter elke naam —\neen heel verhaal",
+    "subline": "Data, plaatsen, anekdotes"
+  },
+  "tree-rooted-at-ancestor": {
+    "headline": "Uit één paar —\nje hele familie",
+    "subline": "Stel elke voorouder in als wortel"
+  },
+  "settings": {
+    "headline": "Jouw verhaal.\nAlleen op je iPhone.",
+    "subline": "Geen account, cloud of abonnement"
+  }
+}

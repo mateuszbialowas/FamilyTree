@@ -4,72 +4,134 @@ name: Capture localized screenshots
 # Maestro 2.2.0 lets YAML `env:` defaults win over `-e` overrides, which is
 # why this block is intentionally absent.
 ---
-# Driven by scripts/screenshots.sh — overrides env per locale.
-# Uses the family-tree://load-sample/<locale>[?zoom=<n>] deep link
-# (handled in FamilyContext.tsx) to set language + import the bundled
-# sample family. The ?zoom= variant primes the tree's initial centering
-# so we can capture a zoomed-out variant without needing a real pinch.
+# Driven by scripts/screenshots.sh — APP_LOCALE is the only navigation
+# variable; every UI element is targeted by testID (defined in
+# src/testIDs.ts), so this flow is locale-independent.
+#
+# Tab navigation uses `family-tree://navigate/<screen>` deep links
+# instead of tapping the tab bar buttons directly (Maestro CLI bug
+# #2448 — `tapOn` on React Navigation tab buttons reports success but
+# doesn't trigger onPress on iOS).
+#
+# Timing strategy:
+#   - After `launchApp`: wait for `splash-overlay` to disappear, then
+#     for `tab-tree` to be visible. The splash is an absolute overlay
+#     on top of the navigation tree, so tab elements exist in the
+#     hierarchy from the start — without the splash gate, the very
+#     first screenshot captures the splash.
+#   - After each navigate/X deep link: `extendedWaitUntil` on a screen-
+#     specific testID confirms the transition before screenshotting.
+#   - After swipes: `waitForAnimationToEnd: timeout: 600` is enough —
+#     the tree canvas runs continuous decorative animations (owl blink,
+#     branch sway), so a longer wait would always burn the full
+#     timeout for no benefit.
 
 - launchApp:
     clearState: true
     clearKeychain: true
 
-- extendedWaitUntil:
-    visible: ".*tab.*"
-    timeout: 10000
+# Sleep idiom for Maestro 2.2.0 (no native `sleep` command):
+# tiny swipe in the status bar area where nothing is tappable.
+# CRITICAL: do NOT place this in the middle of the screen — Maestro
+# treats a near-zero-distance swipe as a long-press, and on screens
+# with interactive content (e.g. Settings buttons) it fires onPress,
+# launching the iOS Document Picker or similar.
+- swipe:
+    start: 50%, 3%
+    end: 50%, 4%
+    duration: 3000
 
-# Set locale + import the bundled sample family for this locale
-- openLink: "family-tree://load-sample/${APP_LOCALE}"
-- waitForAnimationToEnd
+- extendedWaitUntil:
+    visible:
+      id: "fab-add-person"
+    timeout: 5000
+
+# Import the marketing family with "me" as the tree root. The tree
+# root selector text is the cleanest signal that the import dispatched
+# AND the Tree screen re-rendered with the new data.
+- openLink: "family-tree://load-marketing/${APP_LOCALE}?rootId=p-me"
+- extendedWaitUntil:
+    visible:
+      id: "tree-root-selector"
+    timeout: 5000
 
 # Settings
-- tapOn: "${TAB_SETTINGS}, tab.*"
-- waitForAnimationToEnd
+- openLink: "family-tree://navigate/settings"
+- extendedWaitUntil:
+    visible:
+      id: "btn-language-picker"
+    timeout: 5000
+# Sleep (see top-of-file note) — clears the "Refreshing..." banner.
+- swipe:
+    start: 50%, 3%
+    end: 50%, 4%
+    duration: 2000
 - takeScreenshot: "screenshots/${APP_LOCALE}/settings"
 
 # People list
-- tapOn: "${TAB_LIST}, tab.*"
-- waitForAnimationToEnd
+- openLink: "family-tree://navigate/list"
+- extendedWaitUntil:
+    visible:
+      id: "people-list"
+    timeout: 5000
+- swipe:
+    start: 50%, 3%
+    end: 50%, 4%
+    duration: 2000
 - takeScreenshot: "screenshots/${APP_LOCALE}/list"
 
-# First person → person detail
+# Person detail — tap the "me" person row by id, no name lookup needed.
 - tapOn:
-    index: 0
-    text: ".*"
-- waitForAnimationToEnd
+    id: "person-item-p-me"
+- waitForAnimationToEnd:
+    timeout: 1200
 - takeScreenshot: "screenshots/${APP_LOCALE}/person-detail"
 - back
 
-# Tree (default centered, scale 1)
-- tapOn: "${TAB_TREE}, tab.*"
-- waitForAnimationToEnd
+# Tree (rooted at "me" — full pedigree fanning upward). Modest downward
+# pan to move Me toward the bottom; a small rightward nudge balances
+# the canvas, which renders slightly left-of-center for this root.
+- openLink: "family-tree://navigate/tree"
+- extendedWaitUntil:
+    visible:
+      id: "tree-root-selector"
+    timeout: 5000
+- swipe:
+    start: 50%, 3%
+    end: 50%, 4%
+    duration: 2000
+- swipe:
+    start: 50%, 35%
+    end: 50%, 60%
+    duration: 600
+- waitForAnimationToEnd:
+    timeout: 600
+- swipe:
+    start: 45%, 50%
+    end: 53%, 50%
+    duration: 400
+- waitForAnimationToEnd:
+    timeout: 600
 - takeScreenshot: "screenshots/${APP_LOCALE}/tree"
 
-# Tree scrolled — small pan up so the empty area at the top shrinks
-# without hiding the root generation.
-- swipe:
-    start: 50%, 65%
-    end: 50%, 50%
-    duration: 600
-- waitForAnimationToEnd
-- takeScreenshot: "screenshots/${APP_LOCALE}/tree-scrolled"
-
-# Tree zoomed out — relaunch with ?zoom=0.55 so the canvas fits more nodes.
-# Maestro can't pinch, so we re-import via the deep link with a zoom override.
-- launchApp:
-    clearState: true
-    clearKeychain: true
+# Tree rooted at a great-grandfather — inverted pyramid showing the
+# whole family that grew from one root. Re-imports with the ancestor
+# id; small swipe UP lifts him slightly so descendants fill below
+# without overshooting and creating empty space at the bottom.
+- openLink: "family-tree://load-marketing/${APP_LOCALE}?rootId=p-gp-pp-h"
 - extendedWaitUntil:
-    visible: ".*tab.*"
-    timeout: 10000
-- openLink: "family-tree://load-sample/${APP_LOCALE}?zoom=0.55"
-- waitForAnimationToEnd
-- tapOn: "${TAB_TREE}, tab.*"
-- waitForAnimationToEnd
-# Nudge the camera down so the lower generations come into view.
+    visible:
+      id: "tree-root-selector"
+    timeout: 5000
+- openLink: "family-tree://navigate/tree"
 - swipe:
-    start: 50%, 60%
-    end: 50%, 45%
+    start: 50%, 3%
+    end: 50%, 4%
+    duration: 2000
+- swipe:
+    start: 50%, 55%
+    end: 50%, 42%
     duration: 600
-- waitForAnimationToEnd
-- takeScreenshot: "screenshots/${APP_LOCALE}/tree-zoomed-out"
+- waitForAnimationToEnd:
+    timeout: 600
+- takeScreenshot: "screenshots/${APP_LOCALE}/tree-rooted-at-ancestor"

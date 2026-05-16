@@ -1,0 +1,22 @@
+{
+  "tree": {
+    "headline": "Your roots.\nYour story.",
+    "subline": "Unlimited generations"
+  },
+  "list": {
+    "headline": "Every name. Every date.\nKept forever.",
+    "subline": "Your whole family, alphabetical"
+  },
+  "person-detail": {
+    "headline": "Behind every name —\na full story",
+    "subline": "Dates, places, anecdotes"
+  },
+  "tree-rooted-at-ancestor": {
+    "headline": "From one couple —\nyour whole family",
+    "subline": "Set any ancestor as the root"
+  },
+  "settings": {
+    "headline": "Your story.\nOnly on your iPhone.",
+    "subline": "No account, cloud, or subscription"
+  }
+}
