@@ -78,6 +78,7 @@ export default defineConfig({
         url: `${SITE}/`,
       }),
       themeConfig: {
+        siteTitle: 'Family Tree',
         nav: [
           { text: 'Guide', link: '/guide/getting-started' },
           { text: 'Pricing', link: '/pricing' },
@@ -114,6 +115,7 @@ export default defineConfig({
         ['meta', { name: 'keywords', content: 'drzewo genealogiczne aplikacja, aplikacja genealogiczna iPhone, drzewo genealogiczne mobilne, drzewo genealogiczne offline, drzewo genealogiczne bez subskrypcji, genealogia, przodkowie, iOS, iPhone' }],
       ],
       themeConfig: {
+        siteTitle: 'Drzewo genealogiczne',
         nav: [
           { text: 'Przewodnik', link: '/pl/guide/getting-started' },
           { text: 'Cennik', link: '/pl/cennik' },
@@ -150,6 +152,7 @@ export default defineConfig({
         ['meta', { name: 'keywords', content: 'Stammbaum App, Genealogie App, Ahnenforschung App, Stammbaum erstellen, Stammbaum offline, Stammbaum ohne Abo, Stammbaum ohne Anmeldung, iPhone, iOS' }],
       ],
       themeConfig: {
+        siteTitle: 'Stammbaum',
         nav: [
           { text: 'Handbuch', link: '/de/guide/getting-started' },
           { text: 'Preis', link: '/de/preis' },
@@ -186,6 +189,7 @@ export default defineConfig({
         ['meta', { name: 'keywords', content: 'stamboom app, genealogie app, stamboom maken, stamboom offline, stamboom zonder abonnement, stamboom zonder account, voorouders, iPhone, iOS' }],
       ],
       themeConfig: {
+        siteTitle: 'Stamboom',
         nav: [
           { text: 'Handleiding', link: '/nl/guide/getting-started' },
           { text: 'Prijs', link: '/nl/prijs' },
@@ -222,6 +226,7 @@ export default defineConfig({
         ['meta', { name: 'keywords', content: 'slektstre app, slektsforskning app, slektstre offline, slektstre uten abonnement, slektstre uten konto, forfedre, familietre, iPhone, iOS' }],
       ],
       themeConfig: {
+        siteTitle: 'Slektstre',
         nav: [
           { text: 'Veiledning', link: '/no/guide/getting-started' },
           { text: 'Pris', link: '/no/pris' },
@@ -258,6 +263,7 @@ export default defineConfig({
         ['meta', { name: 'keywords', content: 'släktträd app, släktforskning app, släktträd offline, släktträd utan prenumeration, släktträd utan konto, förfäder, familjeträd, iPhone, iOS' }],
       ],
       themeConfig: {
+        siteTitle: 'Släktträd',
         nav: [
           { text: 'Guide', link: '/sv/guide/getting-started' },
           { text: 'Pris', link: '/sv/pris' },
@@ -294,6 +300,7 @@ export default defineConfig({
         ['meta', { name: 'keywords', content: 'stamtræ app, slægtsforskning app, stamtræ offline, stamtræ uden abonnement, stamtræ uden konto, forfædre, familietræ, iPhone, iOS' }],
       ],
       themeConfig: {
+        siteTitle: 'Stamtræ',
         nav: [
           { text: 'Vejledning', link: '/da/guide/getting-started' },
           { text: 'Pris', link: '/da/pris' },
