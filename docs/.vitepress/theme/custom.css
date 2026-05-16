@@ -55,13 +55,38 @@
   margin-top: 1.25rem;
 }
 
+/* Hero image — locale-specific iPhone screenshot (1800×3900ish). Keep
+ * it tall on desktop, but capped so it never collides with the nav bar
+ * or overflows the page edge. Soft drop shadow to read as a "device". */
+.VPHero .VPImage {
+  max-height: 540px;
+  width: auto;
+  filter: drop-shadow(0 12px 24px rgba(0, 0, 0, 0.12));
+}
+
+.VPHero .image-bg {
+  width: 360px;
+  height: 360px;
+  border-radius: 50%;
+}
+
+@media (min-width: 640px) {
+  .VPHero .VPImage {
+    max-height: 620px;
+  }
+}
+
 @media (min-width: 960px) {
   .VPHero .text {
     font-size: 4.5rem;
   }
 
-  .VPHero .image-container {
-    transform: scale(2);
-    transform-origin: center center;
+  .VPHero .VPImage {
+    max-height: 680px;
+  }
+
+  .VPHero .image-bg {
+    width: 440px;
+    height: 440px;
   }
 }
