@@ -1,0 +1,95 @@
+appId: com.mateuszbialowas.FamilyTree
+name: Capture localized screenshots (iPad)
+# All env vars must be supplied via `-e KEY=VALUE` from scripts/screenshots-ipad.sh.
+---
+# iPad-only variant of screenshots.yaml.
+#
+# Differences from the iPhone flow:
+#   1. Every `extendedWaitUntil id: ...` is replaced with a sleep-via-swipe.
+#      On iPad / iOS 26 the React Native testIDs aren't reliably propagated
+#      to the iOS accessibility hierarchy (verified via `maestro hierarchy`
+#      — all resource-ids on the list screen were empty), so id-based
+#      visibility checks fail even when the screen renders correctly.
+#   2. The person-detail tap is by coordinate instead of `id: person-item-p-me`.
+#      PersonListItem uses `accessible={false}` to keep child text matchable
+#      on iPhone; that flag combined with the iPad hierarchy issue means
+#      Maestro can't see any row's testID. A coordinate tap into the list
+#      opens *some* row — which person specifically depends on the locale's
+#      alphabetical sort, but every marketing-family entry has full
+#      relationships, so any row yields a valid person-detail screenshot.
+#   3. Only ONE tree screenshot — the ancestor-rooted variant, which fans
+#      the whole family DOWNWARD. The iPad canvas is wide enough to show
+#      the full pedigree in one frame, so the dual tree / tree-rooted-at-
+#      ancestor split used on iPhone is unnecessary here.
+#
+# Tab navigation still uses `family-tree://navigate/<screen>` deep links
+# (Maestro CLI bug #2448 — tapping tabs by id reports success but doesn't
+# trigger onPress on iOS).
+
+- launchApp:
+    clearState: true
+    clearKeychain: true
+
+# Sleep idiom (Maestro 2.2.0 has no native `sleep`): tiny swipe in the
+# status bar area where nothing is tappable. CRITICAL: keep the swipe in
+# the top 5% of the screen — a near-zero swipe in the content area is
+# interpreted as a long-press and can fire onPress on the underlying view.
+- swipe:
+    start: 50%, 3%
+    end: 50%, 4%
+    duration: 3000
+
+# Import the marketing family ONCE — rooted at "me" with iPad-friendly
+# zoom. List / person-detail / settings screens are root-agnostic, so a
+# single load up front is enough. Doing it once also means the zoom
+# override is consumed at the only re-centering that happens (when
+# rootId first transitions from null to p-me).
+- openLink: "family-tree://load-marketing/${APP_LOCALE}?rootId=p-me&zoom=1.3"
+- swipe:
+    start: 50%, 3%
+    end: 50%, 4%
+    duration: 3000
+
+# Settings
+- openLink: "family-tree://navigate/settings"
+- swipe:
+    start: 50%, 3%
+    end: 50%, 4%
+    duration: 2000
+- takeScreenshot: "screenshots/${APP_LOCALE}/settings"
+
+# People list
+- openLink: "family-tree://navigate/list"
+- swipe:
+    start: 50%, 3%
+    end: 50%, 4%
+    duration: 3000
+- takeScreenshot: "screenshots/${APP_LOCALE}/list"
+
+# Person detail — coordinate tap on a row (see note 2 at the top).
+- tapOn:
+    point: "50%, 30%"
+- waitForAnimationToEnd:
+    timeout: 1200
+- takeScreenshot: "screenshots/${APP_LOCALE}/person-detail"
+- back
+
+# Tree — single screenshot rooted at "me" (set at the top of this flow)
+# with zoom from the same deep link. iPad canvas fits the full pedigree
+# (parents → grandparents → great-grandparents fanning upward) in one
+# frame at this zoom.
+- openLink: "family-tree://navigate/tree"
+- swipe:
+    start: 50%, 3%
+    end: 50%, 4%
+    duration: 2000
+# Pan downward — with zoom=1.3 the tree centers higher than its
+# bounding box; nudging the canvas down lifts the visible root into the
+# upper-middle and pulls the empty bottom space up into the frame.
+- swipe:
+    start: 50%, 35%
+    end: 50%, 55%
+    duration: 600
+- waitForAnimationToEnd:
+    timeout: 600
+- takeScreenshot: "screenshots/${APP_LOCALE}/tree"
