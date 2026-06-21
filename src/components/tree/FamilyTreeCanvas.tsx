@@ -182,11 +182,16 @@ export function FamilyTreeCanvas({ state, rootId, onNodePress, onNodeLongPress }
       const boxHeight = Math.max(LABEL_BOX.minHeight, y - LABEL_BOX.rowGap + LABEL_BOX.padBottom);
       return { id: n.id, rows, boxHeight };
     });
-    // Direction of trunk+roots: down if root has parents (ancestors above),
-    // up if root has only descendants below (no parents).
-    const rootHasParents = state.parentChildRelationships.some(r => r.childId === rootId);
+    // Direction of trunk+roots: roots DOWN when there is any family ABOVE the
+    // root (a tree standing in the ground), roots UP (flipped) only when the
+    // root is a progenitor with nothing above it. We test the laid-out
+    // positions rather than just the root's own parents, so ancestors reached
+    // through marriage (in-laws, spouse's grandparents) flip the trunk too.
+    const rootHasAncestors = rootNode
+      ? layout.nodes.some(n => n.y < rootNode.y - 1)
+      : false;
 
-    return { rootNode, branches, couples, extraCouples, animals, labels: nodeLabels, rootHasParents };
+    return { rootNode, branches, couples, extraCouples, animals, labels: nodeLabels, rootHasAncestors };
   }, [layout, rootId, state.parentChildRelationships, state.people]);
 
   // === ANIMATIONS ===
@@ -361,20 +366,20 @@ export function FamilyTreeCanvas({ state, rootId, onNodePress, onNodeLongPress }
 
             {/* TREE BASE — single SVG (trunk + roots) anchored to the selected root person.
                 Direction depends on family structure:
-                  - has parents → growing DOWN (ancestors above, tree base hangs below the root)
-                  - no parents → growing UP (only descendants below, tree base flips above the root)
+                  - ancestors above → growing DOWN (tree base hangs below the root, roots in the ground)
+                  - nothing above (progenitor) → growing UP (tree base flips above the root)
                 Sways gently with the wind around its anchor (where it meets the circle).
                 A soft "ground" shadow is drawn at the far end (only in the down-growing case). */}
             {geo.rootNode && treeTrunkRootsSvg && (() => {
-              const anchorY = geo.rootHasParents
+              const anchorY = geo.rootHasAncestors
                 ? geo.rootNode.y + NODE_R - TRUNK_ROOTS_OVERLAP
                 : geo.rootNode.y - NODE_R + TRUNK_ROOTS_OVERLAP;
-              const flipY = geo.rootHasParents ? 1 : -1;
+              const flipY = geo.rootHasAncestors ? 1 : -1;
               const farY = anchorY + flipY * TRUNK_ROOTS_H;
               return (
                 <>
                   {/* Ground shadow — soft elliptical pool under the root tips. Only when growing down. */}
-                  {geo.rootHasParents && (
+                  {geo.rootHasAncestors && (
                     <Group transform={[
                       { translateX: geo.rootNode.x },
                       { translateY: farY - 6 },

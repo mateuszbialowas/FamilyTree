@@ -297,6 +297,37 @@ describe('computeUnifiedLayout', () => {
     expect(ktos.x).toBeGreaterThan(mateusz.x);
   });
 
+  it('places the spouse\'s ancestors above the root even when the root has no parents', () => {
+    // Root has no parents of his own, but his wife's family (in-laws) is shown.
+    // The trunk-direction logic in FamilyTreeCanvas keys off "is any node above
+    // the root" — so the spouse's ancestors must sit above the root for the
+    // trunk to point roots-down (a tree growing up), not flip up like a
+    // childless progenitor.
+    const state: FamilyState = {
+      people: [
+        person('p-me', 'Mateusz', 'Białowąs', 'male'),
+        person('p-wife', 'Joanna', 'Preiss', 'female'),
+        person('p-fil', 'Marek', 'Preiss', 'male'),
+        person('p-mil', 'Barbara', 'Preiss', 'female'),
+      ],
+      parentChildRelationships: [
+        { id: 'r1', parentId: 'p-fil', childId: 'p-wife' },
+        { id: 'r2', parentId: 'p-mil', childId: 'p-wife' },
+      ],
+      marriages: [
+        { id: 'm1', spouse1Id: 'p-me', spouse2Id: 'p-wife', marriageDate: null, divorceDate: null },
+      ],
+    };
+    const { nodes } = computeUnifiedLayout('p-me', state);
+    const me = nodes.find(n => n.id === 'p-me')!;
+    // The root has no own parents…
+    expect(state.parentChildRelationships.some(r => r.childId === 'p-me')).toBe(false);
+    // …yet the in-laws are laid out above him, so the trunk points roots-down.
+    expect(nodes.some(n => n.y < me.y - 1)).toBe(true);
+    expect(nodes.find(n => n.id === 'p-fil')!.y).toBeLessThan(me.y);
+    expect(nodes.find(n => n.id === 'p-mil')!.y).toBeLessThan(me.y);
+  });
+
   // ─── Core invariants: no overlaps, no crossing branches ──────────────────
   describe('layout invariants (no overlaps, no crossings)', () => {
     // A deliberately gnarly hourglass: 3 generations of ancestors with
