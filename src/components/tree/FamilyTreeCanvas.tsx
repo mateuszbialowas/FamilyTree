@@ -268,7 +268,7 @@ export function FamilyTreeCanvas({ state, rootId, onNodePress, onNodeLongPress }
 
   // === GESTURES ===
   const tx = useSharedValue(0), ty = useSharedValue(0), sc = useSharedValue(1);
-  const stx = useSharedValue(0), sty = useSharedValue(0), ssc = useSharedValue(1);
+  const ssc = useSharedValue(1);
   const fx = useSharedValue(0), fy = useSharedValue(0);
 
   const nodesRef = layout.nodes;
@@ -304,10 +304,15 @@ export function FamilyTreeCanvas({ state, rootId, onNodePress, onNodeLongPress }
   // below (via its moving focal), so pan and pinch never fight over tx/ty —
   // which previously broke focal anchoring and made zoom drift toward a fixed
   // point ("zoomed to centre"), most noticeably on large trees.
+  // Incremental change (changeX/changeY), NOT absolute translation: when a
+  // pinch ends and you lift to one finger, pan activates with a large
+  // accumulated translation — a `stx + translationX` formula would apply it in
+  // one frame → a sudden jump. minDistance also stops a near-stationary
+  // finger-lift from waking the pan (and flinging) at the end of a zoom.
   const pan = Gesture.Pan()
     .maxPointers(1)
-    .onStart(() => { stx.value = tx.value; sty.value = ty.value; })
-    .onUpdate(e => { tx.value = stx.value + e.translationX; ty.value = sty.value + e.translationY; })
+    .minDistance(6)
+    .onChange(e => { tx.value += e.changeX; ty.value += e.changeY; })
     .onEnd(e => { tx.value = withDecay({ velocity: e.velocityX, deceleration: 0.997 }); ty.value = withDecay({ velocity: e.velocityY, deceleration: 0.997 }); });
 
   // Pinch keeps the canvas point under the finger-centre (focal) fixed while
