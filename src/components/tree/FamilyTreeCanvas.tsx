@@ -294,18 +294,29 @@ export function FamilyTreeCanvas({ state, rootId, onNodePress, onNodeLongPress }
     if (hit) onNodeLongPress(hit.id);
   };
 
+  // Single-finger pan only. Two-finger drag is handled by the pinch gesture
+  // below (via its moving focal), so pan and pinch never fight over tx/ty —
+  // which previously broke focal anchoring and made zoom drift toward a fixed
+  // point ("zoomed to centre"), most noticeably on large trees.
   const pan = Gesture.Pan()
+    .maxPointers(1)
     .onStart(() => { stx.value = tx.value; sty.value = ty.value; })
     .onUpdate(e => { tx.value = stx.value + e.translationX; ty.value = sty.value + e.translationY; })
     .onEnd(e => { tx.value = withDecay({ velocity: e.velocityX, deceleration: 0.997 }); ty.value = withDecay({ velocity: e.velocityY, deceleration: 0.997 }); });
 
+  // Pinch keeps the canvas point under the finger-centre (focal) fixed while
+  // scaling. Because the focal moves with the fingers, this also pans with two
+  // fingers. fx/fy hold that anchor point in canvas coordinates.
   const pinch = Gesture.Pinch()
-    .onStart(e => { ssc.value = sc.value; fx.value = e.focalX; fy.value = e.focalY; })
+    .onStart(e => {
+      ssc.value = sc.value;
+      fx.value = (e.focalX - tx.value) / sc.value;
+      fy.value = (e.focalY - ty.value) / sc.value;
+    })
     .onUpdate(e => {
       const nz = Math.min(ZOOM_MAX, Math.max(ZOOM_MIN, ssc.value * e.scale));
-      const r = nz / sc.value;
-      tx.value = fx.value - (fx.value - tx.value) * r;
-      ty.value = fy.value - (fy.value - ty.value) * r;
+      tx.value = e.focalX - fx.value * nz;
+      ty.value = e.focalY - fy.value * nz;
       sc.value = nz;
     });
 
