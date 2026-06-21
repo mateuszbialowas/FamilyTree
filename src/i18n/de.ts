@@ -58,6 +58,8 @@ export const de = {
     firstNamePlaceholder: 'Vornamen eingeben',
     lastNameLabel: 'Nachname *',
     lastNamePlaceholder: 'Nachnamen eingeben',
+    birthSurnameLabel: 'Geburtsname',
+    birthSurnamePlaceholder: 'Geburtsname (geb.)',
     genderLabel: 'Geschlecht',
     genderMale: 'Männlich',
     genderFemale: 'Weiblich',
@@ -72,6 +74,7 @@ export const de = {
 
   personDetail: {
     notFound: 'Person nicht gefunden',
+    birthSurnameLabel: 'Geburtsname',
     birthDateLabel: 'Geburtsdatum',
     deathDateLabel: 'Sterbedatum',
     notesLabel: 'Notizen',
@@ -180,6 +183,7 @@ export const de = {
     personMissingId: 'Person #{{i}}: keine id',
     personMissingFirstName: 'Person #{{i}}: Vorname fehlt',
     personMissingLastName: 'Person #{{i}}: Nachname fehlt',
+    personInvalidBirthSurname: 'Person #{{i}}: ungültiger Geburtsname',
     personInvalidGender: 'Person #{{i}}: ungültiges Geschlecht',
     personInvalidBirth: 'Person #{{i}}: ungültiges Geburtsdatum',
     personInvalidDeath: 'Person #{{i}}: ungültiges Sterbedatum',

@@ -19,6 +19,7 @@ function validatePerson(p: unknown, idx: number): string | null {
   if (!isNonEmptyString(o.id)) return i18n.t('validateImport.personMissingId', { i: idx });
   if (typeof o.firstName !== 'string') return i18n.t('validateImport.personMissingFirstName', { i: idx });
   if (typeof o.lastName !== 'string') return i18n.t('validateImport.personMissingLastName', { i: idx });
+  if (o.birthSurname !== undefined && !isNullableString(o.birthSurname)) return i18n.t('validateImport.personInvalidBirthSurname', { i: idx });
   if (o.gender !== 'male' && o.gender !== 'female') return i18n.t('validateImport.personInvalidGender', { i: idx });
   if (!isNullableString(o.birthDate)) return i18n.t('validateImport.personInvalidBirth', { i: idx });
   if (!isNullableString(o.deathDate)) return i18n.t('validateImport.personInvalidDeath', { i: idx });

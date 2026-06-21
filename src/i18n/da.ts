@@ -58,6 +58,8 @@ export const da = {
     firstNamePlaceholder: 'Indtast fornavn',
     lastNameLabel: 'Efternavn *',
     lastNamePlaceholder: 'Indtast efternavn',
+    birthSurnameLabel: 'Fødenavn',
+    birthSurnamePlaceholder: 'Fødenavn (født)',
     genderLabel: 'Køn',
     genderMale: 'Mand',
     genderFemale: 'Kvinde',
@@ -72,6 +74,7 @@ export const da = {
 
   personDetail: {
     notFound: 'Person ikke fundet',
+    birthSurnameLabel: 'Fødenavn',
     birthDateLabel: 'Fødselsdato',
     deathDateLabel: 'Dødsdato',
     notesLabel: 'Noter',
@@ -180,6 +183,7 @@ export const da = {
     personMissingId: 'person #{{i}}: mangler id',
     personMissingFirstName: 'person #{{i}}: mangler fornavn',
     personMissingLastName: 'person #{{i}}: mangler efternavn',
+    personInvalidBirthSurname: 'person #{{i}}: ugyldigt fødenavn',
     personInvalidGender: 'person #{{i}}: ugyldigt køn',
     personInvalidBirth: 'person #{{i}}: ugyldig fødselsdato',
     personInvalidDeath: 'person #{{i}}: ugyldig dødsdato',

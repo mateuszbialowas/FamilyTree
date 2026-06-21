@@ -2,6 +2,8 @@ export type Person = {
   id: string;
   firstName: string;
   lastName: string;
+  /** Birth surname (Polish "nazwisko rodowe" / née). Optional. */
+  birthSurname?: string | null;
   gender: 'male' | 'female';
   birthDate: string | null;
   deathDate: string | null;

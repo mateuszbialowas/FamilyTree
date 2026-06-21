@@ -58,6 +58,8 @@ export const sv = {
     firstNamePlaceholder: 'Ange förnamn',
     lastNameLabel: 'Efternamn *',
     lastNamePlaceholder: 'Ange efternamn',
+    birthSurnameLabel: 'Födelsenamn',
+    birthSurnamePlaceholder: 'Födelsenamn (född)',
     genderLabel: 'Kön',
     genderMale: 'Man',
     genderFemale: 'Kvinna',
@@ -72,6 +74,7 @@ export const sv = {
 
   personDetail: {
     notFound: 'Personen hittades inte',
+    birthSurnameLabel: 'Födelsenamn',
     birthDateLabel: 'Födelsedatum',
     deathDateLabel: 'Dödsdatum',
     notesLabel: 'Anteckningar',
@@ -180,6 +183,7 @@ export const sv = {
     personMissingId: 'person #{{i}}: saknar id',
     personMissingFirstName: 'person #{{i}}: saknar förnamn',
     personMissingLastName: 'person #{{i}}: saknar efternamn',
+    personInvalidBirthSurname: 'person #{{i}}: ogiltigt födelsenamn',
     personInvalidGender: 'person #{{i}}: ogiltigt kön',
     personInvalidBirth: 'person #{{i}}: ogiltigt födelsedatum',
     personInvalidDeath: 'person #{{i}}: ogiltigt dödsdatum',

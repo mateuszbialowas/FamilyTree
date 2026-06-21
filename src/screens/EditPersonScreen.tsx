@@ -30,6 +30,7 @@ export function EditPersonScreen() {
   const handleSave = (data: {
     firstName: string;
     lastName: string;
+    birthSurname: string;
     gender: 'male' | 'female';
     birthDate: Date | null;
     deathDate: Date | null;
@@ -46,6 +47,7 @@ export function EditPersonScreen() {
         id: person.id,
         firstName: data.firstName.trim(),
         lastName: data.lastName.trim(),
+        birthSurname: data.birthSurname.trim() || null,
         gender: data.gender,
         birthDate: data.birthDate ? formatDateISO(data.birthDate) : null,
         deathDate: data.deathDate ? formatDateISO(data.deathDate) : null,

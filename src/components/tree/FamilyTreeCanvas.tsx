@@ -150,16 +150,19 @@ export function FamilyTreeCanvas({ state, rootId, onNodePress, onNodeLongPress }
     const couples = layout.conns.filter(c => c.type === 'couple');
     const extraCouples = layout.conns.filter(c => c.type === 'extra-couple');
     const animals = placeAnimals(layout.conns);
+    const personById = new Map(state.people.map(p => [p.id, p]));
     const nodeLabels = layout.nodes.map(n => {
       const parts = n.name.split(' ');
       const first = parts[0] || '';
       const last = parts.slice(1).join(' ') || '';
+      const birthSurname = personById.get(n.id)?.birthSurname;
       // Each field wraps to as many lines as it needs (no ellipsis) — full
       // names like "Nowak z domu Kowalskich" stay readable. The box grows to
       // fit. A generous line cap only guards against pathological input.
       const paras = [
         first ? mkPara(first, 10, P.ink, LABEL_BOX.width, true, 2) : null,
         last ? mkPara(last, 9, P.ink, LABEL_BOX.width, false, 3) : null,
+        birthSurname ? mkPara(`z d. ${birthSurname}`, 8, P.inkFade, LABEL_BOX.width, false, 2) : null,
         n.born ? mkPara(`ur. ${n.born}`, 8, P.inkFade, LABEL_BOX.width, false, 1) : null,
         n.label ? mkPara(n.label, 7, P.sepia, LABEL_BOX.width, false, 2) : null,
       ];
@@ -179,7 +182,7 @@ export function FamilyTreeCanvas({ state, rootId, onNodePress, onNodeLongPress }
     const rootHasParents = state.parentChildRelationships.some(r => r.childId === rootId);
 
     return { rootNode, branches, couples, extraCouples, animals, labels: nodeLabels, rootHasParents };
-  }, [layout, rootId, state.parentChildRelationships]);
+  }, [layout, rootId, state.parentChildRelationships, state.people]);
 
   // === ANIMATIONS ===
   const windPhase = useSharedValue(0);

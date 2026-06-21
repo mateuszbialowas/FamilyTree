@@ -89,6 +89,9 @@ export function PersonDetailScreen() {
       />
 
       <Card style={styles.card}>
+        {person.birthSurname ? (
+          <InfoRow label={t('personDetail.birthSurnameLabel')} value={person.birthSurname} />
+        ) : null}
         <InfoRow label={t('personDetail.birthDateLabel')} value={person.birthDate ?? t('common.unknown')} />
         <InfoRow
           label={t('personDetail.deathDateLabel')}

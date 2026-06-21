@@ -40,6 +40,8 @@ export const en = {
     firstNamePlaceholder: 'Enter first name',
     lastNameLabel: 'Last name *',
     lastNamePlaceholder: 'Enter last name',
+    birthSurnameLabel: 'Birth surname',
+    birthSurnamePlaceholder: 'Birth surname (née)',
     genderLabel: 'Gender',
     genderMale: 'Male', genderFemale: 'Female',
     birthDateLabel: 'Date of birth',
@@ -53,6 +55,7 @@ export const en = {
 
   personDetail: {
     notFound: 'Person not found',
+    birthSurnameLabel: 'Birth surname',
     birthDateLabel: 'Date of birth',
     deathDateLabel: 'Date of death',
     notesLabel: 'Notes',
@@ -151,6 +154,7 @@ export const en = {
     personMissingId: 'person #{{i}}: missing id',
     personMissingFirstName: 'person #{{i}}: missing first name',
     personMissingLastName: 'person #{{i}}: missing last name',
+    personInvalidBirthSurname: 'person #{{i}}: invalid birth surname',
     personInvalidGender: 'person #{{i}}: invalid gender',
     personInvalidBirth: 'person #{{i}}: invalid birth date',
     personInvalidDeath: 'person #{{i}}: invalid death date',

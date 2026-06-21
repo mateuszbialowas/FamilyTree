@@ -6,7 +6,7 @@ import type { FamilyState, Person } from '../../types';
 // A node owns a circle (radius NODE_R) plus an 80-wide label box just below it.
 // Height is the worst case (two-line surname + birth + relation), matching the
 // renderer's dynamic box, so the test validates the real footprint.
-const LABEL_W = 80, LABEL_H = 88, LABEL_GAP = 3;
+const LABEL_W = 80, LABEL_H = 96, LABEL_GAP = 3;
 const nodeBox = (n: LNode) => ({
   l: n.x - LABEL_W / 2, r: n.x + LABEL_W / 2,
   t: n.y - NODE_R, b: n.y + NODE_R + LABEL_GAP + LABEL_H,

@@ -11,6 +11,7 @@ import type { Person } from '../types';
 type PersonFormData = {
   firstName: string;
   lastName: string;
+  birthSurname: string;
   gender: 'male' | 'female';
   birthDate: Date | null;
   deathDate: Date | null;
@@ -18,7 +19,7 @@ type PersonFormData = {
 };
 
 type Props = {
-  initialValues?: Partial<Pick<Person, 'firstName' | 'lastName' | 'gender' | 'birthDate' | 'deathDate' | 'notes'>>;
+  initialValues?: Partial<Pick<Person, 'firstName' | 'lastName' | 'birthSurname' | 'gender' | 'birthDate' | 'deathDate' | 'notes'>>;
   submitLabel: string;
   submitTestID?: string;
   onSubmit: (data: PersonFormData) => void;
@@ -28,6 +29,7 @@ export function PersonForm({ initialValues, submitLabel, submitTestID, onSubmit 
   const { t } = useTranslation();
   const [firstName, setFirstName] = useState(initialValues?.firstName ?? '');
   const [lastName, setLastName] = useState(initialValues?.lastName ?? '');
+  const [birthSurname, setBirthSurname] = useState(initialValues?.birthSurname ?? '');
   const [gender, setGender] = useState<'male' | 'female'>(initialValues?.gender ?? 'male');
   const [birthDate, setBirthDate] = useState<Date | null>(
     initialValues?.birthDate ? parseDate(initialValues.birthDate) : null,
@@ -38,7 +40,7 @@ export function PersonForm({ initialValues, submitLabel, submitTestID, onSubmit 
   const [notes, setNotes] = useState(initialValues?.notes ?? '');
 
   const handleSubmit = () => {
-    onSubmit({ firstName, lastName, gender, birthDate, deathDate, notes });
+    onSubmit({ firstName, lastName, birthSurname, gender, birthDate, deathDate, notes });
   };
 
   return (
@@ -56,6 +58,13 @@ export function PersonForm({ initialValues, submitLabel, submitTestID, onSubmit 
         placeholder={t('personForm.lastNamePlaceholder')}
         value={lastName}
         onChangeText={setLastName}
+      />
+      <TextInput
+        testID="input-birth-surname"
+        label={t('personForm.birthSurnameLabel')}
+        placeholder={t('personForm.birthSurnamePlaceholder')}
+        value={birthSurname}
+        onChangeText={setBirthSurname}
       />
 
       <Text style={styles.label}>{t('personForm.genderLabel')}</Text>

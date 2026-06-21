@@ -58,6 +58,8 @@ export const nl = {
     firstNamePlaceholder: 'Voer voornaam in',
     lastNameLabel: 'Achternaam *',
     lastNamePlaceholder: 'Voer achternaam in',
+    birthSurnameLabel: 'Geboortenaam',
+    birthSurnamePlaceholder: 'Geboortenaam (geb.)',
     genderLabel: 'Geslacht',
     genderMale: 'Man',
     genderFemale: 'Vrouw',
@@ -72,6 +74,7 @@ export const nl = {
 
   personDetail: {
     notFound: 'Persoon niet gevonden',
+    birthSurnameLabel: 'Geboortenaam',
     birthDateLabel: 'Geboortedatum',
     deathDateLabel: 'Overlijdensdatum',
     notesLabel: 'Notities',
@@ -180,6 +183,7 @@ export const nl = {
     personMissingId: 'persoon #{{i}}: geen id',
     personMissingFirstName: 'persoon #{{i}}: voornaam ontbreekt',
     personMissingLastName: 'persoon #{{i}}: achternaam ontbreekt',
+    personInvalidBirthSurname: 'persoon #{{i}}: ongeldige geboortenaam',
     personInvalidGender: 'persoon #{{i}}: ongeldig geslacht',
     personInvalidBirth: 'persoon #{{i}}: ongeldige geboortedatum',
     personInvalidDeath: 'persoon #{{i}}: ongeldige overlijdensdatum',

@@ -66,7 +66,7 @@ export const TRUNK_OFFSET = 4;
  *  height is the worst case (two-line surname + birth + relation rows) so the
  *  off-grid extra-spouse search reserves enough vertical room. */
 const LABEL_W = 80;
-const LABEL_H = 88;
+const LABEL_H = 96;
 const LABEL_GAP = 3;
 
 // ======================== UTILS ========================
