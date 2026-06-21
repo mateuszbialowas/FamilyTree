@@ -37,8 +37,17 @@ const TRUNK_ROOTS_OVERLAP = 8;
 /** Offset for shadow elements */
 const SHADOW_OFFSET = { branch: { x: 2, y: 3 }, node: { x: 1.5, y: 2.5 } };
 
-/** Node label box dimensions */
-const LABEL_BOX = { width: 80, height: 54, radius: 5 };
+/** Node label box — fixed width, rounded corners. Height is computed per node
+ *  from the real (line-capped) text height so long names never overflow. */
+const LABEL_BOX = {
+  width: 80,
+  radius: 5,
+  gapFromNode: 3, // gap between circle bottom and box top
+  padTop: 3,
+  padBottom: 4,
+  rowGap: 1,
+  minHeight: 54,
+};
 
 /** Node circle sizes */
 const NODE_GLOW_R = NODE_R + 5;
@@ -145,13 +154,25 @@ export function FamilyTreeCanvas({ state, rootId, onNodePress, onNodeLongPress }
       const parts = n.name.split(' ');
       const first = parts[0] || '';
       const last = parts.slice(1).join(' ') || '';
-      return {
-        id: n.id,
-        name: mkPara(first, 10, P.ink, LABEL_BOX.width, true),
-        surname: mkPara(last, 9, P.ink, LABEL_BOX.width),
-        born: mkPara(n.born ? `ur. ${n.born}` : '', 8, P.inkFade, LABEL_BOX.width),
-        relation: n.label ? mkPara(n.label, 7, P.sepia, LABEL_BOX.width) : null,
-      };
+      // Each field wraps to as many lines as it needs (no ellipsis) — full
+      // names like "Nowak z domu Kowalskich" stay readable. The box grows to
+      // fit. A generous line cap only guards against pathological input.
+      const paras = [
+        first ? mkPara(first, 10, P.ink, LABEL_BOX.width, true, 2) : null,
+        last ? mkPara(last, 9, P.ink, LABEL_BOX.width, false, 3) : null,
+        n.born ? mkPara(`ur. ${n.born}`, 8, P.inkFade, LABEL_BOX.width, false, 1) : null,
+        n.label ? mkPara(n.label, 7, P.sepia, LABEL_BOX.width, false, 2) : null,
+      ];
+      // Stack rows by their real laid-out height → dynamic box height.
+      const rows: { para: ReturnType<typeof mkPara>; y: number }[] = [];
+      let y = LABEL_BOX.padTop;
+      for (const para of paras) {
+        if (!para) continue;
+        rows.push({ para, y });
+        y += para.getHeight() + LABEL_BOX.rowGap;
+      }
+      const boxHeight = Math.max(LABEL_BOX.minHeight, y - LABEL_BOX.rowGap + LABEL_BOX.padBottom);
+      return { id: n.id, rows, boxHeight };
     });
     // Direction of trunk+roots: down if root has parents (ancestors above),
     // up if root has only descendants below (no parents).
@@ -455,14 +476,20 @@ export function FamilyTreeCanvas({ state, rootId, onNodePress, onNodeLongPress }
                   {isBouncing
                     ? <Group transform={bounceTransform} origin={vec(n.x, n.y)}>{nodeBody}</Group>
                     : nodeBody}
-                  <RoundedRect x={n.x - LABEL_BOX.width / 2} y={n.y + NODE_R + 3} width={LABEL_BOX.width} height={LABEL_BOX.height} r={LABEL_BOX.radius} color={P.cream} />
-                  <RoundedRect x={n.x - LABEL_BOX.width / 2} y={n.y + NODE_R + 3} width={LABEL_BOX.width} height={LABEL_BOX.height} r={LABEL_BOX.radius} color={P.parchEdge} style="stroke" strokeWidth={STROKE.labelBox} />
-                  {lb && <>
-                    <Paragraph paragraph={lb.name} x={n.x - LABEL_BOX.width / 2} y={n.y + NODE_R + 5} width={LABEL_BOX.width} />
-                    <Paragraph paragraph={lb.surname} x={n.x - LABEL_BOX.width / 2} y={n.y + NODE_R + 18} width={LABEL_BOX.width} />
-                    <Paragraph paragraph={lb.born} x={n.x - LABEL_BOX.width / 2} y={n.y + NODE_R + 30} width={LABEL_BOX.width} />
-                    {lb.relation && <Paragraph paragraph={lb.relation} x={n.x - LABEL_BOX.width / 2} y={n.y + NODE_R + 41} width={LABEL_BOX.width} />}
-                  </>}
+                  {(() => {
+                    const boxTop = n.y + NODE_R + LABEL_BOX.gapFromNode;
+                    const boxLeft = n.x - LABEL_BOX.width / 2;
+                    const boxH = lb ? lb.boxHeight : LABEL_BOX.minHeight;
+                    return (
+                      <>
+                        <RoundedRect x={boxLeft} y={boxTop} width={LABEL_BOX.width} height={boxH} r={LABEL_BOX.radius} color={P.cream} />
+                        <RoundedRect x={boxLeft} y={boxTop} width={LABEL_BOX.width} height={boxH} r={LABEL_BOX.radius} color={P.parchEdge} style="stroke" strokeWidth={STROKE.labelBox} />
+                        {lb && lb.rows.map((row, ri) => (
+                          <Paragraph key={ri} paragraph={row.para} x={boxLeft} y={boxTop + row.y} width={LABEL_BOX.width} />
+                        ))}
+                      </>
+                    );
+                  })()}
                 </Group>
               );
             })}

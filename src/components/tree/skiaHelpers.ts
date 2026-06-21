@@ -13,9 +13,26 @@ export function mkPath(d: string) {
   } catch { return Skia.Path.Make(); }
 }
 
-/** Create a Skia Paragraph (centered text block) */
-export function mkPara(text: string, sz: number, col: string, w: number, bold = false) {
+/**
+ * Create a Skia Paragraph (centered text block).
+ *
+ * `maxLines` caps how many lines the text may wrap to; combined with
+ * `ellipsis`, overflowing text (e.g. long "z domu …" surnames) is truncated
+ * with an ellipsis instead of spilling out of its label box. After layout the
+ * caller can read `.getHeight()` to stack rows by their real height.
+ */
+export function mkPara(
+  text: string,
+  sz: number,
+  col: string,
+  w: number,
+  bold = false,
+  maxLines?: number,
+  ellipsis = false,
+) {
   const s: SkParagraphStyle = { textAlign: TextAlign.Center };
+  if (maxLines != null) s.maxLines = maxLines;
+  if (ellipsis) s.ellipsis = '…';
   const ts: SkTextStyle = { fontSize: sz, fontFamilies: ['serif'], color: Skia.Color(col), fontStyle: bold ? { weight: 700 } : { weight: 400 } };
   const p = Skia.ParagraphBuilder.Make(s).pushStyle(ts).addText(text).pop().build();
   p.layout(w);

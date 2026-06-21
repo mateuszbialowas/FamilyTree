@@ -1,6 +1,49 @@
 import { describe, it, expect } from 'vitest';
-import { computeUnifiedLayout, COUPLE_SPACING } from '../treeLayout';
+import { computeUnifiedLayout, COUPLE_SPACING, NODE_R, type LNode, type Conn } from '../treeLayout';
 import type { FamilyState, Person } from '../../types';
+
+// ─── Geometry helpers for the layout invariants ───────────────────────────
+// A node owns a circle (radius NODE_R) plus an 80-wide label box just below it.
+// Height is the worst case (two-line surname + birth + relation), matching the
+// renderer's dynamic box, so the test validates the real footprint.
+const LABEL_W = 80, LABEL_H = 88, LABEL_GAP = 3;
+const nodeBox = (n: LNode) => ({
+  l: n.x - LABEL_W / 2, r: n.x + LABEL_W / 2,
+  t: n.y - NODE_R, b: n.y + NODE_R + LABEL_GAP + LABEL_H,
+});
+function boxesOverlap(a: LNode, b: LNode) {
+  const A = nodeBox(a), B = nodeBox(b);
+  return A.l < B.r && B.l < A.r && A.t < B.b && B.t < A.b;
+}
+/** Count node/label-box overlaps, excluding intentionally-adjacent couples. */
+function countOverlaps(nodes: LNode[]) {
+  const partner = new Map(nodes.filter(n => n.partnerId).map(n => [n.id, n.partnerId!]));
+  let n = 0;
+  for (let i = 0; i < nodes.length; i++)
+    for (let j = i + 1; j < nodes.length; j++) {
+      if (partner.get(nodes[i].id) === nodes[j].id) continue;
+      if (boxesOverlap(nodes[i], nodes[j])) n++;
+    }
+  return n;
+}
+const ccw = (a: any, b: any, c: any) =>
+  (c.y - a.y) * (b.x - a.x) > (b.y - a.y) * (c.x - a.x);
+function segmentsCross(a: Conn, b: Conn) {
+  // ignore branches that share a parent origin or a child endpoint
+  if (Math.abs(a.x1 - b.x1) < 1 && Math.abs(a.y1 - b.y1) < 1) return false;
+  if (Math.abs(a.x2 - b.x2) < 1 && Math.abs(a.y2 - b.y2) < 1) return false;
+  const p1 = { x: a.x1, y: a.y1 }, p2 = { x: a.x2, y: a.y2 };
+  const p3 = { x: b.x1, y: b.y1 }, p4 = { x: b.x2, y: b.y2 };
+  return ccw(p1, p3, p4) !== ccw(p2, p3, p4) && ccw(p1, p2, p3) !== ccw(p1, p2, p4);
+}
+function countBranchCrossings(conns: Conn[]) {
+  const br = conns.filter(c => c.type === 'branch');
+  let n = 0;
+  for (let i = 0; i < br.length; i++)
+    for (let j = i + 1; j < br.length; j++)
+      if (segmentsCross(br[i], br[j])) n++;
+  return n;
+}
 
 function person(
   id: string,
@@ -217,8 +260,17 @@ describe('computeUnifiedLayout', () => {
     expect(Math.abs(charles!.x - diana!.x)).toBe(2 * COUPLE_SPACING);
     expect(charles!.partnerId).toBe('p-diana');
 
-    // Camilla jest umieszczona z offsetem (poza główną linią par)
-    expect(camilla!.y).not.toBe(charles!.y);
+    // Camilla jest umieszczona w wolnym miejscu obok Charlesa (po przeciwnej
+    // stronie niż Diana) — połączona linią przerywaną, bez nakładania się.
+    expect(camilla!.id).not.toBe(charles!.id);
+    // Po przeciwnej stronie Charlesa niż Diana
+    expect(Math.sign(camilla!.x - charles!.x)).toBe(-Math.sign(diana!.x - charles!.x));
+    // Nie nachodzi na Charlesa ani Dianę (odstęp ≥ szerokość etykiety w poziomie
+    // lub rozsunięcie w pionie)
+    for (const other of [charles!, diana!]) {
+      const apart = Math.abs(camilla!.x - other.x) >= 80 || Math.abs(camilla!.y - other.y) >= 80;
+      expect(apart).toBe(true);
+    }
 
     // Istnieje dokładnie jedno połączenie typu 'extra-couple' dla pary Charles-Camilla
     const extraConns = conns.filter(c => c.type === 'extra-couple');
@@ -243,5 +295,89 @@ describe('computeUnifiedLayout', () => {
     const mateusz = nodes.find(n => n.id === 'p-mateusz')!;
     const ktos = nodes.find(n => n.id === 'p-ktos')!;
     expect(ktos.x).toBeGreaterThan(mateusz.x);
+  });
+
+  // ─── Core invariants: no overlaps, no crossing branches ──────────────────
+  describe('layout invariants (no overlaps, no crossings)', () => {
+    // A deliberately gnarly hourglass: 3 generations of ancestors with
+    // collateral siblings on both sides, descendants with their own kids,
+    // and a remarriage. Every person is exercised as the root.
+    const buildComplex = (): FamilyState => {
+      const people: Person[] = [];
+      const pc: FamilyState['parentChildRelationships'] = [];
+      const mar: FamilyState['marriages'] = [];
+      let n = 0;
+      const P = (g: 'male' | 'female' = 'male') => {
+        const id = `c${n++}`;
+        people.push(person(id, `Imię${id}`, 'Nazwisko', g));
+        return id;
+      };
+      const marry = (a: string, b: string) =>
+        mar.push({ id: `m${mar.length}`, spouse1Id: a, spouse2Id: b, marriageDate: null, divorceDate: null });
+      const kid = (p: string, c: string) =>
+        pc.push({ id: `r${pc.length}`, parentId: p, childId: c });
+
+      const father = P('male'), mother = P('female'); marry(father, mother);
+      const root = P('male'), rootSpouse = P('female'); marry(root, rootSpouse);
+      kid(father, root); kid(mother, root);
+      // root's siblings (collaterals) with their own kids
+      for (let i = 0; i < 2; i++) {
+        const s = P('female'); kid(father, s); kid(mother, s);
+        const ss = P('male'); marry(ss, s);
+        const c = P('male'); kid(s, c); kid(ss, c);
+      }
+      // root's descendants
+      for (let i = 0; i < 3; i++) {
+        const c = P('male'); kid(root, c); kid(rootSpouse, c);
+        const cs = P('female'); marry(c, cs);
+        for (let j = 0; j < 2; j++) { const g = P('male'); kid(c, g); kid(cs, g); }
+      }
+      // paternal + maternal grandparents, each with extra siblings
+      const addGrandparents = (childId: string, sibGender: 'male' | 'female') => {
+        const gf = P('male'), gm = P('female'); marry(gf, gm);
+        kid(gf, childId); kid(gm, childId);
+        for (let i = 0; i < 2; i++) {
+          const sib = P(sibGender); kid(gf, sib); kid(gm, sib);
+          const sibSp = P(sibGender === 'male' ? 'female' : 'male');
+          marry(sib, sibSp);
+          const cousin = P('male'); kid(sib, cousin); kid(sibSp, cousin);
+        }
+      };
+      addGrandparents(father, 'male');
+      addGrandparents(mother, 'female');
+      // a remarriage (extra spouse for the father)
+      marry(father, P('female'));
+      return { people, parentChildRelationships: pc, marriages: mar };
+    };
+
+    const state = buildComplex();
+
+    it('never overlaps node/label boxes, from any root', () => {
+      for (const p of state.people) {
+        const { nodes } = computeUnifiedLayout(p.id, state);
+        expect(countOverlaps(nodes), `overlap when root=${p.id}`).toBe(0);
+      }
+    });
+
+    it('never crosses parent→child branches, from any root', () => {
+      for (const p of state.people) {
+        const { conns } = computeUnifiedLayout(p.id, state);
+        expect(countBranchCrossings(conns), `crossing when root=${p.id}`).toBe(0);
+      }
+    });
+
+    it('keeps every couple exactly 2·COUPLE_SPACING apart on the same row', () => {
+      for (const p of state.people) {
+        const { nodes } = computeUnifiedLayout(p.id, state);
+        const byId = new Map(nodes.map(node => [node.id, node]));
+        for (const node of nodes) {
+          if (!node.partnerId) continue;
+          const partner = byId.get(node.partnerId);
+          if (!partner) continue;
+          expect(node.y).toBe(partner.y);
+          expect(Math.abs(node.x - partner.x)).toBe(2 * COUPLE_SPACING);
+        }
+      }
+    });
   });
 });
