@@ -142,19 +142,25 @@ export function FamilyTreeCanvas({ state, rootId, onNodePress, onNodeLongPress }
     const branches = layout.conns.filter(c => c.type === 'branch').map(c => {
       const thickAtStart = Math.abs(c.y1 - rootY) <= Math.abs(c.y2 - rootY);
       const raw = genBranch(c.x1, c.y1, c.x2, c.y2, c.seed, thickAtStart);
+      // Sit decorations on the branch's own drawn centreline — so leaves and
+      // animals stay ON long, sagging branches instead of floating above a
+      // straight chord (the bug visible on large trees).
+      const mid = raw.centerline[raw.centerline.length >> 1];
       return {
         ...c,
+        centerline: raw.centerline,
+        mid,
         path: mkPath(raw.path),
         barkLines: raw.barkLines.map(bl => ({ ...bl, path: mkPath(bl.d) })),
         twigs: raw.twigs.map(tw => ({ ...tw, path: mkPath(tw.d) })),
-        midLeaves: genCanopy((c.x1 + c.x2) / 2, (c.y1 + c.y2) / 2 - 16, 20, 14, 20, c.seed + 4000),
+        midLeaves: genCanopy(mid.x, mid.y - 16, 20, 14, 20, c.seed + 4000),
         tipLeaves: genCanopy(c.x2, c.y2 - 30, 18, 12, 18, c.seed + 5000),
       };
     });
 
     const couples = layout.conns.filter(c => c.type === 'couple');
     const extraCouples = layout.conns.filter(c => c.type === 'extra-couple');
-    const animals = placeAnimals(layout.conns);
+    const animals = placeAnimals(branches);
     const personById = new Map(state.people.map(p => [p.id, p]));
     const nodeLabels = layout.nodes.map(n => {
       const parts = n.name.split(' ');
@@ -435,7 +441,7 @@ export function FamilyTreeCanvas({ state, rootId, onNodePress, onNodeLongPress }
                 </Path>
                 {b.barkLines.map((bl, bi) => <Path key={bi} path={bl.path} style="stroke" color={P.bark.deep} strokeWidth={bl.w} opacity={bl.op} strokeCap="round" />)}
                 {b.twigs.map((tw, ti) => <Path key={ti} path={tw.path} style="stroke" color={P.bark.mid} strokeWidth={tw.w} opacity={0.4} strokeCap="round" />)}
-                <Group transform={leafSway[(i + 1) % 3]} origin={vec((b.x1 + b.x2) / 2, (b.y1 + b.y2) / 2)}>
+                <Group transform={leafSway[(i + 1) % 3]} origin={vec(b.mid.x, b.mid.y)}>
                   {b.midLeaves.map((l, li) => (
                     <Group key={li} transform={[{ translateX: l.x }, { translateY: l.y }, { rotate: (l.rot * Math.PI) / 180 }]}>
                       <Path path={leafPath(l.sz, l.type)} color={l.col} opacity={l.op} />

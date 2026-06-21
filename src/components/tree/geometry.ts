@@ -2,7 +2,6 @@ import { sr, lerp, pick } from './mathHelpers';
 import { mkPath } from './skiaHelpers';
 import { P } from './palette';
 import type { LeafD, AnimalD } from './palette';
-import type { Conn } from '../../utils/treeLayout';
 
 // ======================== GEOMETRY CONSTANTS ========================
 
@@ -95,7 +94,11 @@ export function genBranch(x1: number, y1: number, x2: number, y2: number, seed: 
     }
   }
 
-  return { path, barkLines, twigs };
+  // `centerline` is the exact curve the branch is drawn along (with the
+  // gravity sag + bend). Decorations sit on these points so they never float
+  // above long, sagging branches — no need to recompute the curve elsewhere.
+  const centerline = pts.map(p => ({ x: p.x, y: p.y }));
+  return { path, barkLines, twigs, centerline };
 }
 
 // ======================== LEAF SYSTEM ========================
@@ -138,23 +141,30 @@ export function leafPath(sz: number, type: number) {
 export function leafVeinPath(sz: number) { return mkPath(`M 0,${-sz * 0.08} L 0,${-sz * 0.82}`); }
 
 // ======================== ANIMAL PLACEMENT ========================
-export function placeAnimals(conns: Conn[]): AnimalD[] {
+/** A generated branch carrying its drawn centreline (from genBranch). */
+export interface BranchGeo {
+  x1: number; y1: number; x2: number; y2: number; seed: number;
+  centerline: { x: number; y: number }[];
+}
+
+export function placeAnimals(branches: BranchGeo[]): AnimalD[] {
   const a: AnimalD[] = [];
-  const br = conns.filter(c => c.type === 'branch');
+  const br = branches;
   const r = sr(br.length * 7 + 42);
   const types: AnimalD['type'][] = ['bird', 'squirrel', 'bird'];
   const MIN_DIST = 40; // minimum distance between animals
 
   const tooClose = (x: number, y: number) =>
     a.some(e => Math.abs(e.x - x) < MIN_DIST && Math.abs(e.y - y) < MIN_DIST);
+  // Point on the branch's own drawn centreline at parameter t (0..1).
+  const at = (b: BranchGeo, t: number) =>
+    b.centerline[Math.round(t * (b.centerline.length - 1))];
 
   // Place owl on a branch so it sits naturally
   if (br.length > 0) {
     const owlBr = br[Math.floor(br.length / 2)];
-    const t = 0.55;
-    const ox = lerp(owlBr.x1, owlBr.x2, t);
-    const oy = lerp(owlBr.y1, owlBr.y2, t) - 4;
-    a.push({ type: 'owl', x: ox, y: oy, flip: owlBr.x2 < owlBr.x1, seed: owlBr.seed });
+    const p = at(owlBr, 0.55);
+    a.push({ type: 'owl', x: p.x, y: p.y - 4, flip: owlBr.x2 < owlBr.x1, seed: owlBr.seed });
   }
   for (let i = 0; i < br.length; i++) {
     if (r() > ANIMAL_SKIP_THRESHOLD) continue;
@@ -162,8 +172,9 @@ export function placeAnimals(conns: Conn[]): AnimalD[] {
     const t = ANIMAL_BRANCH_POSITION + r() * 0.3;
     const type = types[Math.floor(r() * types.length)];
     const yOff = type === 'squirrel' ? -11 : -9;
-    const ax = lerp(b.x1, b.x2, t);
-    const ay = lerp(b.y1, b.y2, t) + yOff;
+    const p = at(b, t);
+    const ax = p.x;
+    const ay = p.y + yOff;
     if (tooClose(ax, ay)) continue;
     a.push({ type, x: ax, y: ay, flip: r() > 0.5, seed: b.seed + i * 13 });
   }
