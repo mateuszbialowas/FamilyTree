@@ -126,7 +126,12 @@ function MourningBand({ x, y }: { x: number; y: number }) {
 export function FamilyTreeCanvas({ state, rootId, onNodePress, onNodeLongPress }: Props) {
   const { i18n } = useTranslation();
   const layout = useMemo(() => {
-    const labels = computeRelationshipLabels(rootId, state);
+    // Only annotate close family in the tree (up to first cousins / close
+    // in-laws). Distant-cousin "degree of kinship" labels are noise here.
+    const labels = computeRelationshipLabels(rootId, state, 'colloquial', {
+      maxSteps: 4,
+      maxSpouseSteps: 1,
+    });
     return computeUnifiedLayout(rootId, state, labels);
   }, [state.people, state.parentChildRelationships, state.marriages, rootId, i18n.language]);
 

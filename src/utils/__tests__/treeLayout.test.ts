@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { computeUnifiedLayout, COUPLE_SPACING, NODE_R, type LNode, type Conn } from '../treeLayout';
+import { computeUnifiedLayout, COUPLE_SPACING, SOLO_WIDTH, NODE_R, type LNode, type Conn } from '../treeLayout';
 import type { FamilyState, Person } from '../../types';
 
 // ─── Geometry helpers for the layout invariants ───────────────────────────
@@ -378,6 +378,75 @@ describe('computeUnifiedLayout', () => {
           expect(Math.abs(node.x - partner.x)).toBe(2 * COUPLE_SPACING);
         }
       }
+    });
+  });
+
+  // ─── Client-reported scenarios (regression) ──────────────────────────────
+  describe('client-reported regressions', () => {
+    it('adding many siblings never overlaps labels and spreads them out', () => {
+      // "Dopisywanie nowego rodzeństwa powoduje że napisy nachodzą na siebie."
+      const people: Person[] = [
+        person('p-mama', 'Mama', 'Test', 'female'),
+        person('p-tata', 'Tata', 'Test', 'male'),
+        person('p-root', 'Ja', 'Test', 'male'),
+      ];
+      const pc: FamilyState['parentChildRelationships'] = [
+        { id: 'rm', parentId: 'p-mama', childId: 'p-root' },
+        { id: 'rt', parentId: 'p-tata', childId: 'p-root' },
+      ];
+      const mar: FamilyState['marriages'] = [
+        { id: 'm', spouse1Id: 'p-mama', spouse2Id: 'p-tata', marriageDate: null, divorceDate: null },
+      ];
+      // Add eight siblings one by one; the layout must stay overlap-free each time.
+      for (let i = 0; i < 8; i++) {
+        people.push(person(`p-sib${i}`, `Brat${i}`, 'Test', 'male'));
+        pc.push({ id: `rms${i}`, parentId: 'p-mama', childId: `p-sib${i}` });
+        pc.push({ id: `rts${i}`, parentId: 'p-tata', childId: `p-sib${i}` });
+        const state: FamilyState = { people, parentChildRelationships: pc, marriages: mar };
+        const { nodes } = computeUnifiedLayout('p-root', state);
+        expect(countOverlaps(nodes), `overlap after adding sibling #${i}`).toBe(0);
+        // Siblings sit on the same row, each at a distinct X (tree makes room).
+        const row = nodes.filter(n => n.id === 'p-root' || n.id.startsWith('p-sib'));
+        const xs = row.map(n => Math.round(n.x)).sort((a, b) => a - b);
+        for (let k = 1; k < xs.length; k++) {
+          expect(xs[k] - xs[k - 1]).toBeGreaterThanOrEqual(SOLO_WIDTH);
+        }
+      }
+    });
+
+    it('four generations of descendants never cross branches', () => {
+      // "Przy czwartym pokoleniu na dole niepotrzebnie krzyżują się gałęzie."
+      const people: Person[] = [];
+      const pc: FamilyState['parentChildRelationships'] = [];
+      const mar: FamilyState['marriages'] = [];
+      let n = 0;
+      const P = (g: 'male' | 'female') => {
+        const id = `d${n++}`;
+        people.push(person(id, `Os${id}`, 'Ród', g));
+        return id;
+      };
+      const marry = (a: string, b: string) =>
+        mar.push({ id: `m${mar.length}`, spouse1Id: a, spouse2Id: b, marriageDate: null, divorceDate: null });
+      const kid = (p: string, q: string, c: string) => {
+        pc.push({ id: `r${pc.length}`, parentId: p, childId: c });
+        pc.push({ id: `r${pc.length}`, parentId: q, childId: c });
+      };
+      const expand = (a: string, b: string, depth: number) => {
+        if (depth === 0) return;
+        for (let i = 0; i < 3; i++) {
+          const c = P(i % 2 === 0 ? 'male' : 'female');
+          kid(a, b, c);
+          const sp = P(i % 2 === 0 ? 'female' : 'male');
+          marry(c, sp);
+          expand(c, sp, depth - 1);
+        }
+      };
+      const rootA = P('male'), rootB = P('female'); marry(rootA, rootB);
+      expand(rootA, rootB, 4); // 4 generations below the root couple
+      const state: FamilyState = { people, parentChildRelationships: pc, marriages: mar };
+      const { nodes, conns } = computeUnifiedLayout(rootA, state);
+      expect(countBranchCrossings(conns)).toBe(0);
+      expect(countOverlaps(nodes)).toBe(0);
     });
   });
 });

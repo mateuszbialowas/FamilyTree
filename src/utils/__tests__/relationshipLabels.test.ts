@@ -109,4 +109,48 @@ describe('computeRelationshipLabels', () => {
     expect(labels.get('p-marek')).toBe('Wuj');
     expect(labels.get('p-ewa')).toBe('Ciocia');
   });
+
+  it('close-only mode drops distant cousins but keeps close family', () => {
+    // me ← parent ← grandparent ← great-grandparent (GGP)
+    // GGP also → grand-uncle → parent's-cousin → 2nd cousin (6 steps from me)
+    // grandparent also → aunt → 1st cousin (4 steps from me)
+    const state: FamilyState = {
+      people: [
+        person('me', 'Ja', 'X'),
+        person('par', 'Rodzic', 'X'),
+        person('gpar', 'Dziadek', 'X'),
+        person('ggp', 'Pradziadek', 'X'),
+        person('aunt', 'Ciotka', 'X', 'female'),
+        person('cousin1', 'Kuzyn', 'X'),
+        person('guncle', 'Stryj', 'X'),
+        person('parcousin', 'KuzynRodzica', 'X'),
+        person('cousin2', 'DalekiKuzyn', 'X'),
+      ],
+      parentChildRelationships: [
+        { id: 'a', parentId: 'par', childId: 'me' },
+        { id: 'b', parentId: 'gpar', childId: 'par' },
+        { id: 'c', parentId: 'ggp', childId: 'gpar' },
+        { id: 'd', parentId: 'gpar', childId: 'aunt' },
+        { id: 'e', parentId: 'aunt', childId: 'cousin1' },
+        { id: 'f', parentId: 'ggp', childId: 'guncle' },
+        { id: 'g', parentId: 'guncle', childId: 'parcousin' },
+        { id: 'h', parentId: 'parcousin', childId: 'cousin2' },
+      ],
+      marriages: [],
+    };
+    // Unbounded: the distant 2nd cousin still gets a label.
+    const full = computeRelationshipLabels('me', state);
+    expect(full.get('cousin2')).toBeTruthy();
+
+    // Close-only (as the tree uses): parent + first cousin labelled,
+    // distant 2nd cousin and parent's-cousin are not.
+    const close = computeRelationshipLabels('me', state, 'colloquial', {
+      maxSteps: 4,
+      maxSpouseSteps: 1,
+    });
+    expect(close.get('par')).toBeTruthy();
+    expect(close.get('cousin1')).toBeTruthy(); // first cousin (4 steps) kept
+    expect(close.get('cousin2')).toBeUndefined(); // 2nd cousin (6 steps) dropped
+    expect(close.get('parcousin')).toBeUndefined(); // 5 steps dropped
+  });
 });

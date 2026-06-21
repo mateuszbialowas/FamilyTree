@@ -20,7 +20,14 @@ export function computeRelationshipLabels(
   rootId: string,
   state: FamilyState,
   mode: LabelMode = 'colloquial',
+  options?: { maxSteps?: number; maxSpouseSteps?: number },
 ): Map<string, string> {
+  // `maxSteps` / `maxSpouseSteps` cap how distant a relative may be to still get
+  // a label. The tree passes tight limits so it only annotates close family —
+  // distant cousins and remote in-laws ("3rd cousin once removed") add clutter,
+  // not value. Detail screens leave them unbounded.
+  const maxSteps = options?.maxSteps ?? Infinity;
+  const maxSpouseSteps = options?.maxSpouseSteps ?? Infinity;
   const genderMap = new Map(state.people.map((p) => [p.id, p.gender]));
   const labels = getKinshipLabels();
 
@@ -49,9 +56,12 @@ export function computeRelationshipLabels(
     const { personId, path, nodeIds } = queue.shift()!;
 
     if (path.length > 0) {
-      const gender = genderMap.get(personId) ?? 'male';
-      const label = pathToLabel(path, gender, nodeIds, genderMap, mode, labels);
-      if (label) result.set(personId, label);
+      const spouseSteps = path.filter((s) => s === 'spouse').length;
+      if (path.length <= maxSteps && spouseSteps <= maxSpouseSteps) {
+        const gender = genderMap.get(personId) ?? 'male';
+        const label = pathToLabel(path, gender, nodeIds, genderMap, mode, labels);
+        if (label) result.set(personId, label);
+      }
     }
 
     for (const pid of parentOf.get(personId) ?? []) {
