@@ -268,8 +268,11 @@ export function FamilyTreeCanvas({ state, rootId, onNodePress, onNodeLongPress }
 
   // === GESTURES ===
   const tx = useSharedValue(0), ty = useSharedValue(0), sc = useSharedValue(1);
-  const ssc = useSharedValue(1);
-  const fx = useSharedValue(0), fy = useSharedValue(0);
+  // Pinch bookkeeping — previous focal point, pinch scale, and pointer count.
+  // Zoom/pan are applied as per-frame deltas relative to these (see pinch below).
+  const pFocalX = useSharedValue(0), pFocalY = useSharedValue(0);
+  const pScale = useSharedValue(1);
+  const pPointers = useSharedValue(0);
 
   const nodesRef = layout.nodes;
 
@@ -315,20 +318,40 @@ export function FamilyTreeCanvas({ state, rootId, onNodePress, onNodeLongPress }
     .onChange(e => { tx.value += e.changeX; ty.value += e.changeY; })
     .onEnd(e => { tx.value = withDecay({ velocity: e.velocityX, deceleration: 0.997 }); ty.value = withDecay({ velocity: e.velocityY, deceleration: 0.997 }); });
 
-  // Pinch keeps the canvas point under the finger-centre (focal) fixed while
-  // scaling. Because the focal moves with the fingers, this also pans with two
-  // fingers. fx/fy hold that anchor point in canvas coordinates.
+  // Pinch zooms about the finger-centre (focal) and pans with it, applied as
+  // per-frame DELTAS rather than from an absolute anchor. That is what stops a
+  // finger-lift from jumping: when the pointer count changes, the focal centroid
+  // snaps from between the fingers onto the remaining one — a discontinuity. We
+  // detect it via e.numberOfPointers and rebase on that frame WITHOUT applying
+  // it, so the snap is absorbed instead of being pushed into tx/ty.
   const pinch = Gesture.Pinch()
     .onStart(e => {
-      ssc.value = sc.value;
-      fx.value = (e.focalX - tx.value) / sc.value;
-      fy.value = (e.focalY - ty.value) / sc.value;
+      pScale.value = 1;
+      pFocalX.value = e.focalX;
+      pFocalY.value = e.focalY;
+      pPointers.value = e.numberOfPointers;
     })
     .onUpdate(e => {
-      const nz = Math.min(ZOOM_MAX, Math.max(ZOOM_MIN, ssc.value * e.scale));
-      tx.value = e.focalX - fx.value * nz;
-      ty.value = e.focalY - fy.value * nz;
+      if (e.numberOfPointers !== pPointers.value) {
+        // A finger was added or lifted — rebase and drop this frame's focal jump.
+        pPointers.value = e.numberOfPointers;
+        pScale.value = e.scale;
+        pFocalX.value = e.focalX;
+        pFocalY.value = e.focalY;
+        return;
+      }
+      // Zoom about the focal using the incremental scale ratio.
+      const nz = Math.min(ZOOM_MAX, Math.max(ZOOM_MIN, sc.value * (e.scale / pScale.value)));
+      const ratio = nz / sc.value;
+      tx.value = e.focalX - (e.focalX - tx.value) * ratio;
+      ty.value = e.focalY - (e.focalY - ty.value) * ratio;
       sc.value = nz;
+      pScale.value = e.scale;
+      // Pan by focal movement (two-finger drag).
+      tx.value += e.focalX - pFocalX.value;
+      ty.value += e.focalY - pFocalY.value;
+      pFocalX.value = e.focalX;
+      pFocalY.value = e.focalY;
     });
 
   const tap = Gesture.Tap()
