@@ -49,6 +49,20 @@ const LABEL_BOX = {
   minHeight: 54,
 };
 
+/**
+ * Bounds of a person's label card (the parchment box below the circle), in
+ * canvas coordinates. Single source of truth shared by rendering and hit-testing
+ * so the touch target always matches the drawn card.
+ */
+function labelCardBounds(n: { x: number; y: number }, height: number) {
+  return {
+    left: n.x - LABEL_BOX.width / 2,
+    top: n.y + NODE_R + LABEL_BOX.gapFromNode,
+    width: LABEL_BOX.width,
+    height,
+  };
+}
+
 /** Node circle sizes */
 const NODE_GLOW_R = NODE_R + 5;
 
@@ -59,6 +73,9 @@ const STROKE = { rootRing: 2.5, nodeRing: 1.5, innerRing: 0.4, labelBox: 0.6, co
 /** Gesture zoom limits */
 const ZOOM_MIN = 0.3;
 const ZOOM_MAX = 4;
+
+/** Extra touch radius around a node circle, so it is easy to tap. */
+const TAP_SLOP = 20;
 
 /** Animation durations */
 const ANIM = {
@@ -276,13 +293,38 @@ export function FamilyTreeCanvas({ state, rootId, onNodePress, onNodeLongPress }
 
   const nodesRef = layout.nodes;
 
+  // Per-node label-box height, so taps land on the description card too — not
+  // just the circle. The card grows to fit each person's name/dates.
+  const labelHeightById = useMemo(() => {
+    const m = new Map<string, number>();
+    for (const l of geo.labels) m.set(l.id, l.boxHeight);
+    return m;
+  }, [geo.labels]);
+
+  /** Screen (gesture) coordinates → canvas coordinates, undoing pan + zoom. */
+  const screenToCanvas = (screenX: number, screenY: number) => ({
+    x: (screenX - tx.value) / sc.value,
+    y: (screenY - ty.value) / sc.value,
+  });
+
+  // A node is "hit" when the touch falls on its circle OR on its label card
+  // below. Same generous target for tap and long-press.
+  const findHitNode = (screenX: number, screenY: number) => {
+    const { x, y } = screenToCanvas(screenX, screenY);
+    return nodesRef.find(n => {
+      const onCircle =
+        Math.abs(x - n.x) < NODE_R + TAP_SLOP && Math.abs(y - n.y) < NODE_R + TAP_SLOP;
+      if (onCircle) return true;
+      const card = labelCardBounds(n, labelHeightById.get(n.id) ?? LABEL_BOX.minHeight);
+      return (
+        x >= card.left && x <= card.left + card.width &&
+        y >= card.top && y <= card.top + card.height
+      );
+    });
+  };
+
   const handleTap = (tapX: number, tapY: number) => {
-    const canvasX = (tapX - tx.value) / sc.value;
-    const canvasY = (tapY - ty.value) / sc.value;
-    const hit = nodesRef.find(n =>
-      Math.abs(canvasX - n.x) < NODE_R + 20 &&
-      Math.abs(canvasY - n.y) < NODE_R + 20
-    );
+    const hit = findHitNode(tapX, tapY);
     if (hit) {
       setBouncingId(hit.id);
       bounceScale.value = withSequence(
@@ -294,12 +336,7 @@ export function FamilyTreeCanvas({ state, rootId, onNodePress, onNodeLongPress }
   };
 
   const handleLongPress = (tapX: number, tapY: number) => {
-    const canvasX = (tapX - tx.value) / sc.value;
-    const canvasY = (tapY - ty.value) / sc.value;
-    const hit = nodesRef.find(n =>
-      Math.abs(canvasX - n.x) < NODE_R + 20 &&
-      Math.abs(canvasY - n.y) < NODE_R + 20
-    );
+    const hit = findHitNode(tapX, tapY);
     if (hit) onNodeLongPress(hit.id);
   };
 
@@ -535,15 +572,13 @@ export function FamilyTreeCanvas({ state, rootId, onNodePress, onNodeLongPress }
                     ? <Group transform={bounceTransform} origin={vec(n.x, n.y)}>{nodeBody}</Group>
                     : nodeBody}
                   {(() => {
-                    const boxTop = n.y + NODE_R + LABEL_BOX.gapFromNode;
-                    const boxLeft = n.x - LABEL_BOX.width / 2;
-                    const boxH = lb ? lb.boxHeight : LABEL_BOX.minHeight;
+                    const card = labelCardBounds(n, lb ? lb.boxHeight : LABEL_BOX.minHeight);
                     return (
                       <>
-                        <RoundedRect x={boxLeft} y={boxTop} width={LABEL_BOX.width} height={boxH} r={LABEL_BOX.radius} color={P.cream} />
-                        <RoundedRect x={boxLeft} y={boxTop} width={LABEL_BOX.width} height={boxH} r={LABEL_BOX.radius} color={P.parchEdge} style="stroke" strokeWidth={STROKE.labelBox} />
+                        <RoundedRect x={card.left} y={card.top} width={card.width} height={card.height} r={LABEL_BOX.radius} color={P.cream} />
+                        <RoundedRect x={card.left} y={card.top} width={card.width} height={card.height} r={LABEL_BOX.radius} color={P.parchEdge} style="stroke" strokeWidth={STROKE.labelBox} />
                         {lb && lb.rows.map((row, ri) => (
-                          <Paragraph key={ri} paragraph={row.para} x={boxLeft} y={boxTop + row.y} width={LABEL_BOX.width} />
+                          <Paragraph key={ri} paragraph={row.para} x={card.left} y={card.top + row.y} width={card.width} />
                         ))}
                       </>
                     );
