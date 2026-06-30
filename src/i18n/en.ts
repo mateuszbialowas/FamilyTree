@@ -29,6 +29,8 @@ export const en = {
     siblingOrderTitle: 'Order among siblings',
     moveSiblingLeft: 'Move left',
     moveSiblingRight: 'Move right',
+    siblingOrderLocked: "This person's position can't change here — moving them would cross branches.",
+    siblingOrderLockedRoot: 'This is the tree root — set someone else as the root to change its position.',
     bornPrefix: 'b.',
   },
 

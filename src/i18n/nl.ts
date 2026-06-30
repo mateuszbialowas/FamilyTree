@@ -47,6 +47,8 @@ export const nl = {
     siblingOrderTitle: 'Volgorde onder broers en zussen',
     moveSiblingLeft: 'Naar links verplaatsen',
     moveSiblingRight: 'Naar rechts verplaatsen',
+    siblingOrderLocked: 'De positie van deze persoon kan hier niet veranderen — verplaatsen zou takken laten kruisen.',
+    siblingOrderLockedRoot: 'Dit is de stamboomwortel — stel iemand anders in als wortel om de positie te wijzigen.',
     bornPrefix: 'geb.',
   },
 

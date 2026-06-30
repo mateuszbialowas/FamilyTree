@@ -1,9 +1,10 @@
-import React from 'react';
+import React, { useEffect, useMemo } from 'react';
 import { View, Text, TouchableOpacity, Modal, StyleSheet, Pressable } from 'react-native';
+import Animated, { useSharedValue, useAnimatedStyle, withSequence, withTiming } from 'react-native-reanimated';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { useTranslation } from 'react-i18next';
 import { useFamily } from '../../context/FamilyContext';
-import { siblingGroup } from '../../utils/siblingOrder';
+import { reorderAvailability } from '../../utils/reorderAvailability';
 import { colors } from '../../theme/colors';
 import { fonts, fontSizes } from '../../theme/typography';
 import { spacing, borderRadius } from '../../theme/spacing';
@@ -13,6 +14,8 @@ export type RelationType = 'parent' | 'child' | 'spouse' | 'sibling';
 type Props = {
   /** Person whose menu is shown; `null` keeps the menu closed. */
   personId: string | null;
+  /** The tree's current root — reordering is validated against this view. */
+  rootId: string | null;
   onClose: () => void;
   onAddRelation: (relationType: RelationType) => void;
 };
@@ -31,22 +34,41 @@ const ADD_ACTIONS: readonly AddAction[] = [
  * among their siblings (arrows stay open for repeated taps, with the tree
  * updating live behind) and shortcuts to add a related person.
  */
-export function NodeContextMenu({ personId, onClose, onAddRelation }: Props) {
+export function NodeContextMenu({ personId, rootId, onClose, onAddRelation }: Props) {
   const { t } = useTranslation();
   const { state, dispatch } = useFamily();
 
   const person = personId ? state.people.find(p => p.id === personId) ?? null : null;
-  // Recomputed each render, so the position label and arrow availability update
-  // immediately after each reorder dispatch.
-  const siblings = personId ? siblingGroup(personId, state) : [];
-  const index = person ? siblings.findIndex(p => p.id === person.id) : -1;
+
+  // Sibling order + validation. Memoised so the layout simulation (see
+  // reorderAvailability) stays off the per-frame animation path and only reruns
+  // when the data, root, or selected person changes.
+  const { siblings, index, canLeft, canRight } = useMemo(
+    () => reorderAvailability(personId, rootId, state),
+    [personId, rootId, state],
+  );
+
   const hasSiblings = siblings.length > 1;
-  const canMoveLeft = index > 0;
-  const canMoveRight = index >= 0 && index < siblings.length - 1;
+  // Has siblings, but no move would change the picture → position is locked here.
+  const locked = hasSiblings && !canLeft && !canRight;
+  const isRoot = personId != null && personId === rootId;
 
   const move = (direction: 'left' | 'right') => {
     if (personId) dispatch({ type: 'REORDER_SIBLING', payload: { personId, direction } });
   };
+
+  // Pulse the highlighted dot whenever the person's position changes — instant,
+  // in-sheet feedback that a reorder took effect, even while the tree is hidden
+  // behind the sheet.
+  const pulse = useSharedValue(1);
+  useEffect(() => {
+    if (index < 0) return;
+    pulse.value = withSequence(
+      withTiming(1.5, { duration: 110 }),
+      withTiming(1, { duration: 130 }),
+    );
+  }, [index]);
+  const activeDotStyle = useAnimatedStyle(() => ({ transform: [{ scale: pulse.value }] }));
 
   return (
     <Modal visible={personId !== null} animationType="slide" transparent onRequestClose={onClose}>
@@ -81,23 +103,43 @@ export function NodeContextMenu({ personId, onClose, onAddRelation }: Props) {
           {hasSiblings && (
             <View style={styles.orderSection}>
               <Text style={styles.orderTitle}>{t('tree.siblingOrderTitle')}</Text>
-              <View style={styles.orderRow}>
-                <ArrowButton
-                  testID="btn-sibling-left"
-                  icon="chevron-left"
-                  enabled={canMoveLeft}
-                  label={t('tree.moveSiblingLeft')}
-                  onPress={() => move('left')}
-                />
-                <Text style={styles.orderPosition}>{index + 1} / {siblings.length}</Text>
-                <ArrowButton
-                  testID="btn-sibling-right"
-                  icon="chevron-right"
-                  enabled={canMoveRight}
-                  label={t('tree.moveSiblingRight')}
-                  onPress={() => move('right')}
-                />
-              </View>
+              {locked ? (
+                <View style={styles.orderLocked} testID="sibling-order-locked">
+                  <MaterialCommunityIcons name="lock-outline" size={18} color={colors.textMuted} style={styles.orderLockedIcon} />
+                  <Text style={styles.orderLockedText}>
+                    {t(isRoot ? 'tree.siblingOrderLockedRoot' : 'tree.siblingOrderLocked')}
+                  </Text>
+                </View>
+              ) : (
+                <>
+                  <View style={styles.orderRow}>
+                    <ArrowButton
+                      testID="btn-sibling-left"
+                      icon="chevron-left"
+                      enabled={canLeft}
+                      label={t('tree.moveSiblingLeft')}
+                      onPress={() => move('left')}
+                    />
+                    <View style={styles.dots}>
+                      {siblings.map((s, i) =>
+                        i === index ? (
+                          <Animated.View key={s.id} style={[styles.dot, styles.dotActive, activeDotStyle]} />
+                        ) : (
+                          <View key={s.id} style={styles.dot} />
+                        )
+                      )}
+                    </View>
+                    <ArrowButton
+                      testID="btn-sibling-right"
+                      icon="chevron-right"
+                      enabled={canRight}
+                      label={t('tree.moveSiblingRight')}
+                      onPress={() => move('right')}
+                    />
+                  </View>
+                  <Text style={styles.orderPosition}>{index + 1} / {siblings.length}</Text>
+                </>
+              )}
             </View>
           )}
         </Pressable>
@@ -184,12 +226,49 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
   },
+  dots: {
+    flex: 1,
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingHorizontal: spacing.sm,
+  },
+  dot: {
+    width: 7,
+    height: 7,
+    borderRadius: 3.5,
+    backgroundColor: colors.border,
+    marginHorizontal: 3,
+    marginVertical: 2,
+  },
+  dotActive: {
+    width: 10,
+    height: 10,
+    borderRadius: 5,
+    backgroundColor: colors.primary,
+  },
   orderPosition: {
     fontFamily: fonts.bodyBold,
-    fontSize: fontSizes.lg,
-    color: colors.text,
-    marginHorizontal: spacing.xl,
-    minWidth: 64,
+    fontSize: fontSizes.sm,
+    color: colors.textMuted,
+    marginTop: spacing.sm,
+    textAlign: 'center',
+  },
+  orderLocked: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingHorizontal: spacing.md,
+  },
+  orderLockedIcon: {
+    marginRight: spacing.sm,
+  },
+  orderLockedText: {
+    flex: 1,
+    fontFamily: fonts.body,
+    fontSize: fontSizes.sm,
+    color: colors.textMuted,
     textAlign: 'center',
   },
   arrowBtn: {

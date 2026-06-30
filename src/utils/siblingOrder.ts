@@ -1,5 +1,4 @@
 import type { FamilyState, Person } from '../types';
-import { getSiblings } from './relationships';
 
 /**
  * Single source of truth for the left→right order of siblings on the tree.
@@ -27,9 +26,31 @@ export function compareSiblings(a?: Person, b?: Person): number {
   return 0;
 }
 
-/** A person + their full siblings, in current left→right (visual) order. */
+/**
+ * A person together with their siblings, in current left→right (visual) order.
+ *
+ * The base order is the parent-child relationship (insertion) order — exactly
+ * how the layout builds its `childrenOf` lists — and only THEN is it sorted by
+ * compareSiblings. Building it the same way the tree does is essential: a naive
+ * `[self, ...siblings]` base would break ties for undated siblings differently
+ * than the tree, so the menu's "3 / 7" position could disagree with the drawn
+ * left→right order.
+ */
 export function siblingGroup(personId: string, state: FamilyState): Person[] {
-  const self = state.people.find((p) => p.id === personId);
+  const byId = new Map(state.people.map((p) => [p.id, p]));
+  const self = byId.get(personId);
   if (!self) return [];
-  return [self, ...getSiblings(personId, state)].sort(compareSiblings);
+
+  const parentIds = new Set(
+    state.parentChildRelationships
+      .filter((r) => r.childId === personId)
+      .map((r) => r.parentId),
+  );
+  if (parentIds.size === 0) return [self];
+
+  const ids: string[] = [];
+  for (const r of state.parentChildRelationships) {
+    if (parentIds.has(r.parentId) && !ids.includes(r.childId)) ids.push(r.childId);
+  }
+  return ids.map((id) => byId.get(id)!).sort(compareSiblings);
 }

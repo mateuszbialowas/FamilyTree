@@ -47,6 +47,8 @@ export const de = {
     siblingOrderTitle: 'Reihenfolge unter Geschwistern',
     moveSiblingLeft: 'Nach links verschieben',
     moveSiblingRight: 'Nach rechts verschieben',
+    siblingOrderLocked: 'Die Position dieser Person lässt sich hier nicht ändern — das Verschieben würde Zweige kreuzen.',
+    siblingOrderLockedRoot: 'Dies ist die Baumwurzel — lege eine andere Person als Wurzel fest, um ihre Position zu ändern.',
     bornPrefix: '*',
   },
 

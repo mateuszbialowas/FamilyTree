@@ -1,5 +1,6 @@
 import { describe, it, expect } from 'vitest';
 import { computeUnifiedLayout, COUPLE_SPACING, SOLO_WIDTH, NODE_R, type LNode, type Conn } from '../treeLayout';
+import { siblingGroup } from '../siblingOrder';
 import type { FamilyState, Person } from '../../types';
 
 // ─── Geometry helpers for the layout invariants ───────────────────────────
@@ -506,5 +507,54 @@ describe('computeUnifiedLayout', () => {
     expect(x('s1')).toBeLessThan(x('me'));
     expect(x('me')).toBeLessThan(x('s2'));
     expect(x('s2')).toBeLessThan(x('s3'));
+  });
+
+  it("married root's siblings render in the same order the menu shows", () => {
+    // Root is a COUPLE (mateusz+joanna); mateusz's undated brothers hang under
+    // his parents, joanna's family on the other side. The menu (siblingGroup)
+    // and the drawn left→right order must agree for the brothers — regression
+    // for the "menu says Piotrek 1st but tree shows Kuba 1st" report.
+    const make = (orders: Record<string, number | undefined>): FamilyState => ({
+      people: [
+        person('jan', 'Jan', 'Kowalski', 'male', '1985-06-30'),
+        person('ewelina', 'Ewelina', 'Kowalska', 'female'),
+        { ...person('mateusz', 'Mateusz', 'Białowąs', 'male', '1990-08-31'), manualOrder: orders.mateusz },
+        { ...person('kuba', 'Kuba', 'Kowalski'), manualOrder: orders.kuba },
+        { ...person('piotrek', 'Piotrek', 'Kowalski'), manualOrder: orders.piotrek },
+        person('joanna', 'Joanna', 'Preiss', 'female', '1992-03-14'),
+        person('marek', 'Marek', 'Preiss', 'male', '1942-09-01'),
+        person('barbara', 'Barbara', 'Preiss', 'female', '1944-04-22'),
+        person('kasia', 'Katarzyna', 'Preiss', 'female', '1994-07-07'),
+      ],
+      parentChildRelationships: [
+        { id: 'r1', parentId: 'jan', childId: 'mateusz' },
+        { id: 'r2', parentId: 'jan', childId: 'kuba' },
+        { id: 'r3', parentId: 'jan', childId: 'piotrek' },
+        { id: 'r4', parentId: 'ewelina', childId: 'mateusz' },
+        { id: 'r5', parentId: 'ewelina', childId: 'kuba' },
+        { id: 'r6', parentId: 'ewelina', childId: 'piotrek' },
+        { id: 'r7', parentId: 'marek', childId: 'joanna' },
+        { id: 'r8', parentId: 'marek', childId: 'kasia' },
+        { id: 'r9', parentId: 'barbara', childId: 'joanna' },
+        { id: 'r10', parentId: 'barbara', childId: 'kasia' },
+      ],
+      marriages: [
+        { id: 'm1', spouse1Id: 'mateusz', spouse2Id: 'joanna', marriageDate: null, divorceDate: null },
+        { id: 'm2', spouse1Id: 'jan', spouse2Id: 'ewelina', marriageDate: null, divorceDate: null },
+        { id: 'm3', spouse1Id: 'marek', spouse2Id: 'barbara', marriageDate: null, divorceDate: null },
+      ],
+    });
+
+    // For both default and a hand-set order, the two brothers' left→right order
+    // on the tree must match their relative order in the menu.
+    for (const orders of [{}, { piotrek: 0, kuba: 1, mateusz: 2 }]) {
+      const state = make(orders);
+      const { nodes } = computeUnifiedLayout('mateusz', state);
+      const x = (id: string) => nodes.find(n => n.id === id)!.x;
+      const menu = siblingGroup('piotrek', state).map(p => p.id);
+      const brothersByMenu = menu.filter(id => id === 'kuba' || id === 'piotrek');
+      const brothersByTree = ['kuba', 'piotrek'].sort((a, b) => x(a) - x(b));
+      expect(brothersByTree).toEqual(brothersByMenu);
+    }
   });
 });

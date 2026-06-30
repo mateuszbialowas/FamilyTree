@@ -153,6 +153,7 @@ export function TreeScreen() {
       {/* Long-press node context menu */}
       <NodeContextMenu
         personId={menuPersonId}
+        rootId={effectiveRootId}
         onClose={() => setMenuPersonId(null)}
         onAddRelation={handleAddRelation}
       />

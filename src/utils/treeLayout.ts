@@ -539,8 +539,11 @@ export function computeUnifiedLayout(
         for (const cu of right) placeDescendantSubtree(cu, 'right');
       } else {
         // Multiple parent units: fan each parent's collaterals outward to keep
-        // the two ancestor branches from crossing.
-        for (const cu of collaterals) placeDescendantSubtree(cu, side);
+        // the two ancestor branches from crossing. On the LEFT side, place
+        // nearest-spine first (reversed) so siblings still read left→right in
+        // sibling order — a plain forward loop would mirror them.
+        const ordered = side === 'left' ? [...collaterals].reverse() : collaterals;
+        for (const cu of ordered) placeDescendantSubtree(cu, side);
       }
 
       // Centre P over the X-span of all its placed children.

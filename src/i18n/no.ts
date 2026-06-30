@@ -47,6 +47,8 @@ export const no = {
     siblingOrderTitle: 'Rekkefølge blant søsken',
     moveSiblingLeft: 'Flytt til venstre',
     moveSiblingRight: 'Flytt til høyre',
+    siblingOrderLocked: 'Posisjonen til denne personen kan ikke endres her — flytting ville krysse greiner.',
+    siblingOrderLockedRoot: 'Dette er treets rot — sett en annen person som rot for å endre posisjonen.',
     bornPrefix: 'f.',
   },
 

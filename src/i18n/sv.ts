@@ -47,6 +47,8 @@ export const sv = {
     siblingOrderTitle: 'Ordning bland syskon',
     moveSiblingLeft: 'Flytta vänster',
     moveSiblingRight: 'Flytta höger',
+    siblingOrderLocked: 'Den här personens position kan inte ändras här — att flytta skulle korsa grenar.',
+    siblingOrderLockedRoot: 'Detta är trädets rot — ange någon annan som rot för att ändra positionen.',
     bornPrefix: 'f.',
   },
 

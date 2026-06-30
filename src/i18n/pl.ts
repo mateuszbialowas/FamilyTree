@@ -55,6 +55,8 @@ export const pl = {
     siblingOrderTitle: 'Kolejność wśród rodzeństwa',
     moveSiblingLeft: 'Przesuń w lewo',
     moveSiblingRight: 'Przesuń w prawo',
+    siblingOrderLocked: 'Pozycji tej osoby nie można tu zmienić — przesunięcie spowodowałoby skrzyżowanie gałęzi.',
+    siblingOrderLockedRoot: 'To korzeń drzewa — ustaw inną osobę jako korzeń, aby zmienić jego pozycję.',
     bornPrefix: 'ur.',
   },
 
