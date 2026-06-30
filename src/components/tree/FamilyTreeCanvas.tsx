@@ -22,9 +22,9 @@ import { consumeInitialTreeZoom } from '../../utils/screenshotMode';
 import { P } from './palette';
 import { mkPath } from './skiaHelpers';
 import { mkPara } from './skiaHelpers';
-import { WEDDING_RINGS_SVG, TREE_TRUNK_ROOTS_SVG } from './svgAssets';
+import { WEDDING_RINGS_SVG, TREE_TRUNK_ROOTS_SVG, RACCOON_SVG } from './svgAssets';
 import { genBranch, genCanopy, leafPath, leafVeinPath, placeAnimals } from './geometry';
-import { OwlComponent, BirdComponent, SquirrelComponent } from './animals';
+import { OwlComponent, BirdComponent, RaccoonComponent } from './animals';
 
 // ======================== CANVAS CONSTANTS ========================
 
@@ -229,6 +229,7 @@ function PersonInitials({ x, y, name }: { x: number; y: number; name: string }) 
 // ======================== MOURNING BAND (thin diagonal strip, lower-right) ========================
 const weddingRingsSvg = Skia.SVG.MakeFromString(WEDDING_RINGS_SVG);
 const treeTrunkRootsSvg = Skia.SVG.MakeFromString(TREE_TRUNK_ROOTS_SVG);
+const raccoonSvg = Skia.SVG.MakeFromString(RACCOON_SVG);
 
 function MourningBand({ x, y }: { x: number; y: number }) {
   const r = NODE_R;
@@ -364,12 +365,6 @@ export function FamilyTreeCanvas({ state, rootId, onNodePress, onNodeLongPress }
     ), -1, false);
   }, [ambientAnimations]);
 
-  const tailWag = useSharedValue(0);
-  useEffect(() => {
-    if (!ambientAnimations) { tailWag.value = 0; return; }
-    tailWag.value = withRepeat(withTiming(0.12, { duration: ANIM.tailWag, easing: Easing.inOut(Easing.sin) }), -1, true);
-  }, [ambientAnimations]);
-
   // Pulsing halo around the selected root person
   const rootGlow = useSharedValue(0);
   useEffect(() => {
@@ -398,7 +393,6 @@ export function FamilyTreeCanvas({ state, rootId, onNodePress, onNodeLongPress }
   const trunkSway = useDerivedValue(() => [{ rotate: Math.sin(windPhase.value * 0.5) * 0.012 }]);
   const owlEyeT = useDerivedValue(() => [{ scaleY: owlBlink.value }]);
   const birdBobT = useDerivedValue(() => [{ translateY: birdBob.value }]);
-  const tailWagT = useDerivedValue(() => [{ rotate: tailWag.value }]);
 
   // Tap bounce — when a node is tapped, briefly scale it up around its center
   const [bouncingId, setBouncingId] = useState<string | null>(null);
@@ -682,7 +676,7 @@ export function FamilyTreeCanvas({ state, rootId, onNodePress, onNodeLongPress }
             {geo.animals.map((a, i) => {
               if (a.type === 'owl') return <OwlComponent key={`a${i}`} x={a.x} y={a.y} flip={a.flip} eyeScale={owlEyeT} />;
               if (a.type === 'bird') return <BirdComponent key={`a${i}`} x={a.x} y={a.y} flip={a.flip} bobTransform={birdBobT} />;
-              if (a.type === 'squirrel') return <SquirrelComponent key={`a${i}`} x={a.x} y={a.y} flip={a.flip} tailTransform={tailWagT} />;
+              if (a.type === 'squirrel') return <RaccoonComponent key={`a${i}`} x={a.x} y={a.y} flip={a.flip} svg={raccoonSvg} />;
               return null;
             })}
 
