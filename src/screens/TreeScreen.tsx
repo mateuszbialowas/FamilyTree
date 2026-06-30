@@ -11,6 +11,7 @@ import {
   consumeInitialTreeRootId,
   consumeInitialTreeRootName,
 } from '../utils/screenshotMode';
+import { loadRootId, saveRootId } from '../utils/storage';
 import { FamilyTreeCanvas } from '../components/tree/FamilyTreeCanvas';
 import { EmptyState } from '../components/ui/EmptyState';
 import { useTranslation } from 'react-i18next';
@@ -42,6 +43,19 @@ export function TreeScreen() {
       `${p.firstName} ${p.lastName}`.toLowerCase() === target,
     );
     if (match) setRootId(match.id);
+  }, [state.people]);
+
+  // Restore the user's last chosen root once on launch (separate storage key, so
+  // family data is never touched). Skipped if a deep link or pick already set it.
+  const rootRestored = React.useRef(false);
+  useEffect(() => {
+    if (rootRestored.current || state.people.length === 0) return;
+    rootRestored.current = true;
+    loadRootId().then(savedId => {
+      if (savedId && state.people.some(p => p.id === savedId)) {
+        setRootId(prev => prev ?? savedId);
+      }
+    });
   }, [state.people]);
 
   const effectiveRootId = rootId && state.people.some(p => p.id === rootId)
@@ -129,6 +143,7 @@ export function TreeScreen() {
                   ]}
                   onPress={() => {
                     setRootId(item.id);
+                    saveRootId(item.id);
                     setPickerVisible(false);
                   }}
                 >
