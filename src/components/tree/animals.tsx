@@ -90,47 +90,50 @@ export function SquirrelComponent({ x, y, flip, tailTransform }: { x: number; y:
   const s = flip ? -1 : 1;
   const S = P.squirrel;
   const paths = useMemo(() => ({
-    tail: mkPath('M -3,6 C -10,3 -15,-5 -10,-12 C -7,-16 -2,-14 -1,-9 C 0,-5 -1,0 -3,4 Z'),
-    tailLight: mkPath('M -3,5 C -9,2 -13,-4 -9,-10 C -7,-14 -3,-12 -2,-8 C -1,-4 -1,1 -3,4 Z'),
-    tailFur1: mkPath('M -5,2 Q -8,-2 -8,-6'),
-    tailFur2: mkPath('M -4,0 Q -6,-4 -5,-9'),
-    body: mkPath('M 0,2 C -5,0 -7,4 -6,12 C -5,15 -2,16 0,16 C 2,16 5,15 6,12 C 7,4 5,0 0,2 Z'),
-    belly: mkPath('M -3.5,7 C -3.5,11 0,14 3.5,7 Z'),
-    bellyLine1: mkPath('M -1,5 Q 1,6 3,5'),
-    bellyLine2: mkPath('M -1.5,8 Q 1,9 3.5,8'),
-    paw: mkPath('M 3,7 Q 5,6 6,8 Q 5,9 3,9 Z'),
-    earL: mkPath('M 3,-7 L 2,-13 Q 4,-11 5,-7 Z'),
-    earR: mkPath('M 9,-7 L 10,-13 Q 8,-11 7,-7 Z'),
-    earInL: mkPath('M 3.5,-7 L 2.8,-11 Q 4,-10 4.5,-7 Z'),
-    earInR: mkPath('M 8.5,-7 L 9.2,-11 Q 8,-10 7.5,-7 Z'),
-    whiskers: mkPath('M 10.5,-2.5 L 14,-3.5 M 10.5,-2 L 14,-1.5 M 10.5,-1.5 L 13,0'),
-    footL: mkPath('M -2,15 Q -4,16 -5,15.5 Q -4,17 -1,16.5 Z'),
-    footR: mkPath('M 4,15 Q 6,16 7,15.5 Q 6,17 3,16.5 Z'),
+    // Bushy tail: a soft crescent curling up the left side and over the head.
+    tail: mkPath('M -2,13 C -10,14 -15,6 -14,-3 C -13,-12 -7,-16 -1,-14 C -4,-11 -6,-6 -5,-1 C -4,4 -3,9 -2,13 Z'),
+    tailLight: mkPath('M -3,11 C -9,11 -13,5 -12,-3 C -11,-10 -7,-13 -3,-12 C -5,-9 -6,-5 -5,0 C -4,4 -3,8 -3,11 Z'),
+    tailFur1: mkPath('M -10,8 Q -13,2 -12,-4'),
+    tailFur2: mkPath('M -8,10 Q -11,3 -10,-6'),
+    // Plump sitting body (narrow chest, wide haunches).
+    body: mkPath('M 0,-3 C 5,-3 8,2 8,8 C 8,14 4,18 0,18 C -4,18 -8,14 -8,8 C -8,2 -5,-3 0,-3 Z'),
+    belly: mkPath('M 1,4 C 4,4 5,9 3,14 C 2,16 0,16 -1,15 C -2,12 -2,7 -1,5 C -0.3,4.2 0.3,4 1,4 Z'),
+    bellyLine1: mkPath('M -1,7 Q 1,8 3,7'),
+    bellyLine2: mkPath('M -1.5,10 Q 1,11 3,10'),
+    pawL: mkPath('M -1,2 C 1,2 2,5 0,7 C -2,7 -3,5 -2,3 C -1.7,2.3 -1.4,2 -1,2 Z'),
+    earL: mkPath('M -2,-12 C -5,-15 -4,-19 -1,-18 C 1,-17 1,-14 0,-12 Z'),
+    earR: mkPath('M 5,-12 C 6,-15 8,-18 10,-16 C 11,-14 9,-13 7,-12 Z'),
+    earInL: mkPath('M -2,-12 C -4,-15 -3,-17 -1,-16.5 C 0,-16 0,-14 -0.5,-12 Z'),
+    earInR: mkPath('M 6,-12 C 6.5,-15 8,-16 9,-15 C 9.5,-14 8.5,-13 7,-12 Z'),
+    whiskers: mkPath('M 10,-6 L 14.5,-7 M 10,-5.3 L 14.5,-5 M 10,-4.6 L 14,-3'),
+    footL: mkPath('M -4,16.5 C -6,16.5 -7,18.5 -5,18.5 C -4,18.5 -3,17.5 -4,16.5 Z'),
+    footR: mkPath('M 4,16.5 C 6,16.5 7,18.5 5,18.5 C 4,18.5 3,17.5 4,16.5 Z'),
   }), []);
   return (
     <Group transform={[{ translateX: x }, { translateY: y }, { scaleX: s }]}>
-      <Group transform={tailTransform} origin={vec(-3, 6)}>
+      <Group transform={tailTransform} origin={vec(-2, 13)}>
         <Path path={paths.tail} color={S.tail} />
-        <Path path={paths.tailLight} color={S.tailLight} opacity={0.4} />
-        <Path path={paths.tailFur1} style="stroke" color={S.bodyDk} strokeWidth={0.3} opacity={0.15} />
-        <Path path={paths.tailFur2} style="stroke" color={S.bodyDk} strokeWidth={0.3} opacity={0.12} />
+        <Path path={paths.tailLight} color={S.tailLight} opacity={0.45} />
+        <Path path={paths.tailFur1} style="stroke" color={S.bodyDk} strokeWidth={0.4} opacity={0.15} />
+        <Path path={paths.tailFur2} style="stroke" color={S.bodyDk} strokeWidth={0.4} opacity={0.12} />
       </Group>
-      <Oval x={-5.5} y={0.5} width={13} height={17} color="rgba(0,0,0,0.07)" />
+      <Oval x={-7} y={-1} width={15} height={20} color="rgba(0,0,0,0.06)" />
       <Path path={paths.body} color={S.body} />
-      <Path path={paths.belly} color={S.belly} opacity={0.6} />
-      <Path path={paths.bellyLine1} style="stroke" color={S.body} strokeWidth={0.3} opacity={0.2} />
-      <Path path={paths.bellyLine2} style="stroke" color={S.body} strokeWidth={0.3} opacity={0.15} />
-      <Path path={paths.paw} color={S.bodyDk} opacity={0.3} />
-      <Oval x={1} y={-8} width={10} height={9} color={S.body} />
+      <Path path={paths.belly} color={S.belly} opacity={0.65} />
+      <Path path={paths.bellyLine1} style="stroke" color={S.bodyDk} strokeWidth={0.3} opacity={0.18} />
+      <Path path={paths.bellyLine2} style="stroke" color={S.bodyDk} strokeWidth={0.3} opacity={0.15} />
+      <Path path={paths.pawL} color={S.bodyDk} opacity={0.35} />
       <Path path={paths.earL} color={S.ear} />
       <Path path={paths.earR} color={S.ear} />
-      <Path path={paths.earInL} color={S.belly} opacity={0.4} />
-      <Path path={paths.earInR} color={S.belly} opacity={0.4} />
-      <Circle cx={8} cy={-4.5} r={1.8} color="white" />
-      <Circle cx={8.3} cy={-4.5} r={1.2} color={S.eye} />
-      <Circle cx={8.7} cy={-5} r={0.4} color="white" opacity={0.85} />
-      <Oval x={8.5} y={-4} width={2} height={1.4} color={S.nose} />
-      <Path path={paths.whiskers} style="stroke" color={S.bodyDk} strokeWidth={0.2} opacity={0.2} />
+      <Circle cx={2} cy={-8} r={7} color={S.body} />
+      <Circle cx={8} cy={-6} r={3.2} color={S.body} />
+      <Path path={paths.earInL} color={S.belly} opacity={0.45} />
+      <Path path={paths.earInR} color={S.belly} opacity={0.45} />
+      <Circle cx={5} cy={-8} r={2.6} color="white" />
+      <Circle cx={5.6} cy={-7.8} r={1.7} color={S.eye} />
+      <Circle cx={6.2} cy={-8.6} r={0.7} color="white" opacity={0.9} />
+      <Circle cx={10.2} cy={-6} r={1.2} color={S.nose} />
+      <Path path={paths.whiskers} style="stroke" color={S.bodyDk} strokeWidth={0.2} opacity={0.25} />
       <Path path={paths.footL} color={S.bodyDk} opacity={0.4} />
       <Path path={paths.footR} color={S.bodyDk} opacity={0.4} />
     </Group>
