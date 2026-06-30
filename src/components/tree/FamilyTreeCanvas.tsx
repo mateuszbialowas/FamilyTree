@@ -77,6 +77,14 @@ const ZOOM_MAX = 4;
 /** Extra touch radius around a node circle, so it is easy to tap. */
 const TAP_SLOP = 20;
 
+/**
+ * Above this many drawn nodes the ambient animations (wind/leaves/blinking/
+ * bobbing/glow) are switched off. Each one repaints the whole Skia canvas every
+ * frame, so on big trees they cause constant lag; disabling them keeps large
+ * trees smooth while small trees stay lively.
+ */
+const AMBIENT_ANIM_NODE_LIMIT = 45;
+
 /** Animation durations */
 const ANIM = {
   wind: 5000,
@@ -218,13 +226,22 @@ export function FamilyTreeCanvas({ state, rootId, onNodePress, onNodeLongPress }
   }, [layout, rootId, state.parentChildRelationships, state.people]);
 
   // === ANIMATIONS ===
+  // Each continuous animation drives a Skia value, and in react-native-skia any
+  // value change repaints the WHOLE canvas. On a large tree that means redrawing
+  // every node/branch/leaf ~60×/s even while idle — the main source of lag. So
+  // the ambient decorations (wind, blinking, bobbing, glow) are disabled past a
+  // node-count threshold: the tree then only repaints while panning/zooming.
+  const ambientAnimations = layout.nodes.length <= AMBIENT_ANIM_NODE_LIMIT;
+
   const windPhase = useSharedValue(0);
   useEffect(() => {
+    if (!ambientAnimations) { windPhase.value = 0; return; }
     windPhase.value = withRepeat(withTiming(Math.PI * 2, { duration: ANIM.wind, easing: Easing.inOut(Easing.sin) }), -1, true);
-  }, []);
+  }, [ambientAnimations]);
 
   const owlBlink = useSharedValue(1);
   useEffect(() => {
+    if (!ambientAnimations) { owlBlink.value = 1; return; }
     owlBlink.value = withDelay(ANIM.blinkDelay, withRepeat(
       withSequence(
         withTiming(0.05, { duration: ANIM.blinkClose }),
@@ -232,31 +249,34 @@ export function FamilyTreeCanvas({ state, rootId, onNodePress, onNodeLongPress }
         withDelay(ANIM.blinkInterval, withTiming(1, { duration: 0 })),
       ), -1, false,
     ));
-  }, []);
+  }, [ambientAnimations]);
 
   const birdBob = useSharedValue(0);
   useEffect(() => {
+    if (!ambientAnimations) { birdBob.value = 0; return; }
     birdBob.value = withRepeat(withSequence(
       withTiming(-1.5, { duration: ANIM.bobUp, easing: Easing.inOut(Easing.quad) }),
       withTiming(0.5, { duration: ANIM.bobDown, easing: Easing.inOut(Easing.quad) }),
       withTiming(0, { duration: ANIM.bobSettle }),
       withDelay(ANIM.bobPause, withTiming(0, { duration: 0 })),
     ), -1, false);
-  }, []);
+  }, [ambientAnimations]);
 
   const tailWag = useSharedValue(0);
   useEffect(() => {
+    if (!ambientAnimations) { tailWag.value = 0; return; }
     tailWag.value = withRepeat(withTiming(0.12, { duration: ANIM.tailWag, easing: Easing.inOut(Easing.sin) }), -1, true);
-  }, []);
+  }, [ambientAnimations]);
 
   // Pulsing halo around the selected root person
   const rootGlow = useSharedValue(0);
   useEffect(() => {
+    if (!ambientAnimations) { rootGlow.value = 0; return; }
     rootGlow.value = withRepeat(
       withTiming(1, { duration: ANIM.glowPulse, easing: Easing.inOut(Easing.sin) }),
       -1, true,
     );
-  }, []);
+  }, [ambientAnimations]);
   const glowR = useDerivedValue(() => NODE_GLOW_R + rootGlow.value * 5);
   const glowOpacity = useDerivedValue(() => 0.18 + rootGlow.value * 0.17);
 
