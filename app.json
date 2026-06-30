@@ -2,7 +2,7 @@
   "expo": {
     "name": "Family Tree",
     "slug": "family-tree",
-    "version": "1.2.2",
+    "version": "1.3.0",
     "scheme": "family-tree",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
