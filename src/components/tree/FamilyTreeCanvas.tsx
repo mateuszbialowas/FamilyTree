@@ -70,8 +70,8 @@ const NODE_GLOW_R = NODE_R + 5;
 const STROKE = { rootRing: 2.5, nodeRing: 1.5, innerRing: 0.4, labelBox: 0.6, coupleLine: 1 };
 
 
-/** Gesture zoom limits */
-const ZOOM_MIN = 0.3;
+/** Gesture zoom limits. Min is low so big trees can be zoomed right out to fit. */
+const ZOOM_MIN = 0.08;
 const ZOOM_MAX = 4;
 
 /** Extra touch radius around a node circle, so it is easy to tap. */
@@ -432,6 +432,37 @@ export function FamilyTreeCanvas({ state, rootId, onNodePress, onNodeLongPress }
 
   const [canvasSize, setCanvasSize] = useState({ w: 0, h: 0 });
 
+  // Frame the WHOLE tree in view: bounding box of every node (plus room for the
+  // circle and the label card below it), scaled to fit the canvas. Never zooms
+  // past 1, and clamps to ZOOM_MIN so even huge trees fit on one screen.
+  const fitToScreen = useCallback(() => {
+    if (canvasSize.w === 0 || layout.nodes.length === 0) return;
+    let minX = Infinity, maxX = -Infinity, minY = Infinity, maxY = -Infinity;
+    for (const n of layout.nodes) {
+      if (n.x < minX) minX = n.x;
+      if (n.x > maxX) maxX = n.x;
+      if (n.y < minY) minY = n.y;
+      if (n.y > maxY) maxY = n.y;
+    }
+    const padX = LABEL_BOX.width / 2 + 8;
+    const padTop = NODE_R + 14;
+    const padBottom = NODE_R + LABEL_BOX.gapFromNode + LABEL_BOX.minHeight + 8;
+    const left = minX - padX, right = maxX + padX;
+    const top = minY - padTop, bottom = maxY + padBottom;
+    const margin = 24;
+    const z = Math.max(ZOOM_MIN, Math.min(
+      (canvasSize.w - margin * 2) / (right - left),
+      (canvasSize.h - margin * 2) / (bottom - top),
+      1,
+    ));
+    const cx = (left + right) / 2, cy = (top + bottom) / 2;
+    const easing = Easing.out(Easing.quad);
+    tx.value = withTiming(canvasSize.w / 2 - cx * z, { duration: ANIM.centerDuration, easing });
+    ty.value = withTiming(canvasSize.h / 2 - cy * z, { duration: ANIM.centerDuration, easing });
+    sc.value = withTiming(z, { duration: ANIM.centerDuration, easing });
+  }, [layout.nodes, canvasSize]);
+
+  // Jump back to the root person at 1:1 zoom.
   const centerOnRoot = useCallback(() => {
     const node = layout.nodes.find(n => n.id === rootId);
     if (!node || canvasSize.w === 0) return;
@@ -625,9 +656,14 @@ export function FamilyTreeCanvas({ state, rootId, onNodePress, onNodeLongPress }
 
           </Group>
         </Canvas>
-        <TouchableOpacity style={styles.centerBtn} onPress={centerOnRoot} activeOpacity={0.7}>
-          <MaterialCommunityIcons name="crosshairs-gps" size={22} color={P.bark.mid} />
-        </TouchableOpacity>
+        <View style={styles.controls}>
+          <TouchableOpacity style={styles.iconBtn} onPress={fitToScreen} activeOpacity={0.7} testID="btn-fit-tree">
+            <MaterialCommunityIcons name="fit-to-screen-outline" size={22} color={P.bark.mid} />
+          </TouchableOpacity>
+          <TouchableOpacity style={styles.iconBtn} onPress={centerOnRoot} activeOpacity={0.7} testID="btn-center-root">
+            <MaterialCommunityIcons name="crosshairs-gps" size={22} color={P.bark.mid} />
+          </TouchableOpacity>
+        </View>
       </View>
     </GestureDetector>
   );
@@ -636,10 +672,13 @@ export function FamilyTreeCanvas({ state, rootId, onNodePress, onNodeLongPress }
 const styles = StyleSheet.create({
   wrap: { flex: 1 },
   cvs: { flex: 1 },
-  centerBtn: {
+  controls: {
     position: 'absolute',
     bottom: 16,
     left: 16,
+    gap: 10,
+  },
+  iconBtn: {
     width: 40,
     height: 40,
     borderRadius: 20,
