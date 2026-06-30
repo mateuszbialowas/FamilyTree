@@ -15,7 +15,7 @@ import {
 } from 'react-native-reanimated';
 import type { FamilyState } from '../../types';
 import {
-  computeUnifiedLayout, NODE_R,
+  computeUnifiedLayout, NODE_R, type Conn,
 } from '../../utils/treeLayout';
 import { computeRelationshipLabels } from '../../utils/relationshipLabels';
 import { consumeInitialTreeZoom } from '../../utils/screenshotMode';
@@ -62,6 +62,108 @@ function labelCardBounds(n: { x: number; y: number }, height: number) {
     height,
   };
 }
+
+export type NodeLabel = {
+  rows: { para: ReturnType<typeof mkPara>; y: number }[];
+  boxHeight: number;
+};
+
+/**
+ * Build the Skia paragraphs for one person's label card. This is the expensive
+ * part of the scene (text shaping), so callers cache it by text — it depends
+ * only on the person's name/dates/relation, never on where the node is drawn.
+ */
+function buildNodeLabel(
+  name: string,
+  birthSurname: string | null | undefined,
+  born: string,
+  relationLabel: string | undefined,
+): NodeLabel {
+  const parts = name.split(' ');
+  const first = parts[0] || '';
+  const last = parts.slice(1).join(' ') || '';
+  const paras = [
+    first ? mkPara(first, 10, P.ink, LABEL_BOX.width, true, 2) : null,
+    last ? mkPara(last, 9, P.ink, LABEL_BOX.width, false, 3) : null,
+    birthSurname ? mkPara(`z d. ${birthSurname}`, 8, P.inkFade, LABEL_BOX.width, false, 2) : null,
+    born ? mkPara(`ur. ${born}`, 8, P.inkFade, LABEL_BOX.width, false, 1) : null,
+    relationLabel ? mkPara(relationLabel, 7, P.sepia, LABEL_BOX.width, false, 2) : null,
+  ];
+  const rows: NodeLabel['rows'] = [];
+  let y = LABEL_BOX.padTop;
+  for (const para of paras) {
+    if (!para) continue;
+    rows.push({ para, y });
+    y += para.getHeight() + LABEL_BOX.rowGap;
+  }
+  const boxHeight = Math.max(LABEL_BOX.minHeight, y - LABEL_BOX.rowGap + LABEL_BOX.padBottom);
+  return { rows, boxHeight };
+}
+
+/**
+ * Build one branch's drawn geometry (organic path, bark, twigs, leaf canopies).
+ * Pure function of the branch endpoints/seed, so callers cache it — a reorder
+ * leaves most branches in place and they need no regeneration.
+ */
+function buildBranch(c: Conn, rootY: number, leafMul: number) {
+  const thickAtStart = Math.abs(c.y1 - rootY) <= Math.abs(c.y2 - rootY);
+  const raw = genBranch(c.x1, c.y1, c.x2, c.y2, c.seed, thickAtStart);
+  const mid = raw.centerline[raw.centerline.length >> 1];
+  return {
+    ...c,
+    centerline: raw.centerline,
+    mid,
+    path: mkPath(raw.path),
+    barkLines: raw.barkLines.map(bl => ({ ...bl, path: mkPath(bl.d) })),
+    twigs: raw.twigs.map(tw => ({ ...tw, path: mkPath(tw.d) })),
+    midLeaves: genCanopy(mid.x, mid.y - 16, 20, 14, Math.round(20 * leafMul), c.seed + 4000),
+    tipLeaves: genCanopy(c.x2, c.y2 - 30, 18, 12, Math.round(18 * leafMul), c.seed + 5000),
+  };
+}
+type BuiltBranch = ReturnType<typeof buildBranch>;
+
+/**
+ * One branch with its bark and foliage. Memoised on the (cached, position-keyed)
+ * branch object: a reorder moves only part of the tree, so unmoved branches keep
+ * the same object reference and React skips re-rendering them entirely — leaves
+ * and all. The sway transforms are stable refs (static when ambient animations
+ * are off), so they don't defeat the memo. This is what lets big trees stay lush
+ * AND fast on reorder. `sway*` are Reanimated transform values (typed loose,
+ * like the animal transforms).
+ */
+const BranchView = React.memo(function BranchView({ b, swayMid, swayTip }: {
+  b: BuiltBranch;
+  swayMid: any;
+  swayTip: any;
+}) {
+  return (
+    <Group>
+      <Group transform={[{ translateX: SHADOW_OFFSET.branch.x }, { translateY: SHADOW_OFFSET.branch.y }]}>
+        <Path path={b.path} color={P.shadow.branch} />
+      </Group>
+      <Path path={b.path} style="fill">
+        <LinearGradient start={vec(b.x1, b.y1)} end={vec(b.x2, b.y2)} colors={[P.bark.mid, P.bark.dark, P.bark.edge]} />
+      </Path>
+      {b.barkLines.map((bl, bi) => <Path key={bi} path={bl.path} style="stroke" color={P.bark.deep} strokeWidth={bl.w} opacity={bl.op} strokeCap="round" />)}
+      {b.twigs.map((tw, ti) => <Path key={ti} path={tw.path} style="stroke" color={P.bark.mid} strokeWidth={tw.w} opacity={0.4} strokeCap="round" />)}
+      <Group transform={swayMid} origin={vec(b.mid.x, b.mid.y)}>
+        {b.midLeaves.map((l, li) => (
+          <Group key={li} transform={[{ translateX: l.x }, { translateY: l.y }, { rotate: (l.rot * Math.PI) / 180 }]}>
+            <Path path={leafPath(l.sz, l.type)} color={l.col} opacity={l.op} />
+            {l.layer > 0 && <Path path={leafVeinPath(l.sz)} style="stroke" color={P.leaf.deep} strokeWidth={0.25} opacity={0.18} />}
+          </Group>
+        ))}
+      </Group>
+      <Group transform={swayTip} origin={vec(b.x2, b.y2 - 14)}>
+        {b.tipLeaves.map((l, li) => (
+          <Group key={`tp${li}`} transform={[{ translateX: l.x }, { translateY: l.y }, { rotate: (l.rot * Math.PI) / 180 }]}>
+            <Path path={leafPath(l.sz, l.type)} color={l.col} opacity={l.op} />
+          </Group>
+        ))}
+      </Group>
+    </Group>
+  );
+});
 
 /** Node circle sizes */
 const NODE_GLOW_R = NODE_R + 5;
@@ -150,69 +252,69 @@ function MourningBand({ x, y }: { x: number; y: number }) {
 // ======================== MAIN COMPONENT ========================
 export function FamilyTreeCanvas({ state, rootId, onNodePress, onNodeLongPress }: Props) {
   const { i18n } = useTranslation();
-  const layout = useMemo(() => {
-    // Only annotate close family in the tree (up to first cousins / close
-    // in-laws). Distant-cousin "degree of kinship" labels are noise here.
-    const labels = computeRelationshipLabels(rootId, state, 'colloquial', {
-      maxSteps: 4,
-      maxSpouseSteps: 1,
-    });
-    return computeUnifiedLayout(rootId, state, labels);
-  }, [state.people, state.parentChildRelationships, state.marriages, rootId, i18n.language]);
 
+  // Kinship labels ("Brat", "Ciocia", …) depend on the relationship graph and
+  // root, NOT on node positions or sibling order — so this survives a reorder.
+  // Only annotate close family (up to first cousins / close in-laws); distant
+  // "degree of kinship" labels are noise here.
+  const relLabels = useMemo(
+    () => computeRelationshipLabels(rootId, state, 'colloquial', { maxSteps: 4, maxSpouseSteps: 1 }),
+    [state.parentChildRelationships, state.marriages, rootId, i18n.language],
+  );
+
+  const layout = useMemo(
+    () => computeUnifiedLayout(rootId, state, relLabels),
+    [state.people, state.parentChildRelationships, state.marriages, rootId, relLabels],
+  );
+
+  // Label cards (Skia paragraphs) cached per person by their text. A reorder
+  // only moves nodes, so every text key is unchanged → zero paragraphs rebuilt,
+  // which is the main cost on large trees. Keyed on people for add/edit/remove.
+  const labelCache = React.useRef(new Map<string, { key: string; value: NodeLabel }>());
+  const nodeLabels = useMemo(() => {
+    const cache = labelCache.current;
+    const out = new Map<string, NodeLabel>();
+    for (const p of state.people) {
+      const rel = relLabels.get(p.id);
+      const born = p.birthDate || '';
+      const key = `${p.firstName}${p.lastName}${p.birthSurname || ''}${born}${rel || ''}`;
+      let entry = cache.get(p.id);
+      if (!entry || entry.key !== key) {
+        entry = { key, value: buildNodeLabel(`${p.firstName} ${p.lastName}`, p.birthSurname, born, rel) };
+        cache.set(p.id, entry);
+      }
+      out.set(p.id, entry.value);
+    }
+    return out;
+  }, [state.people, relLabels]);
+
+  const branchCache = React.useRef(new Map<string, BuiltBranch>());
   const geo = useMemo(() => {
     const rootNode = layout.nodes.find(n => n.id === rootId);
     const rootY = rootNode?.y ?? 0;
 
+    // Cache branch geometry by endpoints/seed (decorations sit on the branch's
+    // own drawn centreline, so they stay on long sagging branches). A reorder
+    // shifts only part of the tree → unchanged branches reuse their cached
+    // geometry. A fresh map each pass keeps the cache from growing unbounded.
+    // Foliage stays full — BranchView is memoised, so a reorder only re-renders
+    // the few branches that actually moved. Only very large trees get thinned, as
+    // a last-resort guard on the initial full-scene render.
+    const leafMul = layout.nodes.length > 300 ? 0.5 : 1;
+    const prev = branchCache.current;
+    const next = new Map<string, BuiltBranch>();
     const branches = layout.conns.filter(c => c.type === 'branch').map(c => {
-      const thickAtStart = Math.abs(c.y1 - rootY) <= Math.abs(c.y2 - rootY);
-      const raw = genBranch(c.x1, c.y1, c.x2, c.y2, c.seed, thickAtStart);
-      // Sit decorations on the branch's own drawn centreline — so leaves and
-      // animals stay ON long, sagging branches instead of floating above a
-      // straight chord (the bug visible on large trees).
-      const mid = raw.centerline[raw.centerline.length >> 1];
-      return {
-        ...c,
-        centerline: raw.centerline,
-        mid,
-        path: mkPath(raw.path),
-        barkLines: raw.barkLines.map(bl => ({ ...bl, path: mkPath(bl.d) })),
-        twigs: raw.twigs.map(tw => ({ ...tw, path: mkPath(tw.d) })),
-        midLeaves: genCanopy(mid.x, mid.y - 16, 20, 14, 20, c.seed + 4000),
-        tipLeaves: genCanopy(c.x2, c.y2 - 30, 18, 12, 18, c.seed + 5000),
-      };
+      const key = `${rootY}|${leafMul}|${c.x1},${c.y1},${c.x2},${c.y2},${c.seed}`;
+      let b = prev.get(key);
+      if (!b) b = buildBranch(c, rootY, leafMul);
+      next.set(key, b);
+      return b;
     });
+    branchCache.current = next;
 
     const couples = layout.conns.filter(c => c.type === 'couple');
     const extraCouples = layout.conns.filter(c => c.type === 'extra-couple');
     const animals = placeAnimals(branches);
-    const personById = new Map(state.people.map(p => [p.id, p]));
-    const nodeLabels = layout.nodes.map(n => {
-      const parts = n.name.split(' ');
-      const first = parts[0] || '';
-      const last = parts.slice(1).join(' ') || '';
-      const birthSurname = personById.get(n.id)?.birthSurname;
-      // Each field wraps to as many lines as it needs (no ellipsis) — full
-      // names like "Nowak z domu Kowalskich" stay readable. The box grows to
-      // fit. A generous line cap only guards against pathological input.
-      const paras = [
-        first ? mkPara(first, 10, P.ink, LABEL_BOX.width, true, 2) : null,
-        last ? mkPara(last, 9, P.ink, LABEL_BOX.width, false, 3) : null,
-        birthSurname ? mkPara(`z d. ${birthSurname}`, 8, P.inkFade, LABEL_BOX.width, false, 2) : null,
-        n.born ? mkPara(`ur. ${n.born}`, 8, P.inkFade, LABEL_BOX.width, false, 1) : null,
-        n.label ? mkPara(n.label, 7, P.sepia, LABEL_BOX.width, false, 2) : null,
-      ];
-      // Stack rows by their real laid-out height → dynamic box height.
-      const rows: { para: ReturnType<typeof mkPara>; y: number }[] = [];
-      let y = LABEL_BOX.padTop;
-      for (const para of paras) {
-        if (!para) continue;
-        rows.push({ para, y });
-        y += para.getHeight() + LABEL_BOX.rowGap;
-      }
-      const boxHeight = Math.max(LABEL_BOX.minHeight, y - LABEL_BOX.rowGap + LABEL_BOX.padBottom);
-      return { id: n.id, rows, boxHeight };
-    });
     // Direction of trunk+roots: roots DOWN when there is any family ABOVE the
     // root (a tree standing in the ground), roots UP (flipped) only when the
     // root is a progenitor with nothing above it. We test the laid-out
@@ -222,8 +324,8 @@ export function FamilyTreeCanvas({ state, rootId, onNodePress, onNodeLongPress }
       ? layout.nodes.some(n => n.y < rootNode.y - 1)
       : false;
 
-    return { rootNode, branches, couples, extraCouples, animals, labels: nodeLabels, rootHasAncestors };
-  }, [layout, rootId, state.parentChildRelationships, state.people]);
+    return { rootNode, branches, couples, extraCouples, animals, rootHasAncestors };
+  }, [layout, rootId]);
 
   // === ANIMATIONS ===
   // Each continuous animation drives a Skia value, and in react-native-skia any
@@ -317,9 +419,9 @@ export function FamilyTreeCanvas({ state, rootId, onNodePress, onNodeLongPress }
   // just the circle. The card grows to fit each person's name/dates.
   const labelHeightById = useMemo(() => {
     const m = new Map<string, number>();
-    for (const l of geo.labels) m.set(l.id, l.boxHeight);
+    for (const [id, l] of nodeLabels) m.set(id, l.boxHeight);
     return m;
-  }, [geo.labels]);
+  }, [nodeLabels]);
 
   /** Screen (gesture) coordinates → canvas coordinates, undoing pan + zoom. */
   const screenToCanvas = (screenX: number, screenY: number) => ({
@@ -546,33 +648,15 @@ export function FamilyTreeCanvas({ state, rootId, onNodePress, onNodeLongPress }
               );
             })()}
 
-            {/* BRANCHES */}
-            {geo.branches.map((b, i) => (
-              <Group key={`b${i}`}>
-                <Group transform={[{ translateX: SHADOW_OFFSET.branch.x }, { translateY: SHADOW_OFFSET.branch.y }]}>
-                  <Path path={b.path} color={P.shadow.branch} />
-                </Group>
-                <Path path={b.path} style="fill">
-                  <LinearGradient start={vec(b.x1, b.y1)} end={vec(b.x2, b.y2)} colors={[P.bark.mid, P.bark.dark, P.bark.edge]} />
-                </Path>
-                {b.barkLines.map((bl, bi) => <Path key={bi} path={bl.path} style="stroke" color={P.bark.deep} strokeWidth={bl.w} opacity={bl.op} strokeCap="round" />)}
-                {b.twigs.map((tw, ti) => <Path key={ti} path={tw.path} style="stroke" color={P.bark.mid} strokeWidth={tw.w} opacity={0.4} strokeCap="round" />)}
-                <Group transform={leafSway[(i + 1) % 3]} origin={vec(b.mid.x, b.mid.y)}>
-                  {b.midLeaves.map((l, li) => (
-                    <Group key={li} transform={[{ translateX: l.x }, { translateY: l.y }, { rotate: (l.rot * Math.PI) / 180 }]}>
-                      <Path path={leafPath(l.sz, l.type)} color={l.col} opacity={l.op} />
-                      {l.layer > 0 && <Path path={leafVeinPath(l.sz)} style="stroke" color={P.leaf.deep} strokeWidth={0.25} opacity={0.18} />}
-                    </Group>
-                  ))}
-                </Group>
-                <Group transform={leafSway[(i + 2) % 3]} origin={vec(b.x2, b.y2 - 14)}>
-                  {b.tipLeaves.map((l, li) => (
-                    <Group key={`tp${li}`} transform={[{ translateX: l.x }, { translateY: l.y }, { rotate: (l.rot * Math.PI) / 180 }]}>
-                      <Path path={leafPath(l.sz, l.type)} color={l.col} opacity={l.op} />
-                    </Group>
-                  ))}
-                </Group>
-              </Group>
+            {/* BRANCHES — keyed by position+seed (stable for unmoved branches)
+                so React.memo on BranchView skips re-rendering them on reorder. */}
+            {geo.branches.map(b => (
+              <BranchView
+                key={`${b.x1},${b.y1},${b.x2},${b.y2},${b.seed}`}
+                b={b}
+                swayMid={leafSway[b.seed % 3]}
+                swayTip={leafSway[(b.seed + 1) % 3]}
+              />
             ))}
 
             {/* EXTRA-COUPLES — secondary marriages (no shared kids), rendered as dashed lines.
@@ -604,7 +688,7 @@ export function FamilyTreeCanvas({ state, rootId, onNodePress, onNodeLongPress }
 
             {/* NODES — the most-recently-tapped node bounces (scale up & settle) around its circle center */}
             {layout.nodes.map(n => {
-              const lb = geo.labels.find(l => l.id === n.id);
+              const lb = nodeLabels.get(n.id);
               const isRoot = n.id === rootId;
               const isBouncing = n.id === bouncingId;
               const nodeBody = (

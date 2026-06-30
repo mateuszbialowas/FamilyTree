@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { reorderAvailability } from '../reorderAvailability';
+import { isNodeReorderable } from '../reorderAvailability';
 import type { FamilyState, Person } from '../../types';
 
 function person(id: string, birthDate: string | null = null): Person {
@@ -35,30 +35,21 @@ const state: FamilyState = {
   ],
 };
 
-describe('reorderAvailability', () => {
+describe('isNodeReorderable', () => {
   it('locks a married root — neither direction would move the tree', () => {
-    const a = reorderAvailability('mateusz', 'mateusz', state);
-    expect(a.canLeft).toBe(false);
-    expect(a.canRight).toBe(false);
-    expect(a.siblings.length).toBe(3);
+    expect(isNodeReorderable('mateusz', 'mateusz', state)).toBe(false);
   });
 
   it('allows moving a non-root sibling', () => {
-    const a = reorderAvailability('kuba', 'mateusz', state);
-    expect(a.canLeft || a.canRight).toBe(true);
+    expect(isNodeReorderable('kuba', 'mateusz', state)).toBe(true);
   });
 
   it('reports a person with no siblings as not movable', () => {
     const solo: FamilyState = { people: [person('only')], parentChildRelationships: [], marriages: [] };
-    const a = reorderAvailability('only', 'only', solo);
-    expect(a.siblings.map(p => p.id)).toEqual(['only']);
-    expect(a.canLeft).toBe(false);
-    expect(a.canRight).toBe(false);
+    expect(isNodeReorderable('only', 'only', solo)).toBe(false);
   });
 
-  it('returns an empty result for a null person', () => {
-    expect(reorderAvailability(null, 'mateusz', state)).toEqual({
-      siblings: [], index: -1, canLeft: false, canRight: false,
-    });
+  it('returns false with no root', () => {
+    expect(isNodeReorderable('kuba', null, state)).toBe(false);
   });
 });

@@ -131,14 +131,36 @@ export function genCanopy(cx: number, cy: number, rx: number, ry: number, count:
   return leaves;
 }
 
+// Leaf shapes depend only on (size, type), and the renderer asks for one per
+// leaf every frame — thousands of times. Cache them module-wide, quantizing the
+// size to ~0.5px buckets (visually identical) so a handful of paths are built
+// once and reused for the whole forest instead of rebuilt on every render.
+const _leafPathCache = new Map<string, ReturnType<typeof mkPath>>();
 export function leafPath(sz: number, type: number) {
-  const w = sz * 0.42;
-  if (type === 0) return mkPath(`M 0,0 C ${-w},${-sz * 0.25} ${-w * 0.9},${-sz * 0.65} ${-w * 0.12},${-sz * 0.92} Q 0,${-sz * 1.06} ${w * 0.12},${-sz * 0.92} C ${w * 0.9},${-sz * 0.65} ${w},${-sz * 0.25} 0,0 Z`);
-  if (type === 1) return mkPath(`M 0,0 C ${-w * 1.15},${-sz * 0.32} ${-w * 0.8},${-sz * 0.78} 0,${-sz} C ${w * 0.8},${-sz * 0.78} ${w * 1.15},${-sz * 0.32} 0,0 Z`);
-  return mkPath(`M 0,0 C ${-w * 1.25},${-sz * 0.38} ${-w * 0.65},${-sz * 0.82} 0,${-sz} C ${w * 0.65},${-sz * 0.82} ${w * 1.25},${-sz * 0.38} 0,0 Z`);
+  const q = Math.round(sz * 2) / 2;
+  const key = `${q}|${type}`;
+  const hit = _leafPathCache.get(key);
+  if (hit) return hit;
+  const w = q * 0.42;
+  const p = type === 0
+    ? mkPath(`M 0,0 C ${-w},${-q * 0.25} ${-w * 0.9},${-q * 0.65} ${-w * 0.12},${-q * 0.92} Q 0,${-q * 1.06} ${w * 0.12},${-q * 0.92} C ${w * 0.9},${-q * 0.65} ${w},${-q * 0.25} 0,0 Z`)
+    : type === 1
+    ? mkPath(`M 0,0 C ${-w * 1.15},${-q * 0.32} ${-w * 0.8},${-q * 0.78} 0,${-q} C ${w * 0.8},${-q * 0.78} ${w * 1.15},${-q * 0.32} 0,0 Z`)
+    : mkPath(`M 0,0 C ${-w * 1.25},${-q * 0.38} ${-w * 0.65},${-q * 0.82} 0,${-q} C ${w * 0.65},${-q * 0.82} ${w * 1.25},${-q * 0.38} 0,0 Z`);
+  _leafPathCache.set(key, p);
+  return p;
 }
 
-export function leafVeinPath(sz: number) { return mkPath(`M 0,${-sz * 0.08} L 0,${-sz * 0.82}`); }
+const _leafVeinCache = new Map<string, ReturnType<typeof mkPath>>();
+export function leafVeinPath(sz: number) {
+  const q = Math.round(sz * 2) / 2;
+  const key = String(q);
+  const hit = _leafVeinCache.get(key);
+  if (hit) return hit;
+  const p = mkPath(`M 0,${-q * 0.08} L 0,${-q * 0.82}`);
+  _leafVeinCache.set(key, p);
+  return p;
+}
 
 // ======================== ANIMAL PLACEMENT ========================
 /** A generated branch carrying its drawn centreline (from genBranch). */

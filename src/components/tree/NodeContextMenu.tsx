@@ -4,7 +4,8 @@ import Animated, { useSharedValue, useAnimatedStyle, withSequence, withTiming } 
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { useTranslation } from 'react-i18next';
 import { useFamily } from '../../context/FamilyContext';
-import { reorderAvailability } from '../../utils/reorderAvailability';
+import { siblingGroup } from '../../utils/siblingOrder';
+import { isNodeReorderable } from '../../utils/reorderAvailability';
 import { colors } from '../../theme/colors';
 import { fonts, fontSizes } from '../../theme/typography';
 import { spacing, borderRadius } from '../../theme/spacing';
@@ -40,17 +41,25 @@ export function NodeContextMenu({ personId, rootId, onClose, onAddRelation }: Pr
 
   const person = personId ? state.people.find(p => p.id === personId) ?? null : null;
 
-  // Sibling order + validation. Memoised so the layout simulation (see
-  // reorderAvailability) stays off the per-frame animation path and only reruns
-  // when the data, root, or selected person changes.
-  const { siblings, index, canLeft, canRight } = useMemo(
-    () => reorderAvailability(personId, rootId, state),
-    [personId, rootId, state],
-  );
-
+  // Current sibling order + the person's position — cheap, recomputed each
+  // render so the dots/counter track every reorder.
+  const siblings = personId ? siblingGroup(personId, state) : [];
+  const index = siblings.findIndex(p => p.id === personId);
   const hasSiblings = siblings.length > 1;
-  // Has siblings, but no move would change the picture → position is locked here.
-  const locked = hasSiblings && !canLeft && !canRight;
+
+  // Whether this node can move in the current view at all (the costly layout
+  // simulation). It's a per-node property — pinned or not — so it does NOT
+  // change as you reorder; compute it once per open, keyed on the structure and
+  // root, NOT on `state` identity. This keeps the arrows snappy: tapping them no
+  // longer re-runs the simulation every time.
+  const movable = useMemo(
+    () => (personId ? isNodeReorderable(personId, rootId, state) : false),
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- intentionally not on state.people: movability is stable across reorders, only the structure/root/person matter.
+    [personId, rootId, state.parentChildRelationships, state.marriages],
+  );
+  const canLeft = movable && index > 0;
+  const canRight = movable && index < siblings.length - 1;
+  const locked = hasSiblings && !movable;
   const isRoot = personId != null && personId === rootId;
 
   const move = (direction: 'left' | 'right') => {
