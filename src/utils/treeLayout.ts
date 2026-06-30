@@ -187,6 +187,22 @@ export function computeUnifiedLayout(
     parentsOf.get(r.childId)!.push(r.parentId);
   }
 
+  // Sibling order = birth order, left→right. Children with a birth date sort
+  // ascending (ISO YYYY-MM-DD ⇒ lexicographic = chronological); undated children
+  // keep their insertion order at the end. Array.sort is stable (ES2019), so the
+  // undated tail preserves the order they were entered. This drives every
+  // downstream consumer (childUnitsOf, collaterals) since they read childrenOf.
+  for (const kids of childrenOf.values()) {
+    kids.sort((a, b) => {
+      const da = pMap.get(a)?.birthDate || null;
+      const db = pMap.get(b)?.birthDate || null;
+      if (da && db) return da < db ? -1 : da > db ? 1 : 0;
+      if (da) return -1;
+      if (db) return 1;
+      return 0;
+    });
+  }
+
   const { primarySpouseMap, extraSpousesMap } = classifyMarriages(state, childrenOf);
   const spouseOf = (id: string): string | null => primarySpouseMap.get(id) ?? null;
 
@@ -352,18 +368,13 @@ export function computeUnifiedLayout(
     return w;
   };
 
-  /** Widest subtrees to the outside, narrow ones centred — reduces long branches. */
-  const orderChildren = (kids: DNode[]): DNode[] => {
-    if (kids.length <= 1) return kids;
-    const sorted = [...kids].sort((a, b) => subWidth(b) - subWidth(a));
-    const result: DNode[] = new Array(sorted.length);
-    let left = 0, right = sorted.length - 1, pickRight = true;
-    for (const child of sorted) {
-      if (pickRight) result[right--] = child; else result[left++] = child;
-      pickRight = !pickRight;
-    }
-    return result;
-  };
+  /**
+   * Siblings are drawn in birth order (childrenOf is pre-sorted by birth date),
+   * so children keep the order they were built in — leftmost = oldest. We no
+   * longer reorder by subtree width: birth order is semantically correct for a
+   * genealogy tree and the global contour still guarantees no overlaps/crossings.
+   */
+  const orderChildren = (kids: DNode[]): DNode[] => kids;
 
   /** Compute relative centres for a descendant tree (no side effects). */
   const layoutDescTree = (d: DNode, center: number, out: Map<string, number>) => {
