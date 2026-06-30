@@ -52,15 +52,32 @@ export function NodeContextMenu({ personId, onClose, onAddRelation }: Props) {
     <Modal visible={personId !== null} animationType="slide" transparent onRequestClose={onClose}>
       <Pressable style={styles.overlay} onPress={onClose} testID="node-menu-backdrop">
         <Pressable style={styles.sheet} onPress={() => { /* swallow tap */ }}>
+          <View style={styles.grabber} />
+
           <View style={styles.header}>
             <Text style={styles.title} numberOfLines={1}>
               {person ? `${person.firstName} ${person.lastName}` : ''}
             </Text>
-            <TouchableOpacity onPress={onClose} testID="node-menu-close">
-              <MaterialCommunityIcons name="close" size={24} color={colors.text} />
+            <TouchableOpacity onPress={onClose} testID="node-menu-close" hitSlop={8}>
+              <MaterialCommunityIcons name="close" size={24} color={colors.textMuted} />
             </TouchableOpacity>
           </View>
 
+          {/* Primary actions — adding a related person is the common case. */}
+          {ADD_ACTIONS.map(action => (
+            <TouchableOpacity
+              key={action.relationType}
+              testID={action.testID}
+              style={styles.action}
+              onPress={() => onAddRelation(action.relationType)}
+            >
+              <MaterialCommunityIcons name={action.icon} size={22} color={colors.primary} style={styles.actionIcon} />
+              <Text style={styles.actionText}>{t(action.labelKey)}</Text>
+            </TouchableOpacity>
+          ))}
+
+          {/* Secondary control — reordering siblings is occasional, so it sits
+              at the bottom in a muted footer. */}
           {hasSiblings && (
             <View style={styles.orderSection}>
               <Text style={styles.orderTitle}>{t('tree.siblingOrderTitle')}</Text>
@@ -83,18 +100,6 @@ export function NodeContextMenu({ personId, onClose, onAddRelation }: Props) {
               </View>
             </View>
           )}
-
-          {ADD_ACTIONS.map(action => (
-            <TouchableOpacity
-              key={action.relationType}
-              testID={action.testID}
-              style={styles.action}
-              onPress={() => onAddRelation(action.relationType)}
-            >
-              <MaterialCommunityIcons name={action.icon} size={24} color={colors.primary} style={styles.actionIcon} />
-              <Text style={styles.actionText}>{t(action.labelKey)}</Text>
-            </TouchableOpacity>
-          ))}
         </Pressable>
       </Pressable>
     </Modal>
@@ -132,14 +137,24 @@ const styles = StyleSheet.create({
     borderTopLeftRadius: borderRadius.xl,
     borderTopRightRadius: borderRadius.xl,
     maxHeight: '70%',
-    paddingBottom: 40,
+    paddingBottom: spacing.xl,
+  },
+  grabber: {
+    width: 36,
+    height: 4,
+    borderRadius: 2,
+    backgroundColor: colors.border,
+    alignSelf: 'center',
+    marginTop: spacing.sm,
+    marginBottom: spacing.xs,
   },
   header: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
     paddingHorizontal: spacing.lg,
-    paddingVertical: spacing.lg,
+    paddingTop: spacing.sm,
+    paddingBottom: spacing.md,
     borderBottomWidth: 1,
     borderBottomColor: colors.border,
   },
@@ -151,9 +166,11 @@ const styles = StyleSheet.create({
   },
   orderSection: {
     paddingHorizontal: spacing.lg,
-    paddingVertical: spacing.md,
-    borderBottomWidth: 1,
-    borderBottomColor: colors.border,
+    paddingTop: spacing.md,
+    paddingBottom: spacing.sm,
+    marginTop: spacing.sm,
+    borderTopWidth: 1,
+    borderTopColor: colors.border,
   },
   orderTitle: {
     fontFamily: fonts.body,
@@ -191,11 +208,11 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     paddingVertical: spacing.md,
     paddingHorizontal: spacing.lg,
-    borderBottomWidth: StyleSheet.hairlineWidth,
-    borderBottomColor: colors.border,
   },
   actionIcon: {
     marginRight: spacing.md,
+    width: 24,
+    textAlign: 'center',
   },
   actionText: {
     fontFamily: fonts.body,
