@@ -44,6 +44,9 @@ export const no = {
     longPressAddChild: 'Legg til barn',
     longPressAddSpouse: 'Legg til ektefelle',
     longPressAddSibling: 'Legg til søsken',
+    siblingOrderTitle: 'Rekkefølge blant søsken',
+    moveSiblingLeft: 'Flytt til venstre',
+    moveSiblingRight: 'Flytt til høyre',
     bornPrefix: 'f.',
   },
 
@@ -169,6 +172,7 @@ export const no = {
       removedMarriage: 'Fjernet ekteskap: {{s1}} ⚭ {{s2}}',
       removedMarriageGeneric: 'Fjernet ekteskap',
       importedData: 'Importerte data ({{count}} personer)',
+      reorderedSibling: 'Endret søskenrekkefølge: {{name}}',
       clearedAll: 'Slettet alle data',
       unknownPerson: 'ukjent person',
     },

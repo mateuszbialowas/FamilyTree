@@ -8,6 +8,12 @@ export type Person = {
   birthDate: string | null;
   deathDate: string | null;
   notes: string;
+  /**
+   * Manual left→right position among full siblings. When unset, siblings are
+   * ordered by birthDate. Set for an entire sibling group the moment the user
+   * reorders any of them (see REORDER_SIBLING).
+   */
+  manualOrder?: number | null;
 };
 
 export type ParentChildRelationship = {
@@ -37,5 +43,6 @@ export type FamilyAction =
   | { type: 'ADD_PARENT_CHILD'; payload: ParentChildRelationship }
   | { type: 'ADD_MARRIAGE'; payload: Marriage }
   | { type: 'REMOVE_RELATIONSHIP'; payload: { id: string; kind: 'parentChild' | 'marriage' } }
+  | { type: 'REORDER_SIBLING'; payload: { personId: string; direction: 'left' | 'right' } }
   | { type: 'IMPORT_DATA'; payload: FamilyState }
   | { type: 'CLEAR_DATA' };

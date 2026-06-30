@@ -1,4 +1,5 @@
 import type { FamilyState } from '../types';
+import { compareSiblings } from './siblingOrder';
 
 // ======================== TYPES ========================
 
@@ -187,20 +188,12 @@ export function computeUnifiedLayout(
     parentsOf.get(r.childId)!.push(r.parentId);
   }
 
-  // Sibling order = birth order, left→right. Children with a birth date sort
-  // ascending (ISO YYYY-MM-DD ⇒ lexicographic = chronological); undated children
-  // keep their insertion order at the end. Array.sort is stable (ES2019), so the
-  // undated tail preserves the order they were entered. This drives every
-  // downstream consumer (childUnitsOf, collaterals) since they read childrenOf.
+  // Sibling order = left→right via the shared comparator: manual override first,
+  // then birth date, then insertion order. Array.sort is stable (ES2019), so the
+  // undated tail preserves the order entered. This drives every downstream
+  // consumer (childUnitsOf, collaterals) since they all read childrenOf.
   for (const kids of childrenOf.values()) {
-    kids.sort((a, b) => {
-      const da = pMap.get(a)?.birthDate || null;
-      const db = pMap.get(b)?.birthDate || null;
-      if (da && db) return da < db ? -1 : da > db ? 1 : 0;
-      if (da) return -1;
-      if (db) return 1;
-      return 0;
-    });
+    kids.sort((a, b) => compareSiblings(pMap.get(a), pMap.get(b)));
   }
 
   const { primarySpouseMap, extraSpousesMap } = classifyMarriages(state, childrenOf);
@@ -472,6 +465,37 @@ export function computeUnifiedLayout(
     commitUnit(P, center);
   };
 
+  /** P's child person-ids in sibling order, deduped across both spouses. */
+  const orderedChildIds = (P: Unit): string[] => {
+    const ids: string[] = [];
+    for (const m of P.members) {
+      for (const cid of childrenOf.get(m) ?? []) {
+        if (!ids.includes(cid)) ids.push(cid);
+      }
+    }
+    return ids;
+  };
+
+  /**
+   * Split P's collateral child-units into those that fan LEFT of the spine child
+   * and those that fan RIGHT, preserving sibling order with the units nearest the
+   * spine first. This keeps the spine child (often the tree root) in its
+   * birth-order slot among its siblings instead of being pinned to one edge.
+   */
+  const splitCollateralsAroundSpine = (P: Unit, childUnit: Unit, collaterals: Unit[]) => {
+    const sibIds = orderedChildIds(P);
+    const spineChildId = childUnit.members.find(m => isChildOfUnit(m, P));
+    const spineIdx = spineChildId ? sibIds.indexOf(spineChildId) : -1;
+    const idxOf = (cu: Unit) => {
+      const cid = cu.members.find(m => isChildOfUnit(m, P));
+      return cid ? sibIds.indexOf(cid) : sibIds.length;
+    };
+    return {
+      left: collaterals.filter(cu => idxOf(cu) < spineIdx).sort((a, b) => idxOf(b) - idxOf(a)),
+      right: collaterals.filter(cu => idxOf(cu) >= spineIdx).sort((a, b) => idxOf(a) - idxOf(b)),
+    };
+  };
+
   const placeAncestors = (childUnit: Unit) => {
     const parents = parentUnitsOf(childUnit).filter(
       p => !placedUnits.has(p.id) && p.gen === childUnit.gen - 1,
@@ -506,15 +530,23 @@ export function computeUnifiedLayout(
       const collaterals = childUnitsOf(P).filter(
         cu => !placedUnits.has(cu.id) && cu.gen === P.gen + 1,
       );
-      for (const cu of collaterals) placeDescendantSubtree(cu, side);
 
-      const childXs: number[] = [];
-      for (const m of P.members) {
-        for (const cid of childrenOf.get(m) ?? []) {
-          const x = px.get(cid);
-          if (x != null) childXs.push(x);
-        }
+      if (anchored.length === 1) {
+        // One parent unit: fan siblings to both sides of the spine child so the
+        // root keeps its birth-order slot among them.
+        const { left, right } = splitCollateralsAroundSpine(P, childUnit, collaterals);
+        for (const cu of left) placeDescendantSubtree(cu, 'left');
+        for (const cu of right) placeDescendantSubtree(cu, 'right');
+      } else {
+        // Multiple parent units: fan each parent's collaterals outward to keep
+        // the two ancestor branches from crossing.
+        for (const cu of collaterals) placeDescendantSubtree(cu, side);
       }
+
+      // Centre P over the X-span of all its placed children.
+      const childXs = orderedChildIds(P)
+        .map(cid => px.get(cid))
+        .filter((x): x is number => x != null);
       const desired = childXs.length
         ? (Math.min(...childXs) + Math.max(...childXs)) / 2
         : 0;

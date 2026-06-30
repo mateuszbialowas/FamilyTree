@@ -480,4 +480,31 @@ describe('computeUnifiedLayout', () => {
       expect(countOverlaps(nodes)).toBe(0);
     });
   });
+
+  it('root sits among its siblings by sibling order, not pinned to the edge', () => {
+    // Root "me" is the 2nd of four siblings (manualOrder: s1 < me < s2 < s3).
+    // Collateral siblings must fan to BOTH sides of the root so it keeps its
+    // birth-order slot. Regression: previously all siblings went to one side.
+    const sib = (id: string, order: number): Person => ({
+      ...person(id, id, 'X'), manualOrder: order,
+    });
+    const state: FamilyState = {
+      people: [
+        person('mom', 'Mom', 'X', 'female'),
+        sib('me', 1), sib('s1', 0), sib('s2', 2), sib('s3', 3),
+      ],
+      parentChildRelationships: [
+        { id: 'r0', parentId: 'mom', childId: 'me' },
+        { id: 'r1', parentId: 'mom', childId: 's1' },
+        { id: 'r2', parentId: 'mom', childId: 's2' },
+        { id: 'r3', parentId: 'mom', childId: 's3' },
+      ],
+      marriages: [],
+    };
+    const { nodes } = computeUnifiedLayout('me', state);
+    const x = (id: string) => nodes.find(n => n.id === id)!.x;
+    expect(x('s1')).toBeLessThan(x('me'));
+    expect(x('me')).toBeLessThan(x('s2'));
+    expect(x('s2')).toBeLessThan(x('s3'));
+  });
 });

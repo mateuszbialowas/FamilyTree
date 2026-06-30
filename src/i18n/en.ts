@@ -26,6 +26,9 @@ export const en = {
     longPressAddChild: 'Add child',
     longPressAddSpouse: 'Add spouse',
     longPressAddSibling: 'Add sibling',
+    siblingOrderTitle: 'Order among siblings',
+    moveSiblingLeft: 'Move left',
+    moveSiblingRight: 'Move right',
     bornPrefix: 'b.',
   },
 
@@ -140,6 +143,7 @@ export const en = {
       removedMarriage: 'Removed marriage: {{s1}} ⚭ {{s2}}',
       removedMarriageGeneric: 'Removed marriage',
       importedData: 'Imported data ({{count}} people)',
+      reorderedSibling: 'Reordered siblings: {{name}}',
       clearedAll: 'Cleared all data',
       unknownPerson: 'unknown person',
     },

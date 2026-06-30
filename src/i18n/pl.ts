@@ -52,6 +52,9 @@ export const pl = {
     longPressAddChild: 'Dodaj dziecko',
     longPressAddSpouse: 'Dodaj małżonka',
     longPressAddSibling: 'Dodaj rodzeństwo',
+    siblingOrderTitle: 'Kolejność wśród rodzeństwa',
+    moveSiblingLeft: 'Przesuń w lewo',
+    moveSiblingRight: 'Przesuń w prawo',
     bornPrefix: 'ur.',
   },
 
@@ -177,6 +180,7 @@ export const pl = {
       removedMarriage: 'Usunięto małżeństwo: {{s1}} ⚭ {{s2}}',
       removedMarriageGeneric: 'Usunięto małżeństwo',
       importedData: 'Zaimportowano dane ({{count}} osób)',
+      reorderedSibling: 'Zmieniono kolejność rodzeństwa: {{name}}',
       clearedAll: 'Wyczyszczono wszystkie dane',
       unknownPerson: 'nieznana osoba',
     },

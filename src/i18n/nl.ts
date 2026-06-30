@@ -44,6 +44,9 @@ export const nl = {
     longPressAddChild: 'Kind toevoegen',
     longPressAddSpouse: 'Partner toevoegen',
     longPressAddSibling: 'Broer/zus toevoegen',
+    siblingOrderTitle: 'Volgorde onder broers en zussen',
+    moveSiblingLeft: 'Naar links verplaatsen',
+    moveSiblingRight: 'Naar rechts verplaatsen',
     bornPrefix: 'geb.',
   },
 
@@ -169,6 +172,7 @@ export const nl = {
       removedMarriage: 'Huwelijk verwijderd: {{s1}} ⚭ {{s2}}',
       removedMarriageGeneric: 'Huwelijk verwijderd',
       importedData: 'Gegevens geïmporteerd ({{count}} personen)',
+      reorderedSibling: 'Volgorde broers/zussen gewijzigd: {{name}}',
       clearedAll: 'Alle gegevens gewist',
       unknownPerson: 'onbekende persoon',
     },

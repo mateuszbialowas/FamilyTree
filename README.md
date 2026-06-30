@@ -84,6 +84,39 @@ eas build --platform ios --profile production
 eas submit --platform ios --latest
 ```
 
+### Run on a physical iPhone
+
+This app ships native modules (Skia, the date picker), so it **cannot run in
+Expo Go** — you build a development build and install it on the device over USB.
+
+**One-time setup**
+
+1. Install [Xcode](https://apps.apple.com/app/xcode/id497799835) and its
+   command-line tools (`xcode-select --install`).
+2. Connect the iPhone with a cable and tap **Trust** on the phone.
+3. Enable **Developer Mode** on the phone (iOS 16+):
+   **Settings → Privacy & Security → Developer Mode → On**, then restart.
+4. Set a signing team once: open `ios/FamilyTree.xcworkspace` in Xcode →
+   select the **FamilyTree** target → **Signing & Capabilities** → pick your
+   Apple ID under **Team** (a free Apple ID works).
+
+**Build & install**
+
+```bash
+npx expo run:ios --device
+```
+
+Pick your iPhone from the list when prompted. The first build takes a few
+minutes; afterwards the app launches on the phone and connects to the Metro
+bundler for live reload.
+
+**If the app won't open** — the developer certificate must be trusted:
+**Settings → General → VPN & Device Management → Developer App → Trust**.
+
+> Already installed the dev build? You can skip the rebuild and just start the
+> bundler with `npm start`, then open the app on the phone (keep it on the same
+> Wi-Fi or plugged in via USB).
+
 ### Sample data
 
 Want to see the tree in action? Import the sample family file:

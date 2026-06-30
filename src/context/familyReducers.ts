@@ -1,5 +1,6 @@
 import type { FamilyState, FamilyAction } from '../types';
 import { describeAction } from '../utils/describeAction';
+import { siblingGroup } from '../utils/siblingOrder';
 import i18n from 'i18next';
 
 export const initialFamilyState: FamilyState = {
@@ -89,6 +90,27 @@ export function familyReducer(state: FamilyState, action: FamilyAction): FamilyS
         ...state,
         marriages: state.marriages.filter((m) => m.id !== action.payload.id),
       };
+
+    case 'REORDER_SIBLING': {
+      const { personId, direction } = action.payload;
+      // Current left→right order of this person's full sibling group.
+      const group = siblingGroup(personId, state);
+      const i = group.findIndex((p) => p.id === personId);
+      if (i === -1) return state;
+      const j = direction === 'left' ? i - 1 : i + 1;
+      if (j < 0 || j >= group.length) return state; // already at the edge
+
+      // Swap with the neighbour, then freeze the whole group's order by writing
+      // an explicit manualOrder to every member (0..n-1, left→right).
+      [group[i], group[j]] = [group[j], group[i]];
+      const orderById = new Map(group.map((p, idx) => [p.id, idx]));
+      return {
+        ...state,
+        people: state.people.map((p) =>
+          orderById.has(p.id) ? { ...p, manualOrder: orderById.get(p.id)! } : p
+        ),
+      };
+    }
 
     case 'IMPORT_DATA':
       return action.payload;

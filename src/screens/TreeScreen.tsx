@@ -1,11 +1,12 @@
 import React, { useState, useCallback, useEffect } from 'react';
 import {
-  View, Text, TouchableOpacity, Modal, FlatList, Alert, StyleSheet, Pressable,
+  View, Text, TouchableOpacity, Modal, FlatList, StyleSheet, Pressable,
 } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { useFamily } from '../context/FamilyContext';
+import { NodeContextMenu, type RelationType } from '../components/tree/NodeContextMenu';
 import {
   consumeInitialTreeRootId,
   consumeInitialTreeRootName,
@@ -23,6 +24,8 @@ export function TreeScreen() {
   const navigation = useNavigation<NativeStackNavigationProp<any>>();
   const [rootId, setRootId] = useState<string | null>(null);
   const [pickerVisible, setPickerVisible] = useState(false);
+  // Person whose long-press context menu is open (null = closed).
+  const [menuPersonId, setMenuPersonId] = useState<string | null>(null);
 
   useEffect(() => {
     // rootId is consumed first (locale-independent). Fall back to
@@ -52,34 +55,16 @@ export function TreeScreen() {
   }, [navigation, effectiveRootId]);
 
   const handleNodeLongPress = useCallback((personId: string) => {
-    const person = state.people.find(p => p.id === personId);
-    if (!person) return;
-    const name = `${person.firstName} ${person.lastName}`;
+    setMenuPersonId(personId);
+  }, []);
 
-    Alert.alert(
-      name,
-      t('tree.longPressTitle'),
-      [
-        {
-          text: t('tree.longPressAddParent'),
-          onPress: () => navigation.navigate('AddPerson', { relatedPersonId: personId, relationType: 'parent' }),
-        },
-        {
-          text: t('tree.longPressAddChild'),
-          onPress: () => navigation.navigate('AddPerson', { relatedPersonId: personId, relationType: 'child' }),
-        },
-        {
-          text: t('tree.longPressAddSpouse'),
-          onPress: () => navigation.navigate('AddPerson', { relatedPersonId: personId, relationType: 'spouse' }),
-        },
-        {
-          text: t('tree.longPressAddSibling'),
-          onPress: () => navigation.navigate('AddPerson', { relatedPersonId: personId, relationType: 'sibling' }),
-        },
-        { text: t('common.cancel'), style: 'cancel' },
-      ],
-    );
-  }, [navigation, state.people, t]);
+  const handleAddRelation = useCallback((relationType: RelationType) => {
+    const personId = menuPersonId;
+    setMenuPersonId(null);
+    if (personId) {
+      navigation.navigate('AddPerson', { relatedPersonId: personId, relationType });
+    }
+  }, [navigation, menuPersonId]);
 
   if (state.people.length === 0) {
     return (
@@ -164,6 +149,13 @@ export function TreeScreen() {
           </Pressable>
         </Pressable>
       </Modal>
+
+      {/* Long-press node context menu */}
+      <NodeContextMenu
+        personId={menuPersonId}
+        onClose={() => setMenuPersonId(null)}
+        onAddRelation={handleAddRelation}
+      />
     </View>
   );
 }

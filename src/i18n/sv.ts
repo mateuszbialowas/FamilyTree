@@ -44,6 +44,9 @@ export const sv = {
     longPressAddChild: 'Lägg till barn',
     longPressAddSpouse: 'Lägg till partner',
     longPressAddSibling: 'Lägg till syskon',
+    siblingOrderTitle: 'Ordning bland syskon',
+    moveSiblingLeft: 'Flytta vänster',
+    moveSiblingRight: 'Flytta höger',
     bornPrefix: 'f.',
   },
 
@@ -169,6 +172,7 @@ export const sv = {
       removedMarriage: 'Tog bort äktenskap: {{s1}} ⚭ {{s2}}',
       removedMarriageGeneric: 'Tog bort äktenskap',
       importedData: 'Importerade data ({{count}} personer)',
+      reorderedSibling: 'Ändrade syskonordning: {{name}}',
       clearedAll: 'Rensade all data',
       unknownPerson: 'okänd person',
     },

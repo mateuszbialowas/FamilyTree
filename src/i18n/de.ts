@@ -44,6 +44,9 @@ export const de = {
     longPressAddChild: 'Kind hinzufügen',
     longPressAddSpouse: 'Ehepartner hinzufügen',
     longPressAddSibling: 'Geschwister hinzufügen',
+    siblingOrderTitle: 'Reihenfolge unter Geschwistern',
+    moveSiblingLeft: 'Nach links verschieben',
+    moveSiblingRight: 'Nach rechts verschieben',
     bornPrefix: '*',
   },
 
@@ -169,6 +172,7 @@ export const de = {
       removedMarriage: 'Ehe entfernt: {{s1}} ⚭ {{s2}}',
       removedMarriageGeneric: 'Ehe entfernt',
       importedData: 'Daten importiert ({{count}} Personen)',
+      reorderedSibling: 'Geschwister-Reihenfolge geändert: {{name}}',
       clearedAll: 'Alle Daten gelöscht',
       unknownPerson: 'unbekannte Person',
     },

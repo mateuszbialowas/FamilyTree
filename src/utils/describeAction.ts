@@ -47,6 +47,9 @@ export function describeAction(action: FamilyAction, stateBefore: FamilyState): 
       return i18n.t('history.actions.removedMarriageGeneric');
     }
 
+    case 'REORDER_SIBLING':
+      return i18n.t('history.actions.reorderedSibling', { name: nameOf(action.payload.personId, stateBefore) });
+
     case 'IMPORT_DATA':
       return i18n.t('history.actions.importedData', { count: action.payload.people.length });
 
