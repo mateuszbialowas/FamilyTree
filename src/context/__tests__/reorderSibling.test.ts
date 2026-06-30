@@ -79,3 +79,50 @@ describe('REORDER_SIBLING', () => {
     expect(familyReducer(s, { type: 'REORDER_SIBLING', payload: { personId: 'ghost', direction: 'left' } })).toBe(s);
   });
 });
+
+describe('PLACE_NEW_SIBLING', () => {
+  // a,b,c hand-arranged (manualOrder 0,1,2); newcomer d born between a and b.
+  function withManualOrderPlusNew(): FamilyState {
+    return {
+      people: [
+        person('P', '1960-01-01'),
+        { ...person('a', '1990-01-01'), manualOrder: 0 },
+        { ...person('b', '1992-01-01'), manualOrder: 1 },
+        { ...person('c', '1994-01-01'), manualOrder: 2 },
+        person('d', '1991-01-01'), // freshly added, no manualOrder
+      ],
+      parentChildRelationships: [
+        { id: 'r1', parentId: 'P', childId: 'a' },
+        { id: 'r2', parentId: 'P', childId: 'b' },
+        { id: 'r3', parentId: 'P', childId: 'c' },
+        { id: 'r4', parentId: 'P', childId: 'd' },
+      ],
+      marriages: [],
+    };
+  }
+
+  it('slots a new dated sibling into a hand-arranged group by birth date', () => {
+    const next = familyReducer(withManualOrderPlusNew(), { type: 'PLACE_NEW_SIBLING', payload: { personId: 'd' } });
+    expect(ids(next, 'a')).toEqual(['a', 'd', 'b', 'c']); // d between a(1990) and b(1992)
+    expect(next.people.find(p => p.id === 'd')!.manualOrder).toBe(1);
+  });
+
+  it('is a no-op when the group is not hand-arranged (birthDate handles it)', () => {
+    // No manualOrder anywhere; add d. Reducer leaves it alone (same ref) and
+    // compareSiblings already orders by birth date.
+    const s: FamilyState = {
+      ...family(),
+      people: [...family().people, person('d', '1991-01-01')],
+      parentChildRelationships: [...family().parentChildRelationships, { id: 'r4', parentId: 'P', childId: 'd' }],
+    };
+    expect(familyReducer(s, { type: 'PLACE_NEW_SIBLING', payload: { personId: 'd' } })).toBe(s);
+    expect(ids(s, 'a')).toEqual(['a', 'd', 'b', 'c']); // already correct by birthDate
+  });
+
+  it('an undated newcomer stays at the end of a hand-arranged group', () => {
+    const base = withManualOrderPlusNew();
+    base.people = base.people.map(p => p.id === 'd' ? { ...p, birthDate: null } : p);
+    const next = familyReducer(base, { type: 'PLACE_NEW_SIBLING', payload: { personId: 'd' } });
+    expect(ids(next, 'a')).toEqual(['a', 'b', 'c', 'd']);
+  });
+});

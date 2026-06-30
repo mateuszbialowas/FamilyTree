@@ -48,6 +48,7 @@ export function describeAction(action: FamilyAction, stateBefore: FamilyState): 
     }
 
     case 'REORDER_SIBLING':
+    case 'PLACE_NEW_SIBLING':
       return i18n.t('history.actions.reorderedSibling', { name: nameOf(action.payload.personId, stateBefore) });
 
     case 'IMPORT_DATA':

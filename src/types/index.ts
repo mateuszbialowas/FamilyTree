@@ -44,5 +44,6 @@ export type FamilyAction =
   | { type: 'ADD_MARRIAGE'; payload: Marriage }
   | { type: 'REMOVE_RELATIONSHIP'; payload: { id: string; kind: 'parentChild' | 'marriage' } }
   | { type: 'REORDER_SIBLING'; payload: { personId: string; direction: 'left' | 'right' } }
+  | { type: 'PLACE_NEW_SIBLING'; payload: { personId: string } }
   | { type: 'IMPORT_DATA'; payload: FamilyState }
   | { type: 'CLEAR_DATA' };

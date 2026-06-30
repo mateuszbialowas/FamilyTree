@@ -114,6 +114,9 @@ export function AddPersonScreen() {
             payload: { id: generateId(), parentId: parent.id, childId: newId },
           });
         });
+        // Slot the new sibling in by birth date when the group is hand-arranged
+        // (otherwise this is a no-op and birthDate ordering applies).
+        dispatch({ type: 'PLACE_NEW_SIBLING', payload: { personId: newId } });
         break;
     }
   };

@@ -14,15 +14,17 @@ Wersja aplikacji: **1.3.0** (build number inkrementowany automatycznie przez EAS
 Kolejność rodzeństwa
 • Rodzeństwo układa się teraz automatycznie od najstarszego (po lewej) do najmłodszego (po prawej) — wystarczy wpisać daty urodzenia.
 • Kolejność możesz też zmienić ręcznie: przytrzymaj osobę na drzewie i użyj strzałek. Aplikacja podpowie, gdy danego węzła nie da się przesunąć (np. korzeń), żeby nie tworzyć skrzyżowań gałęzi.
+• Rodzeństwo dodane później (z datą urodzenia) samo wskakuje na właściwe miejsce, a nie na koniec.
 
 Wygodniejsze przeglądanie dużych rodzin
 • Nowy przycisk „dopasuj całe drzewo do ekranu" i większe oddalenie — całe drzewo na raz.
 • Płynniejszy zoom dwoma palcami — koniec przeskoków przy odrywaniu jednego palca.
 • Większy obszar dotyku: przytrzymanie działa też na karcie z opisem, nie tylko na kółku.
+• Wybrany korzeń drzewa jest teraz zapamiętywany po zamknięciu aplikacji.
 
 Szybciej i ładniej
 • Znacznie lepsza wydajność przy dużych drzewach — płynne przeglądanie i przesuwanie kolejności.
-• Odświeżone menu osoby i przerysowana wiewiórka.
+• Odświeżone menu osoby i nowy bohater na drzewie — kolorowy szop.
 ```
 
 ### 🇬🇧 English
@@ -31,15 +33,17 @@ Szybciej i ładniej
 Sibling order
 • Siblings now line up automatically from oldest (left) to youngest (right) — just add their birth dates.
 • You can also reorder them by hand: long-press a person on the tree and use the arrows. The app tells you when a node can't move (e.g. the root) so branches never cross.
+• A sibling added later (with a birth date) drops into the right spot automatically, not at the end.
 
 Easier browsing of large families
 • New "fit the whole tree to screen" button and further zoom-out — see everything at once.
 • Smoother two-finger zoom — no more jump when you lift one finger.
 • Bigger tap target: long-press now works on the label card, not just the circle.
+• The tree root you pick is now remembered after you close the app.
 
 Faster and prettier
 • Much better performance on large trees — smooth panning and reordering.
-• Refreshed person menu and a redesigned squirrel.
+• Refreshed person menu and a new character on the tree — a colourful raccoon.
 ```
 
 ---
@@ -51,13 +55,15 @@ Faster and prettier
 - **Ręczna zmiana kolejności** przez `REORDER_SIBLING` + pole `Person.manualOrder`. Panel kontekstowy po długim przytrzymaniu węzła (strzałki ◀ ▶, pasek kropek z podświetleniem bieżącej osoby, licznik „X / Y", puls feedbacku).
 - **Walidacja przesunięcia** (`isNodeReorderable`): jeśli ruch nie zmieni drzewa (np. korzeń-para przypięty do skraju), panel pokazuje komunikat „zablokowane" zamiast strzałek, które nic nie robią. Liczona raz przy otwarciu menu.
 - **„Dopasuj całe drzewo do ekranu"** — nowy przycisk liczący ramkę wszystkich węzłów i dobierający zoom; obok przycisku „wróć do korzenia".
+- **Wstawianie nowego rodzeństwa wg daty** (`PLACE_NEW_SIBLING`): dodane później rodzeństwo wpasowuje się w ręcznie ułożoną grupę na pozycję wg daty urodzenia (zamiast lądować na końcu); gdy grupa nie jest ręczna — no-op (sortuje `birthDate`).
+- **Trwały korzeń drzewa**: wybrany korzeń jest zapamiętywany między uruchomieniami (osobny klucz `@family_tree_root`; dane rodziny nietknięte; zapis tylko przy zmianie).
 
 ### Poprawki
 - **Pinch-to-zoom**: przepisany na przyrostowe delty z wykrywaniem zmiany liczby palców (`numberOfPointers`) — brak przeskoku przy odrywaniu jednego palca.
 - **Większe oddalenie**: dolny limit zoomu obniżony (0.3 → 0.08).
 - **Obszar dotyku**: długie przytrzymanie i tap działają też na karcie opisu pod kółkiem (`labelCardBounds` współdzielony przez hit-test i rysowanie).
 - **Układ przy korzeniu-parze**: rodzeństwo korzenia rysowane po właściwej stronie i w poprawnej kolejności (naprawa odbicia po lewej stronie + zgodność menu z drzewem).
-- **Wiewiórka** narysowana od nowa (lepsze proporcje: zgrabny puszysty ogon, większa głowa, wyraźne oko).
+- **Nowy bohater drzewa — szop** zamiast wiewiórki (rysowany przez `ImageSVG`, przekolorowany pod paletę: futro ciepły szary, jasny pyszczek/brzuch, ciemna maska, różowe uszy).
 - **Menu osoby** przeprojektowane: akcje „dodaj…" na górze (najczęstsze), kolejność rodzeństwa w wyciszonej stopce, uchwyt panelu.
 
 ### Wydajność (duże drzewa, np. 120+ osób)
@@ -71,7 +77,7 @@ Faster and prettier
 - Tłumaczenia nowych tekstów we wszystkich 7 językach (pl, en, de, nl, no, sv, da).
 - Walidacja importu dopuszcza opcjonalne `manualOrder`.
 - Plik danych demo `demo-rodzina-120.json` (120 osób, nazwiska panieńskie, daty, zawody) do testów dużych drzew.
-- Testy jednostkowe: kolejność rodzeństwa, reduktor `REORDER_SIBLING`, walidacja `isNodeReorderable`, niezmienniki układu (brak nachodzeń/przecięć).
+- Testy jednostkowe: kolejność rodzeństwa, reduktory `REORDER_SIBLING` i `PLACE_NEW_SIBLING`, walidacja `isNodeReorderable`, niezmienniki układu (brak nachodzeń/przecięć).
 
 ---
 

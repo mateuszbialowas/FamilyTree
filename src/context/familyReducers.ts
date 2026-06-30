@@ -112,6 +112,36 @@ export function familyReducer(state: FamilyState, action: FamilyAction): FamilyS
       };
     }
 
+    case 'PLACE_NEW_SIBLING': {
+      // A freshly-added sibling has no manualOrder, so compareSiblings drops it
+      // at the end of a hand-arranged group. If the group IS hand-arranged,
+      // slot the newcomer in by birth date and renumber; otherwise leave it —
+      // birthDate ordering already places it correctly.
+      const { personId } = action.payload;
+      const self = state.people.find((p) => p.id === personId);
+      if (!self || self.manualOrder != null) return state;
+
+      const group = siblingGroup(personId, state); // self sorts to the end here
+      const others = group.filter((p) => p.id !== personId);
+      if (others.length === 0 || !others.some((p) => p.manualOrder != null)) return state;
+
+      // Others are in current visual order; insert before the first one that is
+      // younger (later birth date). Undated newcomer stays at the end.
+      let insertAt = others.length;
+      if (self.birthDate) {
+        const i = others.findIndex((p) => p.birthDate != null && p.birthDate > self.birthDate!);
+        if (i !== -1) insertAt = i;
+      }
+      const ordered = [...others.slice(0, insertAt), self, ...others.slice(insertAt)];
+      const orderById = new Map(ordered.map((p, idx) => [p.id, idx]));
+      return {
+        ...state,
+        people: state.people.map((p) =>
+          orderById.has(p.id) ? { ...p, manualOrder: orderById.get(p.id)! } : p
+        ),
+      };
+    }
+
     case 'IMPORT_DATA':
       return action.payload;
 
