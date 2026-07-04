@@ -22,6 +22,7 @@ export function useScreenTitles() {
     AddPerson: t('nav.titleAddPerson'),
     EditPerson: t('nav.titleEditPerson'),
     AddRelationship: t('nav.titleAddRelationship'),
+    EditMarriage: t('nav.titleEditMarriage'),
   } as const;
 }
 

@@ -77,6 +77,18 @@ export const formStyles = StyleSheet.create({
     marginTop: -spacing.md,
     marginBottom: spacing.lg,
   },
+  switchRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    paddingVertical: spacing.sm,
+    marginBottom: spacing.sm,
+  },
+  switchLabel: {
+    fontFamily: fonts.body,
+    fontSize: fontSizes.md,
+    color: colors.text,
+  },
   notFound: {
     fontFamily: fonts.body,
     fontSize: fontSizes.md,

@@ -3,7 +3,7 @@ import { View, Text, ScrollView, Alert, Platform } from 'react-native';
 import { useRoute, useNavigation } from '@react-navigation/native';
 import type { RouteProp } from '@react-navigation/native';
 import { useFamily } from '../context/FamilyContext';
-import { formatDateISO } from '../utils/date';
+import { personFieldsFromForm, hasRequiredNames, type PersonFormValues } from '../utils/person';
 import { ScreenHeader } from '../components/ui/ScreenHeader';
 import { PersonForm } from '../components/PersonForm';
 import { KeyboardDoneAccessory } from '../components/ui/KeyboardDoneAccessory';
@@ -27,32 +27,17 @@ export function EditPersonScreen() {
     );
   }
 
-  const handleSave = (data: {
-    firstName: string;
-    lastName: string;
-    birthSurname: string;
-    gender: 'male' | 'female';
-    birthDate: Date | null;
-    deathDate: Date | null;
-    notes: string;
-  }) => {
-    if (!data.firstName.trim() || !data.lastName.trim()) {
+  const handleSave = (values: PersonFormValues) => {
+    if (!hasRequiredNames(values)) {
       Alert.alert(t('common.error'), t('personForm.requiredError'));
       return;
     }
 
+    // Spread the existing person first so fields the form doesn't own
+    // (id, manualOrder) survive the edit; UPDATE_PERSON replaces wholesale.
     dispatch({
       type: 'UPDATE_PERSON',
-      payload: {
-        id: person.id,
-        firstName: data.firstName.trim(),
-        lastName: data.lastName.trim(),
-        birthSurname: data.birthSurname.trim() || null,
-        gender: data.gender,
-        birthDate: data.birthDate ? formatDateISO(data.birthDate) : null,
-        deathDate: data.deathDate ? formatDateISO(data.deathDate) : null,
-        notes: data.notes.trim(),
-      },
+      payload: { ...person, ...personFieldsFromForm(values) },
     });
 
     navigation.goBack();

@@ -1,5 +1,21 @@
 import type { FamilyState, Person, ParentChildRelationship, Marriage } from '../types';
 
+/** Whether `parentId` → `childId` is already recorded (direction-sensitive). */
+export function parentChildExists(state: FamilyState, parentId: string, childId: string): boolean {
+  return state.parentChildRelationships.some(
+    (r) => r.parentId === parentId && r.childId === childId
+  );
+}
+
+/** Whether the two people are already married to each other (order-independent). */
+export function marriageExists(state: FamilyState, aId: string, bId: string): boolean {
+  return state.marriages.some(
+    (m) =>
+      (m.spouse1Id === aId && m.spouse2Id === bId) ||
+      (m.spouse1Id === bId && m.spouse2Id === aId)
+  );
+}
+
 export function getParents(personId: string, state: FamilyState): Person[] {
   const parentIds = state.parentChildRelationships
     .filter((r) => r.childId === personId)

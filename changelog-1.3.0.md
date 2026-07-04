@@ -11,20 +11,6 @@ Wersja aplikacji: **1.3.0** (build number inkrementowany automatycznie przez EAS
 ### 🇵🇱 Polski
 
 ```
-Kolejność rodzeństwa
-• Rodzeństwo układa się teraz automatycznie od najstarszego (po lewej) do najmłodszego (po prawej) — wystarczy wpisać daty urodzenia.
-• Kolejność możesz też zmienić ręcznie: przytrzymaj osobę na drzewie i użyj strzałek. Aplikacja podpowie, gdy danego węzła nie da się przesunąć (np. korzeń), żeby nie tworzyć skrzyżowań gałęzi.
-• Rodzeństwo dodane później (z datą urodzenia) samo wskakuje na właściwe miejsce, a nie na koniec.
-
-Wygodniejsze przeglądanie dużych rodzin
-• Nowy przycisk „dopasuj całe drzewo do ekranu" i większe oddalenie — całe drzewo na raz.
-• Płynniejszy zoom dwoma palcami — koniec przeskoków przy odrywaniu jednego palca.
-• Większy obszar dotyku: przytrzymanie działa też na karcie z opisem, nie tylko na kółku.
-• Wybrany korzeń drzewa jest teraz zapamiętywany po zamknięciu aplikacji.
-
-Szybciej i ładniej
-• Znacznie lepsza wydajność przy dużych drzewach — płynne przeglądanie i przesuwanie kolejności.
-• Odświeżone menu osoby i nowy bohater na drzewie — kolorowy szop.
 ```
 
 ### 🇬🇧 English
@@ -44,6 +30,31 @@ Easier browsing of large families
 Faster and prettier
 • Much better performance on large trees — smooth panning and reordering.
 • Refreshed person menu and a new character on the tree — a colourful raccoon.
+```
+
+### 🇩🇪 Deutsch
+
+```
+```
+
+### 🇳🇱 Nederlands
+
+```
+```
+
+### 🇳🇴 Norsk
+
+```
+```
+
+### 🇸🇪 Svenska
+
+```
+```
+
+### 🇩🇰 Dansk
+
+```
 ```
 
 ---

@@ -2,26 +2,27 @@ import React, { useState, useMemo } from 'react';
 import {
   View,
   Text,
-  ScrollView,
+  FlatList,
   Alert,
   TouchableOpacity,
   StyleSheet,
-  Platform,
 } from 'react-native';
-import DateTimePicker from '@react-native-community/datetimepicker';
 import { useRoute, useNavigation } from '@react-navigation/native';
 import type { RouteProp } from '@react-navigation/native';
 import { useFamily } from '../context/FamilyContext';
+import { parentChildExists, marriageExists } from '../utils/relationships';
 import { generateId } from '../utils/uuid';
 import { formatDateISO } from '../utils/date';
 import { ScreenHeader } from '../components/ui/ScreenHeader';
 import { Button } from '../components/ui/Button';
 import { TextInput } from '../components/ui/TextInput';
+import { DatePickerField } from '../components/ui/DatePickerField';
 import { useTranslation } from 'react-i18next';
 import { formStyles } from '../theme/formStyles';
 import { colors } from '../theme/colors';
 import { fonts, fontSizes } from '../theme/typography';
 import { spacing, borderRadius } from '../theme/spacing';
+import type { Person } from '../types';
 
 type RouteParams = { AddRelationship: { personId: string } };
 type RelType = 'parent-child' | 'child-parent' | 'marriage';
@@ -37,7 +38,6 @@ export function AddRelationshipScreen() {
   const [selectedPersonId, setSelectedPersonId] = useState<string | null>(null);
   const [search, setSearch] = useState('');
   const [marriageDate, setMarriageDate] = useState<Date | null>(null);
-  const [showMarriagePicker, setShowMarriagePicker] = useState(false);
 
   const otherPeople = useMemo(() => {
     const q = search.toLowerCase().trim();
@@ -55,37 +55,8 @@ export function AddRelationshipScreen() {
       return;
     }
 
-    if (relType === 'parent-child') {
-      const exists = state.parentChildRelationships.some(
-        (r) => r.parentId === person.id && r.childId === selectedPersonId
-      );
-      if (exists) {
-        Alert.alert(t('common.error'), t('addRelationship.errorParentChildExists'));
-        return;
-      }
-      dispatch({
-        type: 'ADD_PARENT_CHILD',
-        payload: { id: generateId(), parentId: person.id, childId: selectedPersonId },
-      });
-    } else if (relType === 'child-parent') {
-      const exists = state.parentChildRelationships.some(
-        (r) => r.parentId === selectedPersonId && r.childId === person.id
-      );
-      if (exists) {
-        Alert.alert(t('common.error'), t('addRelationship.errorParentChildExists'));
-        return;
-      }
-      dispatch({
-        type: 'ADD_PARENT_CHILD',
-        payload: { id: generateId(), parentId: selectedPersonId, childId: person.id },
-      });
-    } else {
-      const exists = state.marriages.some(
-        (m) =>
-          (m.spouse1Id === person.id && m.spouse2Id === selectedPersonId) ||
-          (m.spouse1Id === selectedPersonId && m.spouse2Id === person.id)
-      );
-      if (exists) {
+    if (relType === 'marriage') {
+      if (marriageExists(state, person.id, selectedPersonId)) {
         Alert.alert(t('common.error'), t('addRelationship.errorMarriageExists'));
         return;
       }
@@ -99,6 +70,18 @@ export function AddRelationshipScreen() {
           divorceDate: null,
         },
       });
+    } else {
+      // 'parent-child' → person is the parent; 'child-parent' → person is the child.
+      const parentId = relType === 'parent-child' ? person.id : selectedPersonId;
+      const childId = relType === 'parent-child' ? selectedPersonId : person.id;
+      if (parentChildExists(state, parentId, childId)) {
+        Alert.alert(t('common.error'), t('addRelationship.errorParentChildExists'));
+        return;
+      }
+      dispatch({
+        type: 'ADD_PARENT_CHILD',
+        payload: { id: generateId(), parentId, childId },
+      });
     }
 
     navigation.goBack();
@@ -110,91 +93,122 @@ export function AddRelationshipScreen() {
     { key: 'marriage', label: t('addRelationship.typeMarriage') },
   ];
 
+  const renderPerson = ({ item: p }: { item: Person }) => (
+    <TouchableOpacity
+      style={[styles.personRow, selectedPersonId === p.id && styles.personRowActive]}
+      onPress={() => setSelectedPersonId(p.id)}
+    >
+      <Text
+        style={[
+          styles.personName,
+          selectedPersonId === p.id && styles.personNameActive,
+        ]}
+      >
+        {p.firstName} {p.lastName}
+      </Text>
+      {p.birthDate && (
+        <Text style={styles.personDate}>{t('tree.bornPrefix')} {p.birthDate}</Text>
+      )}
+    </TouchableOpacity>
+  );
+
   return (
-    <ScrollView style={formStyles.container} contentContainerStyle={formStyles.content}>
-      <ScreenHeader
-        title={t('addRelationship.title')}
-        subtitle={t('addRelationship.forSubtitle', { firstName: person.firstName, lastName: person.lastName })}
-      />
-
-      <View style={formStyles.form}>
-        <Text style={formStyles.label}>{t('addRelationship.typeLabel')}</Text>
-        {relTypes.map((rt) => (
-          <TouchableOpacity
-            key={rt.key}
-            style={[styles.typeBtn, relType === rt.key && styles.typeActive]}
-            onPress={() => setRelType(rt.key)}
-          >
-            <Text style={[styles.typeText, relType === rt.key && styles.typeTextActive]}>
-              {rt.label}
-            </Text>
-          </TouchableOpacity>
-        ))}
-
-        {relType === 'marriage' && (
-          <>
-            <Text style={[formStyles.label, { marginTop: spacing.lg }]}>{t('addRelationship.marriageDateLabel')}</Text>
-            <TouchableOpacity style={formStyles.dateBtn} onPress={() => setShowMarriagePicker(true)}>
-              <Text style={marriageDate ? formStyles.dateText : formStyles.datePlaceholder}>
-                {marriageDate ? formatDateISO(marriageDate) : t('common.selectDate')}
-              </Text>
-            </TouchableOpacity>
-            {showMarriagePicker && (
-              <DateTimePicker
-                value={marriageDate || new Date()}
-                mode="date"
-                display={Platform.OS === 'ios' ? 'spinner' : 'default'}
-                onChange={(_, date) => {
-                  setShowMarriagePicker(Platform.OS === 'ios');
-                  if (date) setMarriageDate(date);
-                }}
-              />
-            )}
-          </>
-        )}
-
-        <Text style={[formStyles.label, { marginTop: spacing.lg }]}>{t('addRelationship.selectPersonLabel')}</Text>
-        <TextInput
-          placeholder={t('addRelationship.searchPlaceholder')}
-          value={search}
-          onChangeText={setSearch}
-          containerStyle={{ marginBottom: spacing.sm }}
+    <View style={formStyles.container}>
+      {/* Fixed top: header, relationship type, marriage date and search stay
+          pinned so the results list below always has a stable anchor. */}
+      <View style={styles.fixedTop}>
+        <ScreenHeader
+          title={t('addRelationship.title')}
+          subtitle={t('addRelationship.forSubtitle', { firstName: person.firstName, lastName: person.lastName })}
         />
 
-        {otherPeople.map((p) => (
-          <TouchableOpacity
-            key={p.id}
-            style={[styles.personRow, selectedPersonId === p.id && styles.personRowActive]}
-            onPress={() => setSelectedPersonId(p.id)}
-          >
-            <Text
-              style={[
-                styles.personName,
-                selectedPersonId === p.id && styles.personNameActive,
-              ]}
+        <View style={styles.topBody}>
+          <Text style={formStyles.label}>{t('addRelationship.typeLabel')}</Text>
+          {relTypes.map((rt) => (
+            <TouchableOpacity
+              key={rt.key}
+              style={[styles.typeBtn, relType === rt.key && styles.typeActive]}
+              onPress={() => setRelType(rt.key)}
             >
-              {p.firstName} {p.lastName}
-            </Text>
-            {p.birthDate && (
-              <Text style={styles.personDate}>{t('tree.bornPrefix')} {p.birthDate}</Text>
-            )}
-          </TouchableOpacity>
-        ))}
+              <Text style={[styles.typeText, relType === rt.key && styles.typeTextActive]}>
+                {rt.label}
+              </Text>
+            </TouchableOpacity>
+          ))}
 
-        <View style={{ marginTop: spacing.xl }}>
-          <Button
-            testID="btn-save-relationship"
-            title={t('addRelationship.save')}
-            onPress={handleSave}
-            disabled={!selectedPersonId}
+          {relType === 'marriage' && (
+            <View style={{ marginTop: spacing.md }}>
+              <DatePickerField
+                label={t('addRelationship.marriageDateLabel')}
+                value={marriageDate}
+                onChange={setMarriageDate}
+                clearLabel={t('addRelationship.clearMarriageDate')}
+              />
+            </View>
+          )}
+
+          <Text style={[formStyles.label, { marginTop: spacing.md }]}>{t('addRelationship.selectPersonLabel')}</Text>
+          <TextInput
+            placeholder={t('addRelationship.searchPlaceholder')}
+            value={search}
+            onChangeText={setSearch}
           />
         </View>
       </View>
-    </ScrollView>
+
+      {/* Scrollable results fill the rest of the screen. */}
+      <FlatList
+        data={otherPeople}
+        keyExtractor={(p) => p.id}
+        renderItem={renderPerson}
+        keyboardShouldPersistTaps="handled"
+        keyboardDismissMode="on-drag"
+        contentContainerStyle={styles.listContent}
+        ListEmptyComponent={
+          <Text style={styles.emptyText}>{t('addRelationship.noResults')}</Text>
+        }
+      />
+
+      {/* Fixed footer keeps the save button reachable above the tab bar. */}
+      <View style={styles.footer}>
+        <Button
+          testID="btn-save-relationship"
+          title={t('addRelationship.save')}
+          onPress={handleSave}
+          disabled={!selectedPersonId}
+        />
+      </View>
+    </View>
   );
 }
 
 const styles = StyleSheet.create({
+  fixedTop: {
+    backgroundColor: colors.background,
+  },
+  topBody: {
+    paddingHorizontal: spacing.lg,
+  },
+  listContent: {
+    paddingHorizontal: spacing.lg,
+    paddingTop: spacing.sm,
+    paddingBottom: spacing.xl,
+  },
+  footer: {
+    paddingHorizontal: spacing.lg,
+    paddingTop: spacing.sm,
+    paddingBottom: spacing.xl,
+    borderTopWidth: StyleSheet.hairlineWidth,
+    borderTopColor: colors.border,
+    backgroundColor: colors.background,
+  },
+  emptyText: {
+    fontFamily: fonts.body,
+    fontSize: fontSizes.md,
+    color: colors.textMuted,
+    textAlign: 'center',
+    marginTop: spacing.xl,
+  },
   typeBtn: {
     paddingVertical: spacing.md,
     paddingHorizontal: spacing.lg,

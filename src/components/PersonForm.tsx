@@ -1,28 +1,20 @@
 import React, { useState } from 'react';
-import { View, Text, TouchableOpacity } from 'react-native';
+import { View, Text, TouchableOpacity, Switch } from 'react-native';
 import { TextInput } from './ui/TextInput';
 import { Button } from './ui/Button';
 import { DatePickerField } from './ui/DatePickerField';
 import { useTranslation } from 'react-i18next';
 import { formStyles as styles } from '../theme/formStyles';
+import { colors } from '../theme/colors';
 import { parseDate } from '../utils/date';
+import type { PersonFormValues } from '../utils/person';
 import type { Person } from '../types';
 
-type PersonFormData = {
-  firstName: string;
-  lastName: string;
-  birthSurname: string;
-  gender: 'male' | 'female';
-  birthDate: Date | null;
-  deathDate: Date | null;
-  notes: string;
-};
-
 type Props = {
-  initialValues?: Partial<Pick<Person, 'firstName' | 'lastName' | 'birthSurname' | 'gender' | 'birthDate' | 'deathDate' | 'notes'>>;
+  initialValues?: Partial<Pick<Person, 'firstName' | 'lastName' | 'birthSurname' | 'gender' | 'birthDate' | 'deceased' | 'deathDate' | 'notes'>>;
   submitLabel: string;
   submitTestID?: string;
-  onSubmit: (data: PersonFormData) => void;
+  onSubmit: (values: PersonFormValues) => void;
 };
 
 export function PersonForm({ initialValues, submitLabel, submitTestID, onSubmit }: Props) {
@@ -37,10 +29,17 @@ export function PersonForm({ initialValues, submitLabel, submitTestID, onSubmit 
   const [deathDate, setDeathDate] = useState<Date | null>(
     initialValues?.deathDate ? parseDate(initialValues.deathDate) : null,
   );
+  // Backward-compat: an existing death date implies the person is deceased even
+  // when the older data had no explicit flag.
+  const [deceased, setDeceased] = useState<boolean>(
+    initialValues?.deceased ?? initialValues?.deathDate != null,
+  );
   const [notes, setNotes] = useState(initialValues?.notes ?? '');
 
   const handleSubmit = () => {
-    onSubmit({ firstName, lastName, birthSurname, gender, birthDate, deathDate, notes });
+    // Normalisation (trimming, dropping the death date when living, ISO
+    // conversion) lives in personFieldsFromForm — here we just hand off state.
+    onSubmit({ firstName, lastName, birthSurname, gender, birthDate, deceased, deathDate, notes });
   };
 
   return (
@@ -97,13 +96,25 @@ export function PersonForm({ initialValues, submitLabel, submitTestID, onSubmit 
         clearLabel={t('personForm.clearBirthDate')}
       />
 
-      <DatePickerField
-        testID="picker-death"
-        label={t('personForm.deathDateLabel')}
-        value={deathDate}
-        onChange={setDeathDate}
-        clearLabel={t('personForm.clearDeathDate')}
-      />
+      <View style={styles.switchRow}>
+        <Text style={styles.switchLabel}>{t('personForm.deceasedLabel')}</Text>
+        <Switch
+          testID="switch-deceased"
+          value={deceased}
+          onValueChange={setDeceased}
+          trackColor={{ true: colors.primary, false: colors.border }}
+        />
+      </View>
+
+      {deceased && (
+        <DatePickerField
+          testID="picker-death"
+          label={t('personForm.deathDateLabel')}
+          value={deathDate}
+          onChange={setDeathDate}
+          clearLabel={t('personForm.clearDeathDate')}
+        />
+      )}
 
       <TextInput
         testID="input-notes"

@@ -77,6 +77,14 @@ export function familyReducer(state: FamilyState, action: FamilyAction): FamilyS
     case 'ADD_MARRIAGE':
       return { ...state, marriages: [...state.marriages, action.payload] };
 
+    case 'UPDATE_MARRIAGE':
+      return {
+        ...state,
+        marriages: state.marriages.map((m) =>
+          m.id === action.payload.id ? action.payload : m
+        ),
+      };
+
     case 'REMOVE_RELATIONSHIP':
       if (action.payload.kind === 'parentChild') {
         return {

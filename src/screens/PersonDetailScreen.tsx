@@ -5,6 +5,7 @@ import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import type { RouteProp } from '@react-navigation/native';
 import { useFamily } from '../context/FamilyContext';
 import { getParents, getChildren, getSpouses, getSiblings } from '../utils/relationships';
+import { isDeceased } from '../utils/person';
 import { computeRelationshipLabels } from '../utils/relationshipLabels';
 import { ScreenHeader } from '../components/ui/ScreenHeader';
 import { Button } from '../components/ui/Button';
@@ -95,7 +96,13 @@ export function PersonDetailScreen() {
         <InfoRow label={t('personDetail.birthDateLabel')} value={person.birthDate ?? t('common.unknown')} />
         <InfoRow
           label={t('personDetail.deathDateLabel')}
-          value={person.deathDate ?? t('common.alive')}
+          value={
+            person.deathDate
+              ? person.deathDate
+              : isDeceased(person)
+                ? t('personDetail.deceasedNoDate')
+                : t('common.alive')
+          }
         />
         {person.notes ? <InfoRow label={t('personDetail.notesLabel')} value={person.notes} /> : null}
       </Card>
@@ -132,9 +139,11 @@ export function PersonDetailScreen() {
               detail={
                 marriage.marriageDate
                   ? `${t('personDetail.marriageLabel')}: ${marriage.marriageDate}${marriage.divorceDate ? ` | ${t('personDetail.divorceLabel')}: ${marriage.divorceDate}` : ''}`
-                  : undefined
+                  : t('personDetail.marriageNoDate')
               }
               onPress={() => navigateToPerson(sp.id)}
+              onEdit={() => navigation.navigate('EditMarriage', { marriageId: marriage.id })}
+              editTestID={`btn-edit-marriage-${marriage.id}`}
               onRemove={() => handleRemoveRelationship(marriage.id, 'marriage')}
             />
           ))}

@@ -7,6 +7,12 @@ export type Person = {
   gender: 'male' | 'female';
   birthDate: string | null;
   deathDate: string | null;
+  /**
+   * Whether the person is deceased. Lets the user record a death with an
+   * unknown date. Backward-compat: an absent flag combined with a non-null
+   * `deathDate` is treated as deceased.
+   */
+  deceased?: boolean;
   notes: string;
   /**
    * Manual left→right position among full siblings. When unset, siblings are
@@ -15,6 +21,9 @@ export type Person = {
    */
   manualOrder?: number | null;
 };
+
+/** A relationship the user can add relative to an existing person. */
+export type RelationType = 'parent' | 'child' | 'spouse' | 'sibling';
 
 export type ParentChildRelationship = {
   id: string;
@@ -42,6 +51,7 @@ export type FamilyAction =
   | { type: 'DELETE_PERSON'; payload: string }
   | { type: 'ADD_PARENT_CHILD'; payload: ParentChildRelationship }
   | { type: 'ADD_MARRIAGE'; payload: Marriage }
+  | { type: 'UPDATE_MARRIAGE'; payload: Marriage }
   | { type: 'REMOVE_RELATIONSHIP'; payload: { id: string; kind: 'parentChild' | 'marriage' } }
   | { type: 'REORDER_SIBLING'; payload: { personId: string; direction: 'left' | 'right' } }
   | { type: 'PLACE_NEW_SIBLING'; payload: { personId: string } }

@@ -1,12 +1,16 @@
-import React from 'react';
-import { ScrollView, Alert, Platform, View, Text, StyleSheet } from 'react-native';
+import React, { useState } from 'react';
+import { ScrollView, Alert, Platform, View, Text, StyleSheet, TouchableOpacity } from 'react-native';
+import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { useNavigation, useRoute } from '@react-navigation/native';
 import type { RouteProp } from '@react-navigation/native';
+import type { RelationType } from '../types';
 import { useFamily } from '../context/FamilyContext';
-import { getParents } from '../utils/relationships';
+import { getParents, getSpouses } from '../utils/relationships';
+import { personFieldsFromForm, hasRequiredNames, type PersonFormValues } from '../utils/person';
 import { generateId } from '../utils/uuid';
 import { formatDateISO } from '../utils/date';
 import { ScreenHeader } from '../components/ui/ScreenHeader';
+import { DatePickerField } from '../components/ui/DatePickerField';
 import { PersonForm } from '../components/PersonForm';
 import { KeyboardDoneAccessory } from '../components/ui/KeyboardDoneAccessory';
 import { useTranslation } from 'react-i18next';
@@ -18,7 +22,7 @@ import { spacing, borderRadius } from '../theme/spacing';
 type AddPersonParams = {
   AddPerson: {
     relatedPersonId?: string;
-    relationType?: 'parent' | 'child' | 'spouse' | 'sibling';
+    relationType?: RelationType;
   };
 };
 
@@ -28,7 +32,7 @@ export function AddPersonScreen() {
   const route = useRoute<RouteProp<AddPersonParams, 'AddPerson'>>();
   const { state, dispatch } = useFamily();
 
-  const relLabel = (type: 'parent' | 'child' | 'spouse' | 'sibling'): string => {
+  const relLabel = (type: RelationType): string => {
     switch (type) {
       case 'parent': return t('addPerson.relationParent');
       case 'child': return t('addPerson.relationChild');
@@ -44,16 +48,28 @@ export function AddPersonScreen() {
     ? getParents(relatedPersonId, state)
     : [];
 
-  const handleSave = (data: {
-    firstName: string;
-    lastName: string;
-    birthSurname: string;
-    gender: 'male' | 'female';
-    birthDate: Date | null;
-    deathDate: Date | null;
-    notes: string;
-  }) => {
-    if (!data.firstName.trim() || !data.lastName.trim()) {
+  // When adding a child to someone who has a spouse, offer to link the new
+  // child to that spouse too, so both parents are connected in one step.
+  const coParents = relationType === 'child' && relatedPersonId
+    ? getSpouses(relatedPersonId, state).map(s => s.person)
+    : [];
+  // A single spouse is pre-selected (the common case); with several spouses the
+  // user picks which one is the other parent.
+  const [selectedCoParentIds, setSelectedCoParentIds] = useState<string[]>(
+    coParents.length === 1 ? [coParents[0].id] : [],
+  );
+
+  const toggleCoParent = (id: string) => {
+    setSelectedCoParentIds(prev =>
+      prev.includes(id) ? prev.filter(x => x !== id) : [...prev, id],
+    );
+  };
+
+  // Optional marriage date captured inline when quick-adding a spouse.
+  const [spouseMarriageDate, setSpouseMarriageDate] = useState<Date | null>(null);
+
+  const handleSave = (values: PersonFormValues) => {
+    if (!hasRequiredNames(values)) {
       Alert.alert(t('common.error'), t('personForm.requiredError'));
       return;
     }
@@ -62,16 +78,7 @@ export function AddPersonScreen() {
 
     dispatch({
       type: 'ADD_PERSON',
-      payload: {
-        id: newPersonId,
-        firstName: data.firstName.trim(),
-        lastName: data.lastName.trim(),
-        birthSurname: data.birthSurname.trim() || null,
-        gender: data.gender,
-        birthDate: data.birthDate ? formatDateISO(data.birthDate) : null,
-        deathDate: data.deathDate ? formatDateISO(data.deathDate) : null,
-        notes: data.notes.trim(),
-      },
+      payload: { id: newPersonId, ...personFieldsFromForm(values) },
     });
 
     if (relatedPersonId && relationType) {
@@ -81,7 +88,7 @@ export function AddPersonScreen() {
     navigation.goBack();
   };
 
-  const createAutoRelationship = (type: string, newId: string, relatedId: string) => {
+  const createAutoRelationship = (type: RelationType, newId: string, relatedId: string) => {
     switch (type) {
       case 'parent':
         dispatch({
@@ -94,6 +101,13 @@ export function AddPersonScreen() {
           type: 'ADD_PARENT_CHILD',
           payload: { id: generateId(), parentId: relatedId, childId: newId },
         });
+        // Also link the selected co-parent(s) so the child sits under both.
+        selectedCoParentIds.forEach(coParentId => {
+          dispatch({
+            type: 'ADD_PARENT_CHILD',
+            payload: { id: generateId(), parentId: coParentId, childId: newId },
+          });
+        });
         break;
       case 'spouse':
         dispatch({
@@ -102,7 +116,7 @@ export function AddPersonScreen() {
             id: generateId(),
             spouse1Id: relatedId,
             spouse2Id: newId,
-            marriageDate: null,
+            marriageDate: spouseMarriageDate ? formatDateISO(spouseMarriageDate) : null,
             divorceDate: null,
           },
         });
@@ -158,6 +172,47 @@ export function AddPersonScreen() {
             )}
           </View>
         )}
+        {relationType === 'child' && coParents.length > 0 && relatedPerson && (
+          <View testID="coparent-picker" style={previewStyles.box}>
+            <Text style={previewStyles.title}>{t('addPerson.coParentTitle')}</Text>
+            <Text style={previewStyles.body}>
+              {coParents.length === 1
+                ? t('addPerson.coParentBodySingle', { firstName: relatedPerson.firstName })
+                : t('addPerson.coParentBodyMulti', { firstName: relatedPerson.firstName })}
+            </Text>
+            {coParents.map(cp => {
+              const checked = selectedCoParentIds.includes(cp.id);
+              return (
+                <TouchableOpacity
+                  key={cp.id}
+                  testID={`coparent-${cp.id}`}
+                  style={previewStyles.checkRow}
+                  onPress={() => toggleCoParent(cp.id)}
+                >
+                  <MaterialCommunityIcons
+                    name={checked ? 'checkbox-marked' : 'checkbox-blank-outline'}
+                    size={22}
+                    color={checked ? colors.primary : colors.textMuted}
+                  />
+                  <Text style={previewStyles.checkLabel}>
+                    {cp.firstName} {cp.lastName}
+                  </Text>
+                </TouchableOpacity>
+              );
+            })}
+          </View>
+        )}
+        {relationType === 'spouse' && relatedPerson && (
+          <View testID="spouse-marriage-date" style={previewStyles.box}>
+            <Text style={previewStyles.title}>{t('addPerson.spouseMarriageTitle')}</Text>
+            <DatePickerField
+              label={t('addPerson.spouseMarriageDateLabel')}
+              value={spouseMarriageDate}
+              onChange={setSpouseMarriageDate}
+              clearLabel={t('addPerson.clearSpouseMarriageDate')}
+            />
+          </View>
+        )}
         <PersonForm
           submitLabel={t('addPerson.saveLabel')}
           submitTestID="btn-save-person"
@@ -196,5 +251,16 @@ const previewStyles = StyleSheet.create({
     fontSize: fontSizes.sm,
     color: colors.text,
     marginLeft: spacing.xs,
+  },
+  checkRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingVertical: spacing.xs,
+  },
+  checkLabel: {
+    fontFamily: fonts.body,
+    fontSize: fontSizes.md,
+    color: colors.text,
+    marginLeft: spacing.sm,
   },
 });

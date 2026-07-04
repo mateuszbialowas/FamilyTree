@@ -23,6 +23,7 @@ function validatePerson(p: unknown, idx: number): string | null {
   if (o.gender !== 'male' && o.gender !== 'female') return i18n.t('validateImport.personInvalidGender', { i: idx });
   if (!isNullableString(o.birthDate)) return i18n.t('validateImport.personInvalidBirth', { i: idx });
   if (!isNullableString(o.deathDate)) return i18n.t('validateImport.personInvalidDeath', { i: idx });
+  if (o.deceased !== undefined && typeof o.deceased !== 'boolean') return i18n.t('validateImport.personInvalidDeath', { i: idx });
   if (typeof o.notes !== 'string') return i18n.t('validateImport.personMissingNotes', { i: idx });
   if (o.manualOrder !== undefined && o.manualOrder !== null && typeof o.manualOrder !== 'number') return i18n.t('validateImport.personInvalidBirth', { i: idx });
   return null;

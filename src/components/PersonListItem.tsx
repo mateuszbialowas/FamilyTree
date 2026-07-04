@@ -2,6 +2,7 @@ import React from 'react';
 import { TouchableOpacity, View, Text, StyleSheet } from 'react-native';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import type { Person } from '../types';
+import { isDeceased } from '../utils/person';
 import { useTranslation } from 'react-i18next';
 import { colors } from '../theme/colors';
 import { fonts, fontSizes } from '../theme/typography';
@@ -16,7 +17,7 @@ export function PersonListItem({ person, onPress }: Props) {
   const { t } = useTranslation();
   const formatDates = (): string => {
     const birth = person.birthDate ?? '?';
-    const death = person.deathDate ?? t('common.alive').toLowerCase();
+    const death = person.deathDate ?? (isDeceased(person) ? '?' : t('common.alive').toLowerCase());
     return `${birth} – ${death}`;
   };
   return (

@@ -30,6 +30,12 @@ export function describeAction(action: FamilyAction, stateBefore: FamilyState): 
         s2: nameOf(action.payload.spouse2Id, stateBefore),
       });
 
+    case 'UPDATE_MARRIAGE':
+      return i18n.t('history.actions.updatedMarriage', {
+        s1: nameOf(action.payload.spouse1Id, stateBefore),
+        s2: nameOf(action.payload.spouse2Id, stateBefore),
+      });
+
     case 'REMOVE_RELATIONSHIP': {
       if (action.payload.kind === 'parentChild') {
         const r = stateBefore.parentChildRelationships.find(x => x.id === action.payload.id);

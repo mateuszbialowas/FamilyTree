@@ -9,8 +9,11 @@ import { isNodeReorderable } from '../../utils/reorderAvailability';
 import { colors } from '../../theme/colors';
 import { fonts, fontSizes } from '../../theme/typography';
 import { spacing, borderRadius } from '../../theme/spacing';
+import type { RelationType } from '../../types';
 
-export type RelationType = 'parent' | 'child' | 'spouse' | 'sibling';
+// Re-exported so existing importers (e.g. TreeScreen) keep working; the source
+// of truth is src/types.
+export type { RelationType };
 
 type Props = {
   /** Person whose menu is shown; `null` keeps the menu closed. */

@@ -1,5 +1,6 @@
 import type { FamilyState } from '../types';
 import { compareSiblings } from './siblingOrder';
+import { isDeceased } from './person';
 
 // ======================== TYPES ========================
 
@@ -573,7 +574,7 @@ export function computeUnifiedLayout(
       name: `${p.firstName} ${p.lastName}`,
       born: p.birthDate || '',
       label: labels?.get(id),
-      isDead: !!p.deathDate,
+      isDead: isDeceased(p),
     };
     const partner = partnerOf.get(id);
     if (partner) n.partnerId = partner;
@@ -686,7 +687,7 @@ export function computeUnifiedLayout(
       const extraNode: LNode = {
         id: extraId, x: ex, y: ey, depth: personNode.depth,
         name: `${p.firstName} ${p.lastName}`, born: p.birthDate || '',
-        label: labels?.get(extraId), isDead: !!p.deathDate,
+        label: labels?.get(extraId), isDead: isDeceased(p),
       };
       nodes.push(extraNode);
       nodeMap.set(extraId, extraNode);
@@ -722,7 +723,7 @@ export function computeUnifiedLayout(
       nodes.push({
         id: p.id, name: `${p.firstName} ${p.lastName}`, born: p.birthDate || '',
         x: offsetX, y: INITIAL_Y, depth: 0, label: labels?.get(p.id),
-        isDead: !!p.deathDate,
+        isDead: isDeceased(p),
       });
       offsetX += SOLO_WIDTH + CHILD_GAP;
     }

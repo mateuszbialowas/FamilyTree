@@ -10,10 +10,12 @@ type Props = {
   personName: string;
   detail?: string;
   onPress?: () => void;
+  onEdit?: () => void;
   onRemove?: () => void;
+  editTestID?: string;
 };
 
-export function RelationshipCard({ label, personName, detail, onPress, onRemove }: Props) {
+export function RelationshipCard({ label, personName, detail, onPress, onEdit, onRemove, editTestID }: Props) {
   return (
     <View style={styles.container}>
       <TouchableOpacity
@@ -27,8 +29,13 @@ export function RelationshipCard({ label, personName, detail, onPress, onRemove 
         <Text style={styles.name}>{personName}</Text>
         {detail && <Text style={styles.detail}>{detail}</Text>}
       </TouchableOpacity>
+      {onEdit && (
+        <TouchableOpacity style={styles.iconBtn} onPress={onEdit} testID={editTestID}>
+          <MaterialCommunityIcons name="pencil-outline" size={20} color={colors.primary} />
+        </TouchableOpacity>
+      )}
       {onRemove && (
-        <TouchableOpacity style={styles.removeBtn} onPress={onRemove}>
+        <TouchableOpacity style={styles.iconBtn} onPress={onRemove}>
           <MaterialCommunityIcons name="close-circle-outline" size={20} color={colors.error} />
         </TouchableOpacity>
       )}
@@ -69,7 +76,7 @@ const styles = StyleSheet.create({
     color: colors.textMuted,
     marginTop: 2,
   },
-  removeBtn: {
+  iconBtn: {
     padding: spacing.md,
   },
 });
