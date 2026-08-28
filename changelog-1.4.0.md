@@ -33,26 +33,56 @@ Easier family entry
 ### 🇩🇪 Deutsch
 
 ```
+Familie leichter erfassen
+• Fügst du einem Ehepartner-Paar ein Kind hinzu, verknüpfst du es mit einem Tipp gleich mit beiden Eltern.
+• Markiere eine Person als verstorben, auch wenn du das Sterbedatum nicht kennst.
+• Hochzeits- und Scheidungsdatum lassen sich jetzt jederzeit bearbeiten — tippe auf den Stift beim Ehepartner. Das Hochzeitsdatum kannst du auch direkt beim Hinzufügen eines Ehepartners angeben.
+• Angenehmere Personensuche beim Anlegen einer Beziehung — das Suchfeld bleibt oben, die Ergebnisse darunter.
+• Einheitliche Datumsauswahl in der ganzen App.
 ```
 
 ### 🇳🇱 Nederlands
 
 ```
+Familie sneller invoeren
+• Voeg je een kind toe aan iemand met een partner, dan koppel je het met één tik meteen aan beide ouders.
+• Markeer iemand als overleden, ook als je de overlijdensdatum niet weet.
+• Trouw- en scheidingsdatum zijn nu altijd aan te passen — tik op het potlood bij een partner. De trouwdatum stel je ook direct in bij het toevoegen van een partner.
+• Fijner zoeken naar personen bij een nieuwe relatie — het zoekveld blijft bovenaan, de resultaten eronder.
+• Overal in de app dezelfde datumkiezer.
 ```
 
 ### 🇳🇴 Norsk
 
 ```
+Enklere å legge inn familien
+• Legger du et barn til noen som har ektefelle, kobler du det til begge foreldrene med ett trykk.
+• Marker en person som død, selv om du ikke kjenner dødsdatoen.
+• Bryllups- og skilsmissedato kan nå endres når som helst — trykk på blyanten ved ektefellen. Bryllupsdatoen kan du også sette med én gang når du legger til en ektefelle.
+• Bedre personsøk når du oppretter en relasjon — søkefeltet ligger alltid øverst, med treffene under.
+• Samme datovelger i hele appen.
 ```
 
 ### 🇸🇪 Svenska
 
 ```
+Lättare att lägga in familjen
+• När du lägger till ett barn till någon som har en partner kopplar du det till båda föräldrarna med ett tryck.
+• Markera en person som avliden, även när du inte vet dödsdatumet.
+• Bröllops- och skilsmässodatum går nu att ändra när som helst — tryck på pennan vid partnern. Bröllopsdatumet kan du också ange direkt när du lägger till en partner.
+• Skönare personsökning när du skapar en relation — sökfältet ligger alltid högst upp med träffarna under.
+• Samma datumväljare i hela appen.
 ```
 
 ### 🇩🇰 Dansk
 
 ```
+Nemmere at indtaste familien
+• Når du tilføjer et barn til en person med ægtefælle, kobler du det til begge forældre med ét tryk.
+• Markér en person som død, også når du ikke kender dødsdatoen.
+• Bryllups- og skilsmissedato kan nu redigeres når som helst — tryk på blyanten ved ægtefællen. Bryllupsdatoen kan du også angive med det samme, når du tilføjer en ægtefælle.
+• Bedre personsøgning når du opretter en relation — søgefeltet ligger altid øverst med resultaterne under.
+• Samme datovælger i hele appen.
 ```
 
 ---
